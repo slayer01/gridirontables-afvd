@@ -1,0 +1,29 @@
+name: Build Plugin ZIP
+
+on:
+  push:
+    branches: ['*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build ZIP
+        run: |
+          mkdir -p afvd-data
+          cp -r afvd-data.php uninstall.php README.md includes/ admin/ public/ afvd-data/
+          zip -r afvd-data.zip afvd-data/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: afvd-data
+          path: afvd-data.zip
+          retention-days: 30
