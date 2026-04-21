@@ -4,8 +4,8 @@
  * Plugin URI:   https://github.com/slayer01/afvdata
  * Description:  Display American football league standings and schedules from the AFVD (American Football Verband Deutschland) on your WordPress site.
  * Version:      2.0.0
- * Author:       Daniel Schmidt
- * Author URI:   https://www.danielschmidt.org
+ * Author:       Daniel Schmidt-Richert
+ * Author URI:   https://foo.boo
  * License:      GPL2
  * License URI:  https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:  afvd-data
