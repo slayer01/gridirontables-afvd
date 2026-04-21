@@ -20,7 +20,7 @@ class AFVD_Admin {
             'manage_options',
             'afvd-data',
             [$this, 'render_page'],
-            'dashicons-football',
+            'dashicons-awards',
             30
         );
     }
