@@ -120,7 +120,67 @@ defined('ABSPATH') || exit;
             <?php endforeach; ?>
         </tbody>
     </table>
-    <p class="description">
-        <?php esc_html_e('Additional attributes: group="A", home_only="1", show="upcoming|past", highlight="Team Name"', 'afvd-data'); ?>
-    </p>
+
+    <h3><?php esc_html_e('Attribute Reference', 'afvd-data'); ?></h3>
+
+    <h4><?php esc_html_e('Standings & Schedule', 'afvd-data'); ?></h4>
+    <table class="widefat">
+        <thead>
+            <tr>
+                <th><?php esc_html_e('Attribute', 'afvd-data'); ?></th>
+                <th><?php esc_html_e('Values', 'afvd-data'); ?></th>
+                <th><?php esc_html_e('Description', 'afvd-data'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>league</code></td>
+                <td><?php esc_html_e('Slug or Liga Code', 'afvd-data'); ?></td>
+                <td><?php esc_html_e('Required. The league to display, e.g. league="herren".', 'afvd-data'); ?></td>
+            </tr>
+            <tr>
+                <td><code>group</code></td>
+                <td><?php esc_html_e('e.g. "A", "B"', 'afvd-data'); ?></td>
+                <td><?php esc_html_e('Show only a specific group. Without this, all configured groups are shown.', 'afvd-data'); ?></td>
+            </tr>
+            <tr>
+                <td><code>highlight</code></td>
+                <td><?php esc_html_e('Team name', 'afvd-data'); ?></td>
+                <td><?php esc_html_e('Override the team name to highlight. Defaults to the team name configured for this league.', 'afvd-data'); ?></td>
+            </tr>
+            <tr>
+                <td><code>class</code></td>
+                <td><?php esc_html_e('CSS class name', 'afvd-data'); ?></td>
+                <td><?php esc_html_e('Add a custom CSS class to the wrapper element for styling.', 'afvd-data'); ?></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4><?php esc_html_e('Schedule only', 'afvd-data'); ?></h4>
+    <table class="widefat">
+        <thead>
+            <tr>
+                <th><?php esc_html_e('Attribute', 'afvd-data'); ?></th>
+                <th><?php esc_html_e('Values', 'afvd-data'); ?></th>
+                <th><?php esc_html_e('Description', 'afvd-data'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>home_only</code></td>
+                <td><code>"1"</code></td>
+                <td><?php esc_html_e('Show only home games of the configured team. Requires a team name set in the league config.', 'afvd-data'); ?></td>
+            </tr>
+            <tr>
+                <td><code>show</code></td>
+                <td><code>"all"</code>, <code>"upcoming"</code>, <code>"past"</code></td>
+                <td><?php esc_html_e('Filter by time. "upcoming" = today and future, "past" = before today. Default: "all".', 'afvd-data'); ?></td>
+            </tr>
+            <tr>
+                <td><code>limit</code></td>
+                <td><?php esc_html_e('Number', 'afvd-data'); ?></td>
+                <td><?php esc_html_e('Maximum number of games to show. Useful with show="upcoming" to display the next N games.', 'afvd-data'); ?></td>
+            </tr>
+        </tbody>
+    </table>
 <?php endif; ?>
