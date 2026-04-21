@@ -244,7 +244,7 @@ class AFVD_Shortcodes {
             }
             $class_attr = !empty($row_class) ? ' class="' . esc_attr(implode(' ', $row_class)) . '"' : '';
 
-            $date_display = $row['datum1'] ? wp_date(get_option('date_format'), strtotime($row['datum1'])) : '';
+            $date_display = $row['datum1'] ? wp_date('j. F Y', strtotime($row['datum1'])) : '';
 
             $score = (int) $row['td_heim'] . ':' . (int) $row['td_gast'];
             if (0 === (int) $row['td_heim'] && 0 === (int) $row['td_gast'] && !empty($row['datum1']) && strtotime($row['datum1']) > time()) {
@@ -254,9 +254,10 @@ class AFVD_Shortcodes {
             $output .= '<tr' . $class_attr . '>';
             $output .= '<td data-label="' . esc_attr__('Date', 'afvd-data') . '" class="afvd-num">' . esc_html($date_display) . '</td>';
             $output .= '<td data-label="' . esc_attr__('Kickoff', 'afvd-data') . '" class="afvd-num">' . esc_html($row['kickoff']) . '</td>';
+            $game_highlight = $home_highlight || $away_highlight;
             $output .= '<td data-label="' . esc_attr__('Home', 'afvd-data') . '"' . ($home_highlight ? ' class="afvd-highlight"' : '') . '>' . esc_html($row['heim']) . '</td>';
             $output .= '<td data-label="' . esc_attr__('Away', 'afvd-data') . '"' . ($away_highlight ? ' class="afvd-highlight"' : '') . '>' . esc_html($row['gast']) . '</td>';
-            $output .= '<td data-label="' . esc_attr__('Score', 'afvd-data') . '" class="afvd-highlight afvd-num afvd-nomobile">' . esc_html($score) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Score', 'afvd-data') . '" class="afvd-num afvd-nomobile' . ($game_highlight ? ' afvd-highlight' : '') . '">' . esc_html($score) . '</td>';
             $output .= '<td data-label="' . esc_attr__('Stadium', 'afvd-data') . '">' . esc_html($row['stadion']) . '</td>';
             $output .= '</tr>';
         }

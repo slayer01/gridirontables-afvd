@@ -33,12 +33,12 @@ table.afvd-league-table .odd td {
 
 table.afvd-league-table .afvd-highlight {
     font-weight: bold;
-    background-color: var(--afvd-highlight-bg, transparent);
+    background-color: var(--afvd-highlight-bg);
 }
 
 table.afvd-league-table tr.afvd-highlight td {
     font-weight: bold;
-    background-color: var(--afvd-highlight-bg, transparent);
+    background-color: var(--afvd-highlight-bg);
 }
 
 /* --- Numeric columns --- */
