@@ -7,7 +7,7 @@
 table.afvd-league-table {
     width: 100%;
     border-collapse: collapse;
-    font-variant-caps: all-petite-caps;
+    font-family: inherit;
     margin-bottom: 0;
 }
 
