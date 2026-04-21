@@ -47,9 +47,10 @@ class AFVD_Admin {
         );
 
         wp_localize_script('afvd-data-admin', 'afvdData', [
-            'ajaxUrl' => admin_url('admin-ajax.php'),
-            'nonce'   => wp_create_nonce('afvd_data_import'),
-            'i18n'    => [
+            'ajaxUrl'       => admin_url('admin-ajax.php'),
+            'nonce'         => wp_create_nonce('afvd_data_import'),
+            'themePalette'  => self::get_theme_palette(),
+            'i18n'          => [
                 'importing'  => __('Importing...', 'afvd-data'),
                 'success'    => __('Import successful', 'afvd-data'),
                 'error'      => __('Import failed', 'afvd-data'),
@@ -175,6 +176,39 @@ class AFVD_Admin {
         $results  = $importer->import_all_active();
 
         wp_send_json_success($results);
+    }
+
+    /**
+     * Get the active theme's color palette as a flat array of hex values.
+     */
+    public static function get_theme_palette() {
+        $colors = [];
+
+        // Block themes (WP 5.9+): read from theme.json global settings
+        if (function_exists('wp_get_global_settings')) {
+            $palette = wp_get_global_settings(['color', 'palette', 'theme']);
+            if (!empty($palette) && is_array($palette)) {
+                foreach ($palette as $entry) {
+                    if (!empty($entry['color'])) {
+                        $colors[] = sanitize_hex_color($entry['color']);
+                    }
+                }
+            }
+        }
+
+        // Classic themes: read from editor-color-palette theme support
+        if (empty($colors)) {
+            $support = get_theme_support('editor-color-palette');
+            if (!empty($support[0]) && is_array($support[0])) {
+                foreach ($support[0] as $entry) {
+                    if (!empty($entry['color'])) {
+                        $colors[] = sanitize_hex_color($entry['color']);
+                    }
+                }
+            }
+        }
+
+        return array_values(array_filter($colors));
     }
 
     /**
