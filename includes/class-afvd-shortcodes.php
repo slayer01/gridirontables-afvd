@@ -148,10 +148,19 @@ class AFVD_Shortcodes {
         $output .= '<div class="' . $wrapper_class . '">';
 
         if (!empty($groups)) {
+            $has_data = false;
             foreach ($groups as $gruppe) {
                 $args = array_merge($query_args, ['gruppe' => $gruppe]);
                 $rows = AFVD_DB::get_schedule($liga_code, $args);
-                $output .= $this->build_schedule_table($rows, $highlight, $gruppe);
+                if (!empty($rows)) {
+                    $output .= $this->build_schedule_table($rows, $highlight, $gruppe);
+                    $has_data = true;
+                }
+            }
+            // Fall back to all games if no group matched
+            if (!$has_data) {
+                $rows = AFVD_DB::get_schedule($liga_code, $query_args);
+                $output .= $this->build_schedule_table($rows, $highlight);
             }
         } else {
             $rows = AFVD_DB::get_schedule($liga_code, $query_args);
