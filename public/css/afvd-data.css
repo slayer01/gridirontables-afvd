@@ -31,9 +31,8 @@ table.afvd-league-table .odd td {
 
 /* --- Highlighting --- */
 
-table.afvd-league-table .afvd-highlight {
+table.afvd-league-table td.afvd-highlight {
     font-weight: bold;
-    background-color: var(--afvd-highlight-bg);
 }
 
 table.afvd-league-table tr.afvd-highlight td {
