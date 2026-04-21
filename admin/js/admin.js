@@ -4,10 +4,12 @@
     $(function () {
 
         // Color pickers with theme palette swatches
-        var palettes = afvdData.themePalette && afvdData.themePalette.length
-            ? afvdData.themePalette
-            : true;
-        $('.afvd-color-picker').wpColorPicker({ palettes: palettes });
+        if ($.fn.wpColorPicker) {
+            var palettes = typeof afvdData !== 'undefined' && afvdData.themePalette && afvdData.themePalette.length
+                ? afvdData.themePalette
+                : true;
+            $('.afvd-color-picker').wpColorPicker({ palettes: palettes });
+        }
 
         // League management: add row
         $('#afvd-add-league').on('click', function () {
