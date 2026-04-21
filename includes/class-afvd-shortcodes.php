@@ -237,10 +237,14 @@ class AFVD_Shortcodes {
         foreach ($rows as $i => $row) {
             $home_highlight = $highlight && false !== stripos($row['heim'], $highlight);
             $away_highlight = $highlight && false !== stripos($row['gast'], $highlight);
+            $game_highlight = $home_highlight || $away_highlight;
 
             $row_class = [];
             if ($i % 2 === 1) {
                 $row_class[] = 'odd';
+            }
+            if ($game_highlight) {
+                $row_class[] = 'afvd-highlight';
             }
             $class_attr = !empty($row_class) ? ' class="' . esc_attr(implode(' ', $row_class)) . '"' : '';
 
@@ -254,10 +258,9 @@ class AFVD_Shortcodes {
             $output .= '<tr' . $class_attr . '>';
             $output .= '<td data-label="' . esc_attr__('Date', 'afvd-data') . '" class="afvd-num">' . esc_html($date_display) . '</td>';
             $output .= '<td data-label="' . esc_attr__('Kickoff', 'afvd-data') . '" class="afvd-num">' . esc_html($row['kickoff']) . '</td>';
-            $game_highlight = $home_highlight || $away_highlight;
-            $output .= '<td data-label="' . esc_attr__('Home', 'afvd-data') . '"' . ($home_highlight ? ' class="afvd-highlight"' : '') . '>' . esc_html($row['heim']) . '</td>';
-            $output .= '<td data-label="' . esc_attr__('Away', 'afvd-data') . '"' . ($away_highlight ? ' class="afvd-highlight"' : '') . '>' . esc_html($row['gast']) . '</td>';
-            $output .= '<td data-label="' . esc_attr__('Score', 'afvd-data') . '" class="afvd-num afvd-nomobile' . ($game_highlight ? ' afvd-highlight' : '') . '">' . esc_html($score) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Home', 'afvd-data') . '">' . esc_html($row['heim']) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Away', 'afvd-data') . '">' . esc_html($row['gast']) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Score', 'afvd-data') . '" class="afvd-num afvd-nomobile">' . esc_html($score) . '</td>';
             $output .= '<td data-label="' . esc_attr__('Stadium', 'afvd-data') . '">' . esc_html($row['stadion']) . '</td>';
             $output .= '</tr>';
         }

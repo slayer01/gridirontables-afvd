@@ -28,6 +28,7 @@ defined('ABSPATH') || exit;
                 <th><?php esc_html_e('Active', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Standings Rows', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Schedule Rows', 'afvd-data'); ?></th>
+                <th><?php esc_html_e('Raw Data', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Action', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Status', 'afvd-data'); ?></th>
             </tr>
@@ -45,6 +46,16 @@ defined('ABSPATH') || exit;
                     </td>
                     <td class="afvd-count-schedule" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
                         <?php echo (int) $counts['schedule']; ?>
+                    </td>
+                    <td>
+                        <button type="button" class="button button-small afvd-view-raw"
+                                data-liga="<?php echo esc_attr($league['liga_code']); ?>" data-type="standings">
+                            <?php esc_html_e('Standings', 'afvd-data'); ?>
+                        </button>
+                        <button type="button" class="button button-small afvd-view-raw"
+                                data-liga="<?php echo esc_attr($league['liga_code']); ?>" data-type="schedule">
+                            <?php esc_html_e('Schedule', 'afvd-data'); ?>
+                        </button>
                     </td>
                     <td>
                         <button type="button" class="button afvd-import-league"
@@ -66,6 +77,11 @@ defined('ABSPATH') || exit;
         </button>
         <span id="afvd-import-all-status"></span>
     </p>
+
+    <div id="afvd-raw-data-wrap" style="display:none; margin-top:20px;">
+        <h3 id="afvd-raw-data-title"></h3>
+        <div id="afvd-raw-data-content" style="overflow-x:auto;"></div>
+    </div>
 
     <h3><?php esc_html_e('Shortcode Reference', 'afvd-data'); ?></h3>
     <table class="widefat">

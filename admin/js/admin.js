@@ -116,6 +116,55 @@
             });
         });
 
+        // View raw data
+        $(document).on('click', '.afvd-view-raw', function () {
+            var btn = $(this);
+            var liga = btn.data('liga');
+            var type = btn.data('type');
+            var wrap = $('#afvd-raw-data-wrap');
+            var title = $('#afvd-raw-data-title');
+            var content = $('#afvd-raw-data-content');
+
+            btn.prop('disabled', true);
+            content.html('<em>' + afvdData.i18n.importing + '</em>');
+            title.text(liga + ' — ' + type);
+            wrap.show();
+
+            $.post(afvdData.ajaxUrl, {
+                action: 'afvd_raw_data',
+                nonce: afvdData.nonce,
+                liga_code: liga,
+                type: type
+            })
+            .done(function (response) {
+                if (!response.success || !response.data.rows || !response.data.rows.length) {
+                    content.html('<p>' + afvdData.i18n.error + '</p>');
+                    return;
+                }
+
+                var rows = response.data.rows;
+                var keys = Object.keys(rows[0]);
+                var html = '<table class="widefat striped"><thead><tr>';
+                keys.forEach(function (k) { html += '<th>' + k + '</th>'; });
+                html += '</tr></thead><tbody>';
+                rows.forEach(function (row) {
+                    html += '<tr>';
+                    keys.forEach(function (k) {
+                        html += '<td>' + (row[k] !== null ? row[k] : '') + '</td>';
+                    });
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+                content.html(html);
+            })
+            .fail(function () {
+                content.html('<p>' + afvdData.i18n.error + '</p>');
+            })
+            .always(function () {
+                btn.prop('disabled', false);
+            });
+        });
+
     });
 
 })(jQuery);

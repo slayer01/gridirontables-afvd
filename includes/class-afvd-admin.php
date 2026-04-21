@@ -10,6 +10,7 @@ class AFVD_Admin {
         add_action('admin_post_afvd_save_leagues', [$this, 'handle_save_leagues']);
         add_action('wp_ajax_afvd_import', [$this, 'ajax_import']);
         add_action('wp_ajax_afvd_import_all', [$this, 'ajax_import_all']);
+        add_action('wp_ajax_afvd_raw_data', [$this, 'ajax_raw_data']);
     }
 
     public function add_menu_page() {
@@ -177,6 +178,32 @@ class AFVD_Admin {
         $results  = $importer->import_all_active();
 
         wp_send_json_success($results);
+    }
+
+    public function ajax_raw_data() {
+        check_ajax_referer('afvd_data_import', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(__('Unauthorized', 'afvd-data'));
+        }
+
+        $liga_code = sanitize_text_field($_POST['liga_code'] ?? '');
+        $type      = sanitize_key($_POST['type'] ?? '');
+
+        if ('' === $liga_code || !in_array($type, ['standings', 'schedule'], true)) {
+            wp_send_json_error(__('Invalid request', 'afvd-data'));
+        }
+
+        if ('standings' === $type) {
+            $rows = AFVD_DB::get_standings($liga_code);
+        } else {
+            $rows = AFVD_DB::get_schedule($liga_code, []);
+        }
+
+        wp_send_json_success([
+            'type' => $type,
+            'rows' => $rows,
+        ]);
     }
 
     /**
