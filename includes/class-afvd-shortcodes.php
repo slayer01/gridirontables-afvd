@@ -130,11 +130,12 @@ class AFVD_Shortcodes {
             $groups = array_map('trim', explode(',', $league_config['groups']));
         }
 
+        $home_only  = !empty($atts['home_only']);
         $query_args = [
             'show'      => $atts['show'],
             'limit'     => (int) $atts['limit'],
-            'team_name' => $highlight,
-            'home_only' => !empty($atts['home_only']),
+            'team_name' => $home_only ? $highlight : '',
+            'home_only' => $home_only,
         ];
 
         $output = '';
@@ -148,19 +149,10 @@ class AFVD_Shortcodes {
         $output .= '<div class="' . $wrapper_class . '">';
 
         if (!empty($groups)) {
-            $has_data = false;
             foreach ($groups as $gruppe) {
                 $args = array_merge($query_args, ['gruppe' => $gruppe]);
                 $rows = AFVD_DB::get_schedule($liga_code, $args);
-                if (!empty($rows)) {
-                    $output .= $this->build_schedule_table($rows, $highlight, $gruppe);
-                    $has_data = true;
-                }
-            }
-            // Fall back to all games if no group matched
-            if (!$has_data) {
-                $rows = AFVD_DB::get_schedule($liga_code, $query_args);
-                $output .= $this->build_schedule_table($rows, $highlight);
+                $output .= $this->build_schedule_table($rows, $highlight, $gruppe);
             }
         } else {
             $rows = AFVD_DB::get_schedule($liga_code, $query_args);
