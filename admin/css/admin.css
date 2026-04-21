@@ -1,0 +1,46 @@
+.afvd-tab-content {
+    margin-top: 15px;
+}
+
+.afvd-leagues-table input.regular-text {
+    width: 100%;
+}
+
+.afvd-leagues-table input.small-text {
+    width: 100%;
+}
+
+.afvd-leagues-table th,
+.afvd-leagues-table td {
+    padding: 8px;
+}
+
+.afvd-leagues-table .afvd-league-row td {
+    vertical-align: middle;
+}
+
+.afvd-import-status {
+    font-style: italic;
+    color: #666;
+}
+
+.afvd-import-status.success {
+    color: #46b450;
+    font-style: normal;
+}
+
+.afvd-import-status.error {
+    color: #dc3232;
+    font-style: normal;
+}
+
+.afvd-import-league:disabled,
+#afvd-import-all:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+#afvd-import-all-status {
+    margin-left: 10px;
+    font-style: italic;
+}
