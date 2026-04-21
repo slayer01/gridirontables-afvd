@@ -250,6 +250,7 @@ class AFVD_Admin {
      * Find a league config by its slug.
      */
     public static function get_league_by_slug($slug) {
+        $slug = sanitize_key($slug);
         $leagues = self::get_leagues();
         foreach ($leagues as $league) {
             if ($league['slug'] === $slug) {
