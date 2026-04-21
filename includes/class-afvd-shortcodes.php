@@ -45,11 +45,15 @@ class AFVD_Shortcodes {
         ], $atts, 'afvd_standings');
 
         $league_config = AFVD_Admin::get_league_by_slug($atts['league']);
-        $liga_code = $league_config ? $league_config['liga_code'] : $atts['league'];
-        if (!$liga_code) {
-            return $this->error(__('League not found.', 'afvd-data'));
+        if (!$league_config) {
+            return $this->error(sprintf(
+                /* translators: %s: league identifier */
+                __('League "%s" not found. Check the slug in Settings → AFVD Data → Leagues.', 'afvd-data'),
+                $atts['league']
+            ));
         }
 
+        $liga_code = $league_config['liga_code'];
         $highlight = $atts['highlight'] ?: ($league_config['team_name'] ?? '');
 
         $this->enqueue_styles();
@@ -59,7 +63,7 @@ class AFVD_Shortcodes {
 
         if (!empty($atts['group'])) {
             $groups = [$atts['group']];
-        } elseif ($league_config && !empty($league_config['groups'])) {
+        } elseif (!empty($league_config['groups'])) {
             $groups = array_map('trim', explode(',', $league_config['groups']));
         }
 
@@ -104,11 +108,15 @@ class AFVD_Shortcodes {
         ], $atts, 'afvd_schedule');
 
         $league_config = AFVD_Admin::get_league_by_slug($atts['league']);
-        $liga_code = $league_config ? $league_config['liga_code'] : $atts['league'];
-        if (!$liga_code) {
-            return $this->error(__('League not found.', 'afvd-data'));
+        if (!$league_config) {
+            return $this->error(sprintf(
+                /* translators: %s: league identifier */
+                __('League "%s" not found. Check the slug in Settings → AFVD Data → Leagues.', 'afvd-data'),
+                $atts['league']
+            ));
         }
 
+        $liga_code = $league_config['liga_code'];
         $highlight = $atts['highlight'] ?: ($league_config['team_name'] ?? '');
 
         $this->enqueue_styles();

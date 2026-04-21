@@ -247,16 +247,26 @@ class AFVD_Admin {
     }
 
     /**
-     * Find a league config by its slug.
+     * Find a league config by slug or liga_code.
      */
-    public static function get_league_by_slug($slug) {
-        $slug = sanitize_key($slug);
+    public static function get_league_by_slug($identifier) {
+        $identifier = sanitize_key($identifier);
         $leagues = self::get_leagues();
+
+        // Try slug first
         foreach ($leagues as $league) {
-            if ($league['slug'] === $slug) {
+            if ($league['slug'] === $identifier) {
                 return $league;
             }
         }
+
+        // Fall back to liga_code
+        foreach ($leagues as $league) {
+            if ($league['liga_code'] === $identifier) {
+                return $league;
+            }
+        }
+
         return null;
     }
 }
