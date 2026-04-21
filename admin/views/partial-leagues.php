@@ -16,6 +16,7 @@ defined('ABSPATH') || exit;
                 <th><?php esc_html_e('Label', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Liga Code', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Groups', 'afvd-data'); ?></th>
+                <th><?php esc_html_e('Team Name', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Active', 'afvd-data'); ?></th>
                 <th></th>
             </tr>
@@ -44,6 +45,12 @@ defined('ABSPATH') || exit;
                             <input type="text" name="league_groups[]"
                                    value="<?php echo esc_attr($league['groups']); ?>"
                                    class="small-text" placeholder="A,B,C">
+                        </td>
+                        <td>
+                            <input type="text" name="league_team_name[]"
+                                   value="<?php echo esc_attr($league['team_name'] ?? ''); ?>"
+                                   class="regular-text"
+                                   placeholder="<?php esc_attr_e('e.g. Wetterau Bulls', 'afvd-data'); ?>">
                         </td>
                         <td>
                             <input type="checkbox" name="league_active[<?php echo (int) $i; ?>]"
@@ -75,6 +82,7 @@ defined('ABSPATH') || exit;
         <td><input type="text" name="league_label[]" class="regular-text"></td>
         <td><input type="text" name="league_code[]" class="small-text" required></td>
         <td><input type="text" name="league_groups[]" class="small-text" placeholder="A,B,C"></td>
+        <td><input type="text" name="league_team_name[]" class="regular-text" placeholder="<?php esc_attr_e('e.g. Wetterau Bulls', 'afvd-data'); ?>"></td>
         <td><input type="checkbox" name="league_active[{{INDEX}}]" checked></td>
         <td><button type="button" class="button afvd-remove-league"><?php esc_html_e('Remove', 'afvd-data'); ?></button></td>
     </tr>

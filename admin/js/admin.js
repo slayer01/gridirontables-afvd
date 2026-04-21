@@ -1,6 +1,9 @@
 (function ($) {
     'use strict';
 
+    // Color pickers
+    $('.afvd-color-picker').wpColorPicker();
+
     // League management: add row
     $('#afvd-add-league').on('click', function () {
         var tbody = $('#afvd-leagues-body');

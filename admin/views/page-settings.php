@@ -1,10 +1,12 @@
 <?php
 defined('ABSPATH') || exit;
 
-$active_tab = sanitize_key($_GET['tab'] ?? 'settings');
-$team_name  = get_option('afvd_data_team_name', '');
-$base_url   = get_option('afvd_data_api_base_url', 'http://vereine.football-verband.de/');
-$interval   = get_option('afvd_data_sync_interval', 'manual');
+$active_tab       = sanitize_key($_GET['tab'] ?? 'settings');
+$base_url         = get_option('afvd_data_api_base_url', 'http://vereine.football-verband.de/');
+$interval         = get_option('afvd_data_sync_interval', 'manual');
+$color_header_bg  = get_option('afvd_data_color_header_bg', '#333333');
+$color_header_txt = get_option('afvd_data_color_header_text', '#ffffff');
+$color_highlight  = get_option('afvd_data_color_highlight_bg', '');
 $leagues    = get_option('afvd_data_leagues', []);
 $last_sync  = get_option('afvd_data_last_sync', 0);
 ?>
@@ -18,15 +20,15 @@ $last_sync  = get_option('afvd_data_last_sync', 0);
     <?php endif; ?>
 
     <nav class="nav-tab-wrapper">
-        <a href="<?php echo esc_url(add_query_arg(['page' => 'afvd-data', 'tab' => 'settings'], admin_url('options-general.php'))); ?>"
+        <a href="<?php echo esc_url(add_query_arg(['page' => 'afvd-data', 'tab' => 'settings'], admin_url('admin.php'))); ?>"
            class="nav-tab <?php echo 'settings' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e('Settings', 'afvd-data'); ?>
         </a>
-        <a href="<?php echo esc_url(add_query_arg(['page' => 'afvd-data', 'tab' => 'leagues'], admin_url('options-general.php'))); ?>"
+        <a href="<?php echo esc_url(add_query_arg(['page' => 'afvd-data', 'tab' => 'leagues'], admin_url('admin.php'))); ?>"
            class="nav-tab <?php echo 'leagues' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e('Leagues', 'afvd-data'); ?>
         </a>
-        <a href="<?php echo esc_url(add_query_arg(['page' => 'afvd-data', 'tab' => 'import'], admin_url('options-general.php'))); ?>"
+        <a href="<?php echo esc_url(add_query_arg(['page' => 'afvd-data', 'tab' => 'import'], admin_url('admin.php'))); ?>"
            class="nav-tab <?php echo 'import' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e('Import', 'afvd-data'); ?>
         </a>
@@ -48,18 +50,6 @@ $last_sync  = get_option('afvd_data_last_sync', 0);
                     <?php wp_nonce_field('afvd_save_settings', 'afvd_nonce'); ?>
 
                     <table class="form-table">
-                        <tr>
-                            <th scope="row">
-                                <label for="team_name"><?php esc_html_e('Team Name', 'afvd-data'); ?></label>
-                            </th>
-                            <td>
-                                <input type="text" id="team_name" name="team_name"
-                                       value="<?php echo esc_attr($team_name); ?>" class="regular-text">
-                                <p class="description">
-                                    <?php esc_html_e('Your team name as it appears in the AFVD data (e.g., "Wetterau Bulls"). Used to highlight your games.', 'afvd-data'); ?>
-                                </p>
-                            </td>
-                        </tr>
                         <tr>
                             <th scope="row">
                                 <label for="api_base_url"><?php esc_html_e('API Base URL', 'afvd-data'); ?></label>
@@ -93,6 +83,27 @@ $last_sync  = get_option('afvd_data_last_sync', 0);
                                 </select>
                                 <p class="description">
                                     <?php esc_html_e('How often to automatically fetch data from AFVD. Note: WP-Cron depends on site traffic. For reliable scheduling, set up a server cron job that calls wp-cron.php.', 'afvd-data'); ?>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e('Header Background', 'afvd-data'); ?></th>
+                            <td>
+                                <input type="text" name="color_header_bg" value="<?php echo esc_attr($color_header_bg); ?>" class="afvd-color-picker" data-default-color="#333333">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e('Header Text', 'afvd-data'); ?></th>
+                            <td>
+                                <input type="text" name="color_header_text" value="<?php echo esc_attr($color_header_txt); ?>" class="afvd-color-picker" data-default-color="#ffffff">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e('Highlight Background', 'afvd-data'); ?></th>
+                            <td>
+                                <input type="text" name="color_highlight_bg" value="<?php echo esc_attr($color_highlight); ?>" class="afvd-color-picker" data-default-color="">
+                                <p class="description">
+                                    <?php esc_html_e('Background color for highlighted team rows. Leave empty for no background.', 'afvd-data'); ?>
                                 </p>
                             </td>
                         </tr>

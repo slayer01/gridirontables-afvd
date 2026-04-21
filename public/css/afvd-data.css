@@ -12,8 +12,8 @@ table.afvd-league-table {
 }
 
 table.afvd-league-table th {
-    background-color: #333;
-    color: #fff;
+    background-color: var(--afvd-header-bg, #333);
+    color: var(--afvd-header-text, #fff);
     padding: 8px 10px;
     text-align: left;
     font-weight: 600;
@@ -33,10 +33,12 @@ table.afvd-league-table .odd td {
 
 table.afvd-league-table .afvd-highlight {
     font-weight: bold;
+    background-color: var(--afvd-highlight-bg, transparent);
 }
 
 table.afvd-league-table tr.afvd-highlight td {
     font-weight: bold;
+    background-color: var(--afvd-highlight-bg, transparent);
 }
 
 /* --- Numeric columns --- */

@@ -3,13 +3,34 @@ defined('ABSPATH') || exit;
 
 class AFVD_Shortcodes {
 
-    private $team_name;
+    private $colors_enqueued = false;
 
     public function __construct() {
-        $this->team_name = get_option('afvd_data_team_name', '');
-
         add_shortcode('afvd_standings', [$this, 'render_standings']);
         add_shortcode('afvd_schedule', [$this, 'render_schedule']);
+    }
+
+    private function enqueue_styles() {
+        wp_enqueue_style('afvd-data-public', AFVD_DATA_PLUGIN_URL . 'public/css/afvd-data.css', [], AFVD_DATA_VERSION);
+
+        if ($this->colors_enqueued) {
+            return;
+        }
+        $this->colors_enqueued = true;
+
+        $header_bg  = get_option('afvd_data_color_header_bg', '#333333');
+        $header_txt = get_option('afvd_data_color_header_text', '#ffffff');
+        $highlight  = get_option('afvd_data_color_highlight_bg', '');
+
+        $css = ':root{';
+        $css .= '--afvd-header-bg:' . esc_attr($header_bg) . ';';
+        $css .= '--afvd-header-text:' . esc_attr($header_txt) . ';';
+        if ($highlight) {
+            $css .= '--afvd-highlight-bg:' . esc_attr($highlight) . ';';
+        }
+        $css .= '}';
+
+        wp_add_inline_style('afvd-data-public', $css);
     }
 
     /**
@@ -23,17 +44,17 @@ class AFVD_Shortcodes {
             'class'     => '',
         ], $atts, 'afvd_standings');
 
-        $liga_code = $this->resolve_liga_code($atts['league']);
+        $league_config = AFVD_Admin::get_league_by_slug($atts['league']);
+        $liga_code = $league_config ? $league_config['liga_code'] : $atts['league'];
         if (!$liga_code) {
             return $this->error(__('League not found.', 'afvd-data'));
         }
 
-        $highlight = $atts['highlight'] ?: $this->team_name;
+        $highlight = $atts['highlight'] ?: ($league_config['team_name'] ?? '');
 
-        wp_enqueue_style('afvd-data-public', AFVD_DATA_PLUGIN_URL . 'public/css/afvd-data.css', [], AFVD_DATA_VERSION);
+        $this->enqueue_styles();
 
         // Determine groups to render
-        $league_config = AFVD_Admin::get_league_by_slug($atts['league']);
         $groups = [];
 
         if (!empty($atts['group'])) {
@@ -82,17 +103,17 @@ class AFVD_Shortcodes {
             'class'     => '',
         ], $atts, 'afvd_schedule');
 
-        $liga_code = $this->resolve_liga_code($atts['league']);
+        $league_config = AFVD_Admin::get_league_by_slug($atts['league']);
+        $liga_code = $league_config ? $league_config['liga_code'] : $atts['league'];
         if (!$liga_code) {
             return $this->error(__('League not found.', 'afvd-data'));
         }
 
-        $highlight = $atts['highlight'] ?: $this->team_name;
+        $highlight = $atts['highlight'] ?: ($league_config['team_name'] ?? '');
 
-        wp_enqueue_style('afvd-data-public', AFVD_DATA_PLUGIN_URL . 'public/css/afvd-data.css', [], AFVD_DATA_VERSION);
+        $this->enqueue_styles();
 
         // Determine groups to render
-        $league_config = AFVD_Admin::get_league_by_slug($atts['league']);
         $groups = [];
 
         if (!empty($atts['group'])) {
@@ -243,25 +264,6 @@ class AFVD_Shortcodes {
         $output .= '</tbody></table>';
 
         return $output;
-    }
-
-    /**
-     * Resolve a league attribute to a liga_code.
-     * Accepts either a slug (from config) or a direct liga_code.
-     */
-    private function resolve_liga_code($league_attr) {
-        if (empty($league_attr)) {
-            return null;
-        }
-
-        // First try as a slug
-        $config = AFVD_Admin::get_league_by_slug($league_attr);
-        if ($config) {
-            return $config['liga_code'];
-        }
-
-        // Fall back: maybe they passed the liga_code directly
-        return $league_attr;
     }
 
     /**

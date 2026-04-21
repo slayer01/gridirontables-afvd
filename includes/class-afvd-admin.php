@@ -13,19 +13,23 @@ class AFVD_Admin {
     }
 
     public function add_menu_page() {
-        add_options_page(
+        add_menu_page(
             __('AFVD Data', 'afvd-data'),
             __('AFVD Data', 'afvd-data'),
             'manage_options',
             'afvd-data',
-            [$this, 'render_page']
+            [$this, 'render_page'],
+            'dashicons-football',
+            30
         );
     }
 
     public function enqueue_assets($hook) {
-        if ('settings_page_afvd-data' !== $hook) {
+        if ('toplevel_page_afvd-data' !== $hook) {
             return;
         }
+
+        wp_enqueue_style('wp-color-picker');
 
         wp_enqueue_style(
             'afvd-data-admin',
@@ -37,7 +41,7 @@ class AFVD_Admin {
         wp_enqueue_script(
             'afvd-data-admin',
             AFVD_DATA_PLUGIN_URL . 'admin/js/admin.js',
-            ['jquery'],
+            ['jquery', 'wp-color-picker'],
             AFVD_DATA_VERSION,
             true
         );
@@ -68,8 +72,11 @@ class AFVD_Admin {
 
         check_admin_referer('afvd_save_settings', 'afvd_nonce');
 
-        update_option('afvd_data_team_name', sanitize_text_field($_POST['team_name'] ?? ''));
         update_option('afvd_data_api_base_url', esc_url_raw($_POST['api_base_url'] ?? 'http://vereine.football-verband.de/'));
+
+        update_option('afvd_data_color_header_bg', sanitize_hex_color($_POST['color_header_bg'] ?? '#333333'));
+        update_option('afvd_data_color_header_text', sanitize_hex_color($_POST['color_header_text'] ?? '#ffffff'));
+        update_option('afvd_data_color_highlight_bg', sanitize_hex_color($_POST['color_highlight_bg'] ?? ''));
 
         $allowed_intervals = ['manual', 'hourly', 'twicedaily', 'daily'];
         $interval = sanitize_key($_POST['sync_interval'] ?? 'manual');
@@ -89,7 +96,7 @@ class AFVD_Admin {
             'page'    => 'afvd-data',
             'tab'     => 'settings',
             'updated' => '1',
-        ], admin_url('options-general.php')));
+        ], admin_url('admin.php')));
         exit;
     }
 
@@ -100,12 +107,13 @@ class AFVD_Admin {
 
         check_admin_referer('afvd_save_leagues', 'afvd_nonce');
 
-        $leagues = [];
-        $slugs   = $_POST['league_slug'] ?? [];
-        $labels  = $_POST['league_label'] ?? [];
-        $codes   = $_POST['league_code'] ?? [];
-        $groups  = $_POST['league_groups'] ?? [];
-        $actives = $_POST['league_active'] ?? [];
+        $leagues    = [];
+        $slugs      = $_POST['league_slug'] ?? [];
+        $labels     = $_POST['league_label'] ?? [];
+        $codes      = $_POST['league_code'] ?? [];
+        $groups     = $_POST['league_groups'] ?? [];
+        $team_names = $_POST['league_team_name'] ?? [];
+        $actives    = $_POST['league_active'] ?? [];
 
         foreach ($slugs as $i => $slug) {
             $slug = sanitize_key($slug);
@@ -119,6 +127,7 @@ class AFVD_Admin {
                 'label'     => sanitize_text_field($labels[$i] ?? $slug),
                 'liga_code' => $code,
                 'groups'    => sanitize_text_field($groups[$i] ?? ''),
+                'team_name' => sanitize_text_field($team_names[$i] ?? ''),
                 'active'    => isset($actives[$i]),
             ];
         }
@@ -129,7 +138,7 @@ class AFVD_Admin {
             'page'    => 'afvd-data',
             'tab'     => 'leagues',
             'updated' => '1',
-        ], admin_url('options-general.php')));
+        ], admin_url('admin.php')));
         exit;
     }
 
