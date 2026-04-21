@@ -10,38 +10,16 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bump patch version
+      - name: Read version
         run: |
-          # Read current version from plugin header
-          CURRENT=$(grep -oP "Version:\s+\K[0-9]+\.[0-9]+\.[0-9]+" afvd-data.php | head -1)
-          MAJOR=$(echo "$CURRENT" | cut -d. -f1)
-          MINOR=$(echo "$CURRENT" | cut -d. -f2)
-          PATCH=$(echo "$CURRENT" | cut -d. -f3)
-          NEW_PATCH=$((PATCH + 1))
-          NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
-
-          # Update both version locations in afvd-data.php
-          sed -i "s/Version:      ${CURRENT}/Version:      ${NEW_VERSION}/" afvd-data.php
-          sed -i "s/AFVD_DATA_VERSION', '${CURRENT}'/AFVD_DATA_VERSION', '${NEW_VERSION}'/" afvd-data.php
-
-          echo "VERSION=${NEW_VERSION}" >> "$GITHUB_ENV"
-          echo "Bumped version: ${CURRENT} → ${NEW_VERSION}"
-
-      - name: Commit version bump
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add afvd-data.php
-          git commit -m "Bump version to ${VERSION} [skip ci]"
-          git push
+          VERSION=$(grep -oP "Version:\s+\K[0-9]+\.[0-9]+\.[0-9]+" afvd-data.php | head -1)
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          echo "Plugin version: ${VERSION}"
 
       - name: Build ZIP
         run: |
@@ -49,9 +27,16 @@ jobs:
           cp -r afvd-data.php uninstall.php README.md includes/ admin/ public/ afvd-data/
           zip -r afvd-data.zip afvd-data/
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: afvd-data-${{ env.VERSION }}
-          path: afvd-data.zip
-          retention-days: 30
+      - name: Create or update release
+        run: |
+          TAG="v${VERSION}"
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" afvd-data.zip --clobber
+          else
+            gh release create "$TAG" afvd-data.zip \
+              --title "AFVD Data ${VERSION}" \
+              --notes "Release ${VERSION}" \
+              --latest
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
