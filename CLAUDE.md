@@ -39,7 +39,7 @@ Created via `dbDelta()` on activation. Dropped via `uninstall.php`.
 All stored in `wp_options`:
 - `afvd_data_api_base_url` — AFVD XML endpoint base URL
 - `afvd_data_sync_interval` — cron interval (manual/hourly/twicedaily/daily)
-- `afvd_data_leagues` — serialized array of league configs (slug, label, liga_code, groups, team_name, active)
+- `afvd_data_leagues` — serialized array of league configs (slug, label, liga_code, team_name, active)
 
 ## Shortcodes
 

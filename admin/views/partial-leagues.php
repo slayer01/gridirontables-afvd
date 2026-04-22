@@ -15,7 +15,6 @@ defined('ABSPATH') || exit;
                 <th><?php esc_html_e('Slug', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Label', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Liga Code', 'afvd-data'); ?></th>
-                <th><?php esc_html_e('Groups', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Team Name', 'afvd-data'); ?></th>
                 <th><?php esc_html_e('Active', 'afvd-data'); ?></th>
                 <th></th>
@@ -40,11 +39,6 @@ defined('ABSPATH') || exit;
                             <input type="text" name="league_code[]"
                                    value="<?php echo esc_attr($league['liga_code']); ?>"
                                    class="small-text" required>
-                        </td>
-                        <td>
-                            <input type="text" name="league_groups[]"
-                                   value="<?php echo esc_attr($league['groups']); ?>"
-                                   class="small-text" placeholder="A,B,C">
                         </td>
                         <td>
                             <input type="text" name="league_team_name[]"
@@ -81,7 +75,6 @@ defined('ABSPATH') || exit;
         <td><input type="text" name="league_slug[]" class="regular-text" required pattern="[a-z0-9\-]+" title="<?php esc_attr_e('Lowercase letters, numbers, and hyphens only', 'afvd-data'); ?>"></td>
         <td><input type="text" name="league_label[]" class="regular-text"></td>
         <td><input type="text" name="league_code[]" class="small-text" required></td>
-        <td><input type="text" name="league_groups[]" class="small-text" placeholder="A,B,C"></td>
         <td><input type="text" name="league_team_name[]" class="regular-text" placeholder="<?php esc_attr_e('e.g. Wetterau Bulls', 'afvd-data'); ?>"></td>
         <td><input type="checkbox" name="league_active[{{INDEX}}]" checked></td>
         <td><button type="button" class="button afvd-remove-league"><?php esc_html_e('Remove', 'afvd-data'); ?></button></td>

@@ -58,13 +58,11 @@ class AFVD_Shortcodes {
 
         $this->enqueue_styles();
 
-        // Determine groups to render
-        $groups = [];
-
+        // Determine groups from shortcode attribute or imported data
         if (!empty($atts['group'])) {
             $groups = [$atts['group']];
-        } elseif (!empty($league_config['groups'])) {
-            $groups = array_map('trim', explode(',', $league_config['groups']));
+        } else {
+            $groups = AFVD_DB::get_standing_groups($liga_code);
         }
 
         $output = '';
@@ -121,13 +119,11 @@ class AFVD_Shortcodes {
 
         $this->enqueue_styles();
 
-        // Determine groups to render
-        $groups = [];
-
+        // Determine groups from shortcode attribute or imported data
         if (!empty($atts['group'])) {
             $groups = [$atts['group']];
-        } elseif ($league_config && !empty($league_config['groups'])) {
-            $groups = array_map('trim', explode(',', $league_config['groups']));
+        } else {
+            $groups = AFVD_DB::get_schedule_groups($liga_code);
         }
 
         $home_only  = !empty($atts['home_only']);

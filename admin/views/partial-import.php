@@ -141,7 +141,7 @@ defined('ABSPATH') || exit;
             <tr>
                 <td><code>group</code></td>
                 <td><?php esc_html_e('e.g. "A", "B"', 'afvd-data'); ?></td>
-                <td><?php esc_html_e('Show only a specific group. Without this, all configured groups are shown.', 'afvd-data'); ?></td>
+                <td><?php esc_html_e('Show only a specific group. Without this, all groups from the imported data are shown automatically.', 'afvd-data'); ?></td>
             </tr>
             <tr>
                 <td><code>highlight</code></td>

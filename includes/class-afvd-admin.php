@@ -114,7 +114,6 @@ class AFVD_Admin {
         $slugs      = $_POST['league_slug'] ?? [];
         $labels     = $_POST['league_label'] ?? [];
         $codes      = $_POST['league_code'] ?? [];
-        $groups     = $_POST['league_groups'] ?? [];
         $team_names = $_POST['league_team_name'] ?? [];
         $actives    = $_POST['league_active'] ?? [];
 
@@ -129,7 +128,6 @@ class AFVD_Admin {
                 'slug'      => $slug,
                 'label'     => sanitize_text_field($labels[$i] ?? $slug),
                 'liga_code' => $code,
-                'groups'    => sanitize_text_field($groups[$i] ?? ''),
                 'team_name' => sanitize_text_field($team_names[$i] ?? ''),
                 'active'    => isset($actives[$i]),
             ];
