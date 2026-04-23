@@ -79,12 +79,6 @@ table.afvdata-league-table th {
 }
 ```
 
-## Kontakt
-
-- **Entwickler:** Daniel Schmidt-Richert
-- **E-Mail:** afvdata@foo.boo
-- **Source Code:** [github.com/slayer01/afvdata](https://github.com/slayer01/afvdata)
-
 ## Lizenz
 
 GPL v2 or later
