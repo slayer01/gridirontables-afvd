@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AFVData – League Tables & Schedules</title>
+    <style>
+        :root {
+            --primary: #1b2a4a;
+            --accent: #c5283d;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #333;
+            --muted: #666;
+            --border: #e0e0e0;
+            --code-bg: #f0f2f5;
+            --radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.6;
+        }
+
+        /* Hero */
+        .hero {
+            background: var(--primary);
+            color: #fff;
+            text-align: center;
+            padding: 60px 20px 50px;
+        }
+
+        .hero img {
+            height: 120px;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            font-size: 1.15em;
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto 24px;
+        }
+
+        .hero .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 28px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 1em;
+            transition: background 0.2s;
+        }
+
+        .hero .btn:hover { background: #a1202f; }
+
+        .hero .btn + .btn {
+            margin-left: 12px;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .hero .btn + .btn:hover { background: rgba(255,255,255,0.25); }
+
+        /* Container */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Nav */
+        nav {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 0;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 20px;
+            overflow-x: auto;
+        }
+
+        nav a {
+            display: block;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.9em;
+            font-weight: 500;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Sections */
+        section {
+            padding: 48px 0;
+        }
+
+        section + section {
+            border-top: 1px solid var(--border);
+        }
+
+        h2 {
+            font-size: 1.6em;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        h3 {
+            font-size: 1.15em;
+            color: var(--primary);
+            margin: 28px 0 10px;
+        }
+
+        p, li {
+            margin-bottom: 10px;
+        }
+
+        ul, ol {
+            padding-left: 24px;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 1.05em;
+        }
+
+        .card p {
+            font-size: 0.9em;
+            color: var(--muted);
+            margin-bottom: 0;
+        }
+
+        /* Code */
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.88em;
+            font-family: "SF Mono", Menlo, Consolas, monospace;
+        }
+
+        pre {
+            background: var(--primary);
+            color: #e0e7ef;
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            margin: 12px 0 16px;
+            font-size: 0.88em;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0 16px;
+            font-size: 0.9em;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--code-bg);
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Scenario boxes */
+        .scenario {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .scenario h3 {
+            margin-top: 0;
+            color: var(--accent);
+        }
+
+        /* Notice */
+        .notice {
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 0.9em;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 0.85em;
+        }
+
+        footer a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+        }
+
+        footer a:hover { color: #fff; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero { padding: 40px 16px 36px; }
+            .hero h1 { font-size: 1.6em; }
+            .hero .btn { display: block; margin: 8px 0; }
+            .hero .btn + .btn { margin-left: 0; }
+            section { padding: 32px 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+    <img src="logo.png" alt="AFVData Logo">
+    <h1>AFVData</h1>
+    <p>League Tables & Schedules — WordPress Plugin zur Anzeige von American Football Tabellen und Spielplänen.</p>
+    <a href="https://github.com/slayer01/afvdata/releases/latest" class="btn">Download (ZIP)</a>
+    <a href="https://github.com/slayer01/afvdata" class="btn">GitHub</a>
+</header>
+
+<!-- Navigation -->
+<nav>
+    <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#einrichtung">Einrichtung</a></li>
+        <li><a href="#shortcodes">Shortcodes</a></li>
+        <li><a href="#szenarien">Szenarien</a></li>
+        <li><a href="#css">CSS anpassen</a></li>
+        <li><a href="#faq">FAQ</a></li>
+    </ul>
+</nav>
+
+<!-- Features -->
+<section id="features">
+    <div class="container">
+        <h2>Features</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>Tabellen & Spielpläne</h3>
+                <p>Ligatabellen und Spielpläne per Shortcode auf jeder Seite einbinden.</p>
+            </div>
+            <div class="card">
+                <h3>Auto-Sync</h3>
+                <p>Automatischer Datenabgleich per WP-Cron — stündlich, 2x täglich oder täglich.</p>
+            </div>
+            <div class="card">
+                <h3>Mehrere Ligen</h3>
+                <p>Beliebig viele Ligen konfigurieren — Herren, Damen, Jugend, Flag.</p>
+            </div>
+            <div class="card">
+                <h3>Team Highlighting</h3>
+                <p>Pro Liga einen Teamnamen hinterlegen — wird in Tabellen und Spielplänen fett hervorgehoben.</p>
+            </div>
+            <div class="card">
+                <h3>Automatische Gruppen</h3>
+                <p>Gruppen werden automatisch aus den importierten Daten erkannt und angezeigt.</p>
+            </div>
+            <div class="card">
+                <h3>Theme-Farben</h3>
+                <p>Tabellenfarben im Backend konfigurieren — mit Color Picker und Vorschlägen aus dem aktiven Theme.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Installation -->
+<section id="installation">
+    <div class="container">
+        <h2>Installation</h2>
+        <ol>
+            <li>Die aktuelle Version als ZIP von <a href="https://github.com/slayer01/afvdata/releases/latest">GitHub Releases</a> herunterladen.</li>
+            <li>Im WordPress-Admin unter <strong>Plugins → Installieren → Plugin hochladen</strong> das ZIP hochladen.</li>
+            <li>Plugin aktivieren.</li>
+            <li>Im Admin-Menü erscheint der Punkt <strong>AFVData</strong>.</li>
+        </ol>
+        <div class="notice">
+            <strong>Hinweis:</strong> Alternativ kann der Ordner manuell nach <code>wp-content/plugins/</code> kopiert werden.
+        </div>
+    </div>
+</section>
+
+<!-- Einrichtung -->
+<section id="einrichtung">
+    <div class="container">
+        <h2>Einrichtung</h2>
+
+        <h3>1. Liga hinzufügen</h3>
+        <p>Unter <strong>AFVData → Leagues</strong> eine neue Zeile anlegen:</p>
+        <table>
+            <tr><th>Feld</th><th>Beispiel</th><th>Beschreibung</th></tr>
+            <tr><td><code>Slug</code></td><td><code>herren</code></td><td>Wird im Shortcode verwendet. Nur Kleinbuchstaben, Zahlen, Bindestriche.</td></tr>
+            <tr><td><code>Label</code></td><td>Herren Oberliga</td><td>Anzeigename im Admin-Bereich.</td></tr>
+            <tr><td><code>Liga Code</code></td><td><code>olm</code></td><td>Das Kürzel aus der XML-API. Steht in der URL des Spielplans auf der Verbandsseite.</td></tr>
+            <tr><td><code>Team Name</code></td><td>Wetterau Bulls</td><td>Dein Teamname — wird in Tabellen und Spielplänen fett markiert.</td></tr>
+            <tr><td><code>Active</code></td><td>✓</td><td>Nur aktive Ligen werden beim Import berücksichtigt.</td></tr>
+        </table>
+
+        <h3>2. Daten importieren</h3>
+        <p>Unter <strong>AFVData → Import</strong> einzelne Ligen oder alle auf einmal importieren. Die Rohdaten können über die Buttons <em>Standings</em> / <em>Schedule</em> eingesehen werden.</p>
+
+        <h3>3. Einstellungen</h3>
+        <p>Unter <strong>AFVData → Settings</strong> können die API-URL, der Sync-Intervall und die Tabellenfarben konfiguriert werden.</p>
+    </div>
+</section>
+
+<!-- Shortcodes -->
+<section id="shortcodes">
+    <div class="container">
+        <h2>Shortcodes</h2>
+
+        <h3>Tabelle anzeigen</h3>
+        <pre><code>[afvdata_standings league="herren"]</code></pre>
+
+        <h3>Spielplan anzeigen</h3>
+        <pre><code>[afvdata_schedule league="herren"]</code></pre>
+
+        <h3>Alle Attribute</h3>
+        <table>
+            <tr><th>Attribut</th><th>Werte</th><th>Gilt für</th><th>Beschreibung</th></tr>
+            <tr><td><code>league</code></td><td>Slug oder Liga-Code</td><td>Beide</td><td><strong>Pflicht.</strong> Die anzuzeigende Liga.</td></tr>
+            <tr><td><code>group</code></td><td><code>"A"</code>, <code>"B"</code>, ...</td><td>Beide</td><td>Nur eine bestimmte Gruppe anzeigen.</td></tr>
+            <tr><td><code>highlight</code></td><td>Teamname</td><td>Beide</td><td>Überschreibt den in der Liga konfigurierten Teamnamen.</td></tr>
+            <tr><td><code>class</code></td><td>CSS-Klasse</td><td>Beide</td><td>Eigene CSS-Klasse für den Wrapper.</td></tr>
+            <tr><td><code>home_only</code></td><td><code>"1"</code></td><td>Schedule</td><td>Nur Heimspiele des konfigurierten Teams.</td></tr>
+            <tr><td><code>show</code></td><td><code>"all"</code>, <code>"upcoming"</code>, <code>"past"</code></td><td>Schedule</td><td>Zeitfilter. Standard: alle Spiele.</td></tr>
+            <tr><td><code>limit</code></td><td>Zahl</td><td>Schedule</td><td>Maximale Anzahl Spiele.</td></tr>
+        </table>
+    </div>
+</section>
+
+<!-- Szenarien -->
+<section id="szenarien">
+    <div class="container">
+        <h2>Szenarien & Beispiele</h2>
+
+        <div class="scenario">
+            <h3>Vereinswebsite: Tabelle und Spielplan einer Liga</h3>
+            <p>Du möchtest auf deiner Vereinsseite die aktuelle Tabelle und den Spielplan deiner Herrenmannschaft zeigen.</p>
+            <ol>
+                <li>Liga anlegen: Slug <code>herren</code>, Liga Code <code>olm</code>, Team Name <code>Wetterau Bulls</code></li>
+                <li>Importieren</li>
+                <li>Auf der gewünschten Seite einfügen:</li>
+            </ol>
+            <pre><code>[afvdata_standings league="herren"]
+[afvdata_schedule league="herren"]</code></pre>
+            <p>Dein Teamname wird automatisch fett hervorgehoben.</p>
+        </div>
+
+        <div class="scenario">
+            <h3>Nur die nächsten 5 Heimspiele</h3>
+            <p>Auf der Startseite sollen nur die kommenden Heimspiele angezeigt werden — kompakt als Vorschau.</p>
+            <pre><code>[afvdata_schedule league="herren" home_only="1" show="upcoming" limit="5"]</code></pre>
+        </div>
+
+        <div class="scenario">
+            <h3>Mehrere Ligen auf einer Seite</h3>
+            <p>Dein Verein hat Herren, Damen und U19. Für jede Liga einen eigenen Slug anlegen und alle auf einer Seite einbinden:</p>
+            <pre><code>[afvdata_standings league="herren"]
+[afvdata_standings league="damen"]
+[afvdata_standings league="u19"]</code></pre>
+        </div>
+
+        <div class="scenario">
+            <h3>Nur eine bestimmte Gruppe</h3>
+            <p>Die Liga hat Gruppen A, B, C, D — du willst nur Gruppe B zeigen:</p>
+            <pre><code>[afvdata_standings league="jugend" group="B"]
+[afvdata_schedule league="jugend" group="B"]</code></pre>
+        </div>
+
+        <div class="scenario">
+            <h3>Ergebnisse der bisherigen Saison</h3>
+            <p>Eine Seite mit allen vergangenen Spielen und Ergebnissen:</p>
+            <pre><code>[afvdata_schedule league="herren" show="past"]</code></pre>
+        </div>
+
+        <div class="scenario">
+            <h3>Verschiedene Teamnamen pro Liga</h3>
+            <p>Dein Verein heißt in der Herren-Liga "Wetterau Bulls" aber in der Flag-Liga "Bulls Flag". Einfach pro Liga den passenden Teamnamen im Backend eintragen — das Highlighting passt sich automatisch an.</p>
+        </div>
+    </div>
+</section>
+
+<!-- CSS anpassen -->
+<section id="css">
+    <div class="container">
+        <h2>CSS anpassen</h2>
+        <p>Die Tabellenfarben können im Backend unter <strong>Settings</strong> konfiguriert werden. Für weitergehende Anpassungen kann eigenes CSS im Theme verwendet werden.</p>
+
+        <h3>Eigene Header-Farbe</h3>
+        <pre><code>table.afvdata-league-table th {
+    background-color: #dd3333;
+    color: #fff;
+}</code></pre>
+
+        <h3>Highlight-Zeilen einfärben</h3>
+        <pre><code>table.afvdata-league-table tr.afvdata-highlight td {
+    background-color: #fff3cd;
+}</code></pre>
+
+        <h3>Verfügbare CSS-Klassen</h3>
+        <table>
+            <tr><th>Klasse</th><th>Beschreibung</th></tr>
+            <tr><td><code>.afvdata-league-table</code></td><td>Jede Tabelle (Standings & Schedule)</td></tr>
+            <tr><td><code>.afvdata-schedule-table</code></td><td>Zusätzlich auf Spielplan-Tabellen</td></tr>
+            <tr><td><code>.afvdata-highlight</code></td><td>Hervorgehobenes Team (Standings: auf <code>tr</code>, Schedule: auf <code>td</code>)</td></tr>
+            <tr><td><code>.afvdata-standings-wrap</code></td><td>Wrapper um Standings</td></tr>
+            <tr><td><code>.afvdata-schedule-wrap</code></td><td>Wrapper um Schedule</td></tr>
+            <tr><td><code>.afvdata-group-header</code></td><td>Gruppen-Überschrift</td></tr>
+            <tr><td><code>.afvdata-disclaimer</code></td><td>Datenquellen-Hinweis</td></tr>
+        </table>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+    <div class="container">
+        <h2>FAQ</h2>
+
+        <h3>Woher kommen die Daten?</h3>
+        <p>Das Plugin nutzt den öffentlich zugänglichen XML-Export von <code>vereine.football-verband.de</code>. Es besteht keine Verbindung zum AFVD oder einem seiner Mitgliedsverbände.</p>
+
+        <h3>Wie finde ich den Liga-Code?</h3>
+        <p>Der Liga-Code steht in der URL des Spielplans auf der Verbandsseite. Beispiel: In <code>xmlspielplan.php5?Liga=<strong>olm</strong></code> ist <code>olm</code> der Liga-Code.</p>
+
+        <h3>Die Daten sind nicht aktuell?</h3>
+        <p>Unter <strong>AFVData → Import</strong> manuell importieren. Für automatische Updates den Sync-Intervall unter <strong>Settings</strong> einstellen. Beachte: WP-Cron läuft nur bei Seitenaufrufen. Für zuverlässige Intervalle einen Server-Cronjob einrichten, der <code>wp-cron.php</code> aufruft.</p>
+
+        <h3>Kann ich die Tabelle auch ohne WordPress nutzen?</h3>
+        <p>Nein, AFVData ist ein WordPress-Plugin und benötigt eine WordPress-Installation.</p>
+
+        <h3>Welche WordPress-Version wird benötigt?</h3>
+        <p>Mindestens WordPress 5.9 und PHP 7.4.</p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>AFVData – League Tables & Schedules &middot; Open Source unter <a href="https://github.com/slayer01/afvdata">GPL v2</a></p>
+    <p style="margin-top:8px;">Dieses Plugin ist ein unabhängiges Projekt und steht in keiner Verbindung zum AFVD oder einem seiner Mitgliedsverbände.</p>
+</footer>
+
+<!-- Smooth scroll -->
+<script>
+document.querySelectorAll('nav a').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+</script>
+
+</body>
+</html>
