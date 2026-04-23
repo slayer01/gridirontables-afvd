@@ -36,6 +36,10 @@ $last_sync  = get_option('afvd_data_last_sync', 0);
            class="nav-tab <?php echo 'import' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e('Import', 'afvd-data'); ?>
         </a>
+        <a href="<?php echo esc_url(add_query_arg(['page' => 'afvd-data', 'tab' => 'info'], admin_url('admin.php'))); ?>"
+           class="nav-tab <?php echo 'info' === $active_tab ? 'nav-tab-active' : ''; ?>">
+            <?php esc_html_e('Info', 'afvd-data'); ?>
+        </a>
     </nav>
 
     <div class="afvd-tab-content">
@@ -46,6 +50,9 @@ $last_sync  = get_option('afvd_data_last_sync', 0);
                 break;
             case 'import':
                 include AFVD_DATA_PLUGIN_DIR . 'admin/views/partial-import.php';
+                break;
+            case 'info':
+                include AFVD_DATA_PLUGIN_DIR . 'admin/views/partial-info.php';
                 break;
             default:
                 ?>
