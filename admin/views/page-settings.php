@@ -12,10 +12,10 @@ $leagues    = get_option('afvd_data_leagues', []);
 $last_sync  = get_option('afvd_data_last_sync', 0);
 ?>
 <div class="wrap">
-    <h1>
-        <img src="<?php echo esc_url(AFVD_DATA_PLUGIN_URL . 'admin/img/logo.jpg'); ?>" alt="" style="height:32px;vertical-align:middle;margin-right:8px;">
-        <?php esc_html_e('AFVData', 'afvd-data'); ?>
-    </h1>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+        <img src="<?php echo esc_url(AFVD_DATA_PLUGIN_URL . 'admin/img/logo.png'); ?>" alt="" style="height:64px;">
+        <h1 style="margin:0;"><?php esc_html_e('AFVData', 'afvd-data'); ?></h1>
+    </div>
 
     <?php if (!empty($_GET['updated'])) : ?>
         <div class="notice notice-success is-dismissible">
