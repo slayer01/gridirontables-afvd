@@ -1,7 +1,7 @@
 <?php
 defined('ABSPATH') || exit;
 
-class AFVD_Data {
+class AFVData_Plugin {
 
     private static $instance = null;
 
@@ -15,28 +15,28 @@ class AFVD_Data {
     private function __construct() {
         $this->check_db_version();
 
-        new AFVD_Cron();
+        new AFVData_Cron();
 
         if (is_admin()) {
-            new AFVD_Admin();
+            new AFVData_Admin();
         }
 
-        new AFVD_Shortcodes();
+        new AFVData_Shortcodes();
     }
 
     private function check_db_version() {
-        $installed_version = get_option('afvd_data_db_version', '0');
-        if (version_compare($installed_version, AFVD_DATA_DB_VERSION, '<')) {
-            AFVD_DB::install();
+        $installed_version = get_option('afvdata_db_version', '0');
+        if (version_compare($installed_version, AFVDATA_DB_VERSION, '<')) {
+            AFVData_DB::install();
         }
     }
 
     public static function activate() {
-        AFVD_DB::install();
-        AFVD_Cron::schedule();
+        AFVData_DB::install();
+        AFVData_Cron::schedule();
     }
 
     public static function deactivate() {
-        AFVD_Cron::unschedule();
+        AFVData_Cron::unschedule();
     }
 }

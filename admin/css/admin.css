@@ -1,46 +1,46 @@
-.afvd-tab-content {
+.afvdata-tab-content {
     margin-top: 15px;
 }
 
-.afvd-leagues-table input.regular-text {
+.afvdata-leagues-table input.regular-text {
     width: 100%;
 }
 
-.afvd-leagues-table input.small-text {
+.afvdata-leagues-table input.small-text {
     width: 100%;
 }
 
-.afvd-leagues-table th,
-.afvd-leagues-table td {
+.afvdata-leagues-table th,
+.afvdata-leagues-table td {
     padding: 8px;
 }
 
-.afvd-leagues-table .afvd-league-row td {
+.afvdata-leagues-table .afvdata-league-row td {
     vertical-align: middle;
 }
 
-.afvd-import-status {
+.afvdata-import-status {
     font-style: italic;
     color: #666;
 }
 
-.afvd-import-status.success {
+.afvdata-import-status.success {
     color: #46b450;
     font-style: normal;
 }
 
-.afvd-import-status.error {
+.afvdata-import-status.error {
     color: #dc3232;
     font-style: normal;
 }
 
-.afvd-import-league:disabled,
-#afvd-import-all:disabled {
+.afvdata-import-league:disabled,
+#afvdata-import-all:disabled {
     opacity: 0.6;
     cursor: wait;
 }
 
-#afvd-import-all-status {
+#afvdata-import-all-status {
     margin-left: 10px;
     font-style: italic;
 }

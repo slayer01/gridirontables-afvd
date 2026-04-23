@@ -1,55 +1,55 @@
 /* ==========================================================================
-   AFVD Data – Frontend Styles
+   AFVData – Frontend Styles
    ========================================================================== */
 
 /* --- League Table (Standings + Schedule) --- */
 
-table.afvd-league-table {
+table.afvdata-league-table {
     width: 100%;
     border-collapse: collapse;
     font-family: inherit;
     margin-bottom: 0;
 }
 
-table.afvd-league-table th {
-    background-color: var(--afvd-header-bg, #333);
-    color: var(--afvd-header-text, #fff);
+table.afvdata-league-table th {
+    background-color: var(--afvdata-header-bg, #333);
+    color: var(--afvdata-header-text, #fff);
     padding: 8px 10px;
     text-align: left;
     font-weight: 600;
 }
 
-table.afvd-league-table td {
+table.afvdata-league-table td {
     background-color: #fff;
     padding: 6px 10px;
     border-bottom: 1px solid #eee;
 }
 
-table.afvd-league-table .odd td {
+table.afvdata-league-table .odd td {
     background-color: #f5f5f5;
 }
 
 /* --- Highlighting --- */
 
-table.afvd-league-table td.afvd-highlight {
+table.afvdata-league-table td.afvdata-highlight {
     font-weight: bold;
 }
 
-table.afvd-league-table tr.afvd-highlight td {
+table.afvdata-league-table tr.afvdata-highlight td {
     font-weight: bold;
-    background-color: var(--afvd-highlight-bg);
+    background-color: var(--afvdata-highlight-bg);
 }
 
 /* --- Numeric columns --- */
 
-.afvd-league-table .afvd-num {
+.afvdata-league-table .afvdata-num {
     font-size: 0.9em;
     font-variant-numeric: tabular-nums;
 }
 
 /* --- Group header --- */
 
-span.afvd-group-header {
+span.afvdata-group-header {
     font-weight: bold;
     display: block;
     padding: 10px 0;
@@ -57,20 +57,20 @@ span.afvd-group-header {
 
 /* --- Disclaimer --- */
 
-span.afvd-disclaimer {
+span.afvdata-disclaimer {
     font-size: 0.75em;
     color: #aaa;
     display: block;
     margin-top: 6px;
 }
 
-span.afvd-disclaimer a {
+span.afvdata-disclaimer a {
     color: #999;
 }
 
 /* --- Error (editors only) --- */
 
-p.afvd-error {
+p.afvdata-error {
     color: #dc3232;
     background: #fef7f7;
     border-left: 4px solid #dc3232;
@@ -83,37 +83,37 @@ p.afvd-error {
 
 @media all and (max-width: 640px) {
 
-    table.afvd-schedule-table,
-    table.afvd-schedule-table thead,
-    table.afvd-schedule-table tbody,
-    table.afvd-schedule-table tr,
-    table.afvd-schedule-table th,
-    table.afvd-schedule-table td {
+    table.afvdata-schedule-table,
+    table.afvdata-schedule-table thead,
+    table.afvdata-schedule-table tbody,
+    table.afvdata-schedule-table tr,
+    table.afvdata-schedule-table th,
+    table.afvdata-schedule-table td {
         display: block;
     }
 
-    table.afvd-schedule-table {
+    table.afvdata-schedule-table {
         text-align: right;
     }
 
-    table.afvd-schedule-table thead {
+    table.afvdata-schedule-table thead {
         position: absolute;
         left: -9999px;
         top: -9999px;
     }
 
-    table.afvd-schedule-table tr {
+    table.afvdata-schedule-table tr {
         margin-bottom: 10px;
         border: 1px solid #ddd;
     }
 
-    table.afvd-schedule-table td {
+    table.afvdata-schedule-table td {
         position: relative;
         padding-left: 50%;
         text-align: right;
     }
 
-    table.afvd-schedule-table td::before {
+    table.afvdata-schedule-table td::before {
         content: attr(data-label) ":";
         position: absolute;
         left: 10px;
@@ -121,7 +121,7 @@ p.afvd-error {
         text-align: left;
     }
 
-    .afvd-nomobile {
+    .afvdata-nomobile {
         display: none;
     }
 }

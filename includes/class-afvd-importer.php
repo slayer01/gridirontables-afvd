@@ -1,12 +1,12 @@
 <?php
 defined('ABSPATH') || exit;
 
-class AFVD_Importer {
+class AFVData_Importer {
 
     private $base_url;
 
     public function __construct() {
-        $this->base_url = rtrim(get_option('afvd_data_api_base_url', 'http://vereine.football-verband.de/'), '/');
+        $this->base_url = rtrim(get_option('afvdata_api_base_url', 'http://vereine.football-verband.de/'), '/');
     }
 
     /**
@@ -15,7 +15,7 @@ class AFVD_Importer {
      * @return array Results keyed by liga_code.
      */
     public function import_all_active() {
-        $leagues = get_option('afvd_data_leagues', []);
+        $leagues = get_option('afvdata_leagues', []);
         $results = [];
 
         foreach ($leagues as $league) {
@@ -32,7 +32,7 @@ class AFVD_Importer {
             }
         }
 
-        update_option('afvd_data_last_sync', time());
+        update_option('afvdata_last_sync', time());
 
         return $results;
     }
@@ -55,17 +55,17 @@ class AFVD_Importer {
 
         if (is_wp_error($standings_result) && is_wp_error($schedule_result)) {
             return new WP_Error(
-                'afvd_import_failed',
+                'afvdata_import_failed',
                 sprintf(
                     /* translators: 1: standings error, 2: schedule error */
-                    __('Standings: %1$s | Schedule: %2$s', 'afvd-data'),
+                    __('Standings: %1$s | Schedule: %2$s', 'afvdata'),
                     $standings_result->get_error_message(),
                     $schedule_result->get_error_message()
                 )
             );
         }
 
-        $counts = AFVD_DB::get_counts($liga_code);
+        $counts = AFVData_DB::get_counts($liga_code);
 
         return [
             'liga_code'       => $liga_code,
@@ -89,7 +89,7 @@ class AFVD_Importer {
 
         $count = 0;
         foreach ($xml->children() as $row) {
-            AFVD_DB::upsert_standing([
+            AFVData_DB::upsert_standing([
                 'liga_code'   => sanitize_text_field((string) $row->Liga),
                 'bezeichnung' => sanitize_text_field((string) $row->Bezeichnung),
                 'gruppe'      => sanitize_text_field((string) $row->Gruppe),
@@ -107,7 +107,7 @@ class AFVD_Importer {
         }
 
         if ($count > 0) {
-            AFVD_DB::cleanup_stale(AFVD_DB::standings_table(), $liga_code, $import_time);
+            AFVData_DB::cleanup_stale(AFVData_DB::standings_table(), $liga_code, $import_time);
         }
 
         return $count;
@@ -129,7 +129,7 @@ class AFVD_Importer {
             $datum1 = (string) $row->Datum1;
             $datum2 = (string) $row->Datum2;
 
-            AFVD_DB::upsert_game([
+            AFVData_DB::upsert_game([
                 'game_id'      => sanitize_text_field((string) $row->ID),
                 'liga_code'    => sanitize_text_field((string) $row->Liga),
                 'bezeichnung'  => sanitize_text_field((string) $row->Bezeichnung),
@@ -161,7 +161,7 @@ class AFVD_Importer {
         }
 
         if ($count > 0) {
-            AFVD_DB::cleanup_stale(AFVD_DB::schedule_table(), $liga_code, $import_time);
+            AFVData_DB::cleanup_stale(AFVData_DB::schedule_table(), $liga_code, $import_time);
         }
 
         return $count;
@@ -176,7 +176,7 @@ class AFVD_Importer {
     private function fetch_xml($url) {
         $response = wp_remote_get($url, [
             'timeout'    => 30,
-            'user-agent' => 'AFVD-Data-WordPress-Plugin/' . AFVD_DATA_VERSION,
+            'user-agent' => 'AFVData-WordPress-Plugin/' . AFVDATA_VERSION,
         ]);
 
         if (is_wp_error($response)) {
@@ -186,15 +186,15 @@ class AFVD_Importer {
         $code = wp_remote_retrieve_response_code($response);
         if (200 !== $code) {
             return new WP_Error(
-                'afvd_http_error',
+                'afvdata_http_error',
                 /* translators: %d: HTTP status code */
-                sprintf(__('HTTP %d from AFVD API', 'afvd-data'), $code)
+                sprintf(__('HTTP %d from AFVD API', 'afvdata'), $code)
             );
         }
 
         $body = wp_remote_retrieve_body($response);
         if (empty($body)) {
-            return new WP_Error('afvd_empty_response', __('Empty response from AFVD API', 'afvd-data'));
+            return new WP_Error('afvdata_empty_response', __('Empty response from AFVD API', 'afvdata'));
         }
 
         libxml_use_internal_errors(true);
@@ -203,9 +203,9 @@ class AFVD_Importer {
         if (false === $xml) {
             $errors = libxml_get_errors();
             libxml_clear_errors();
-            $msg = !empty($errors) ? $errors[0]->message : __('Unknown XML parse error', 'afvd-data');
+            $msg = !empty($errors) ? $errors[0]->message : __('Unknown XML parse error', 'afvdata');
             /* translators: %s: XML error message */
-            return new WP_Error('afvd_xml_error', sprintf(__('XML parse error: %s', 'afvd-data'), trim($msg)));
+            return new WP_Error('afvdata_xml_error', sprintf(__('XML parse error: %s', 'afvdata'), trim($msg)));
         }
 
         return $xml;
@@ -226,7 +226,7 @@ class AFVD_Importer {
      * Get the slug for a liga_code from the leagues config.
      */
     private function get_slug_for_code($liga_code) {
-        $leagues = get_option('afvd_data_leagues', []);
+        $leagues = get_option('afvdata_leagues', []);
         foreach ($leagues as $league) {
             if ($league['liga_code'] === $liga_code) {
                 return $league['slug'];

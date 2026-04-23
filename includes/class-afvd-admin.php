@@ -1,24 +1,24 @@
 <?php
 defined('ABSPATH') || exit;
 
-class AFVD_Admin {
+class AFVData_Admin {
 
     public function __construct() {
         add_action('admin_menu', [$this, 'add_menu_page']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
-        add_action('admin_post_afvd_save_settings', [$this, 'handle_save_settings']);
-        add_action('admin_post_afvd_save_leagues', [$this, 'handle_save_leagues']);
-        add_action('wp_ajax_afvd_import', [$this, 'ajax_import']);
-        add_action('wp_ajax_afvd_import_all', [$this, 'ajax_import_all']);
-        add_action('wp_ajax_afvd_raw_data', [$this, 'ajax_raw_data']);
+        add_action('admin_post_afvdata_save_settings', [$this, 'handle_save_settings']);
+        add_action('admin_post_afvdata_save_leagues', [$this, 'handle_save_leagues']);
+        add_action('wp_ajax_afvdata_import', [$this, 'ajax_import']);
+        add_action('wp_ajax_afvdata_import_all', [$this, 'ajax_import_all']);
+        add_action('wp_ajax_afvdata_raw_data', [$this, 'ajax_raw_data']);
     }
 
     public function add_menu_page() {
         add_menu_page(
-            __('AFVData', 'afvd-data'),
-            __('AFVData', 'afvd-data'),
+            __('AFVData', 'afvdata'),
+            __('AFVData', 'afvdata'),
             'manage_options',
-            'afvd-data',
+            'afvdata',
             [$this, 'render_page'],
             'dashicons-awards',
             30
@@ -26,7 +26,7 @@ class AFVD_Admin {
     }
 
     public function enqueue_assets($hook) {
-        if ('toplevel_page_afvd-data' !== $hook) {
+        if ('toplevel_page_afvdata' !== $hook) {
             return;
         }
 
@@ -34,29 +34,29 @@ class AFVD_Admin {
         wp_enqueue_script('wp-color-picker');
 
         wp_enqueue_style(
-            'afvd-data-admin',
-            AFVD_DATA_PLUGIN_URL . 'admin/css/admin.css',
+            'afvdata-admin',
+            AFVDATA_PLUGIN_URL . 'admin/css/admin.css',
             [],
-            AFVD_DATA_VERSION
+            AFVDATA_VERSION
         );
 
         wp_enqueue_script(
-            'afvd-data-admin',
-            AFVD_DATA_PLUGIN_URL . 'admin/js/admin.js',
+            'afvdata-admin',
+            AFVDATA_PLUGIN_URL . 'admin/js/admin.js',
             ['jquery', 'wp-color-picker'],
-            AFVD_DATA_VERSION,
+            AFVDATA_VERSION,
             true
         );
 
-        wp_localize_script('afvd-data-admin', 'afvdData', [
+        wp_localize_script('afvdata-admin', 'afvdataConfig', [
             'ajaxUrl'       => admin_url('admin-ajax.php'),
-            'nonce'         => wp_create_nonce('afvd_data_import'),
+            'nonce'         => wp_create_nonce('afvdata_import'),
             'themePalette'  => self::get_theme_palette(),
             'i18n'          => [
-                'importing'  => __('Importing...', 'afvd-data'),
-                'success'    => __('Import successful', 'afvd-data'),
-                'error'      => __('Import failed', 'afvd-data'),
-                'confirm'    => __('Import all active leagues now?', 'afvd-data'),
+                'importing'  => __('Importing...', 'afvdata'),
+                'success'    => __('Import successful', 'afvdata'),
+                'error'      => __('Import failed', 'afvdata'),
+                'confirm'    => __('Import all active leagues now?', 'afvdata'),
             ],
         ]);
     }
@@ -65,21 +65,21 @@ class AFVD_Admin {
         if (!current_user_can('manage_options')) {
             return;
         }
-        include AFVD_DATA_PLUGIN_DIR . 'admin/views/page-settings.php';
+        include AFVDATA_PLUGIN_DIR . 'admin/views/page-settings.php';
     }
 
     public function handle_save_settings() {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Unauthorized', 'afvd-data'));
+            wp_die(esc_html__('Unauthorized', 'afvdata'));
         }
 
-        check_admin_referer('afvd_save_settings', 'afvd_nonce');
+        check_admin_referer('afvdata_save_settings', 'afvdata_nonce');
 
-        update_option('afvd_data_api_base_url', esc_url_raw(wp_unslash($_POST['api_base_url'] ?? 'http://vereine.football-verband.de/')));
+        update_option('afvdata_api_base_url', esc_url_raw(wp_unslash($_POST['api_base_url'] ?? 'http://vereine.football-verband.de/')));
 
-        update_option('afvd_data_color_header_bg', sanitize_hex_color(wp_unslash($_POST['color_header_bg'] ?? '#333333')));
-        update_option('afvd_data_color_header_text', sanitize_hex_color(wp_unslash($_POST['color_header_text'] ?? '#ffffff')));
-        update_option('afvd_data_color_highlight_bg', sanitize_hex_color(wp_unslash($_POST['color_highlight_bg'] ?? '')));
+        update_option('afvdata_color_header_bg', sanitize_hex_color(wp_unslash($_POST['color_header_bg'] ?? '#333333')));
+        update_option('afvdata_color_header_text', sanitize_hex_color(wp_unslash($_POST['color_header_text'] ?? '#ffffff')));
+        update_option('afvdata_color_highlight_bg', sanitize_hex_color(wp_unslash($_POST['color_highlight_bg'] ?? '')));
 
         $allowed_intervals = ['manual', 'hourly', 'twicedaily', 'daily'];
         $interval = sanitize_key(wp_unslash($_POST['sync_interval'] ?? 'manual'));
@@ -87,16 +87,16 @@ class AFVD_Admin {
             $interval = 'manual';
         }
 
-        $old_interval = get_option('afvd_data_sync_interval', 'manual');
-        update_option('afvd_data_sync_interval', $interval);
+        $old_interval = get_option('afvdata_sync_interval', 'manual');
+        update_option('afvdata_sync_interval', $interval);
 
         if ($old_interval !== $interval) {
-            AFVD_Cron::unschedule();
-            AFVD_Cron::schedule();
+            AFVData_Cron::unschedule();
+            AFVData_Cron::schedule();
         }
 
         wp_safe_redirect(add_query_arg([
-            'page'    => 'afvd-data',
+            'page'    => 'afvdata',
             'tab'     => 'settings',
             'updated' => '1',
         ], admin_url('admin.php')));
@@ -105,10 +105,10 @@ class AFVD_Admin {
 
     public function handle_save_leagues() {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Unauthorized', 'afvd-data'));
+            wp_die(esc_html__('Unauthorized', 'afvdata'));
         }
 
-        check_admin_referer('afvd_save_leagues', 'afvd_nonce');
+        check_admin_referer('afvdata_save_leagues', 'afvdata_nonce');
 
         $leagues    = [];
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- individual values sanitized in loop below
@@ -138,10 +138,10 @@ class AFVD_Admin {
             ];
         }
 
-        update_option('afvd_data_leagues', $leagues);
+        update_option('afvdata_leagues', $leagues);
 
         wp_safe_redirect(add_query_arg([
-            'page'    => 'afvd-data',
+            'page'    => 'afvdata',
             'tab'     => 'leagues',
             'updated' => '1',
         ], admin_url('admin.php')));
@@ -149,18 +149,18 @@ class AFVD_Admin {
     }
 
     public function ajax_import() {
-        check_ajax_referer('afvd_data_import', 'nonce');
+        check_ajax_referer('afvdata_import', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('Unauthorized', 'afvd-data'));
+            wp_send_json_error(__('Unauthorized', 'afvdata'));
         }
 
         $liga_code = sanitize_text_field(wp_unslash($_POST['liga_code'] ?? ''));
         if ('' === $liga_code) {
-            wp_send_json_error(__('No league specified', 'afvd-data'));
+            wp_send_json_error(__('No league specified', 'afvdata'));
         }
 
-        $importer = new AFVD_Importer();
+        $importer = new AFVData_Importer();
         $result   = $importer->import_league($liga_code);
 
         if (is_wp_error($result)) {
@@ -171,36 +171,36 @@ class AFVD_Admin {
     }
 
     public function ajax_import_all() {
-        check_ajax_referer('afvd_data_import', 'nonce');
+        check_ajax_referer('afvdata_import', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('Unauthorized', 'afvd-data'));
+            wp_send_json_error(__('Unauthorized', 'afvdata'));
         }
 
-        $importer = new AFVD_Importer();
+        $importer = new AFVData_Importer();
         $results  = $importer->import_all_active();
 
         wp_send_json_success($results);
     }
 
     public function ajax_raw_data() {
-        check_ajax_referer('afvd_data_import', 'nonce');
+        check_ajax_referer('afvdata_import', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('Unauthorized', 'afvd-data'));
+            wp_send_json_error(__('Unauthorized', 'afvdata'));
         }
 
         $liga_code = sanitize_text_field(wp_unslash($_POST['liga_code'] ?? ''));
         $type      = sanitize_key(wp_unslash($_POST['type'] ?? ''));
 
         if ('' === $liga_code || !in_array($type, ['standings', 'schedule'], true)) {
-            wp_send_json_error(__('Invalid request', 'afvd-data'));
+            wp_send_json_error(__('Invalid request', 'afvdata'));
         }
 
         if ('standings' === $type) {
-            $rows = AFVD_DB::get_standings($liga_code);
+            $rows = AFVData_DB::get_standings($liga_code);
         } else {
-            $rows = AFVD_DB::get_schedule($liga_code, []);
+            $rows = AFVData_DB::get_schedule($liga_code, []);
         }
 
         wp_send_json_success([
@@ -246,7 +246,7 @@ class AFVD_Admin {
      * Helper to get leagues config.
      */
     public static function get_leagues() {
-        return get_option('afvd_data_leagues', []);
+        return get_option('afvdata_leagues', []);
     }
 
     /**

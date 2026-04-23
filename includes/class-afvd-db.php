@@ -1,16 +1,16 @@
 <?php
 defined('ABSPATH') || exit;
 
-class AFVD_DB {
+class AFVData_DB {
 
     public static function standings_table() {
         global $wpdb;
-        return $wpdb->prefix . 'afvd_standings';
+        return $wpdb->prefix . 'afvdata_standings';
     }
 
     public static function schedule_table() {
         global $wpdb;
-        return $wpdb->prefix . 'afvd_schedule';
+        return $wpdb->prefix . 'afvdata_schedule';
     }
 
     public static function install() {
@@ -76,7 +76,7 @@ class AFVD_DB {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
-        update_option('afvd_data_db_version', AFVD_DATA_DB_VERSION);
+        update_option('afvdata_db_version', AFVDATA_DB_VERSION);
     }
 
     /**
