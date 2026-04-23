@@ -20,7 +20,7 @@ class AFVD_Admin {
             'manage_options',
             'afvd-data',
             [$this, 'render_page'],
-            'dashicons-awards',
+            AFVD_DATA_PLUGIN_URL . 'admin/img/logo.jpg',
             30
         );
     }
