@@ -28,15 +28,16 @@
 
         /* Hero */
         .hero {
-            background: var(--primary);
-            color: #fff;
+            background: #fff;
+            color: var(--primary);
             text-align: center;
             padding: 60px 20px 50px;
+            border-bottom: 3px solid var(--accent);
         }
 
         .hero img {
-            height: 120px;
-            margin-bottom: 16px;
+            height: 180px;
+            margin-bottom: 20px;
         }
 
         .hero h1 {
@@ -47,7 +48,7 @@
 
         .hero p {
             font-size: 1.15em;
-            opacity: 0.85;
+            color: var(--muted);
             max-width: 600px;
             margin: 0 auto 24px;
         }
@@ -68,10 +69,10 @@
 
         .hero .btn + .btn {
             margin-left: 12px;
-            background: rgba(255,255,255,0.15);
+            background: var(--primary);
         }
 
-        .hero .btn + .btn:hover { background: rgba(255,255,255,0.25); }
+        .hero .btn + .btn:hover { background: #2a3d66; }
 
         /* Container */
         .container {
