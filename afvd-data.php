@@ -3,7 +3,7 @@
  * Plugin Name:  AFVData – League Tables & Schedules
  * Plugin URI:   https://github.com/slayer01/afvdata
  * Description:  Display American football league standings and schedules from the AFVD (American Football Verband Deutschland) on your WordPress site.
- * Version:      2.3.1
+ * Version:      2.3.2
  * Requires at least: 5.9
  * Requires PHP:  7.4
  * Author:       Daniel Schmidt-Richert
@@ -15,7 +15,7 @@
 
 defined('ABSPATH') || exit;
 
-define('AFVDATA_VERSION', '2.3.1');
+define('AFVDATA_VERSION', '2.3.2');
 define('AFVDATA_DB_VERSION', '1.0');
 define('AFVDATA_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AFVDATA_PLUGIN_URL', plugin_dir_url(__FILE__));
