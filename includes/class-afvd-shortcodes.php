@@ -48,7 +48,7 @@ class AFVD_Shortcodes {
         if (!$league_config) {
             return $this->error(sprintf(
                 /* translators: %s: league identifier */
-                __('League "%s" not found. Check the slug in Settings → AFVD Data → Leagues.', 'afvd-data'),
+                __('League "%s" not found. Check the slug in Settings → AFVData → Leagues.', 'afvd-data'),
                 $atts['league']
             ));
         }
@@ -109,7 +109,7 @@ class AFVD_Shortcodes {
         if (!$league_config) {
             return $this->error(sprintf(
                 /* translators: %s: league identifier */
-                __('League "%s" not found. Check the slug in Settings → AFVD Data → Leagues.', 'afvd-data'),
+                __('League "%s" not found. Check the slug in Settings → AFVData → Leagues.', 'afvd-data'),
                 $atts['league']
             ));
         }
@@ -287,7 +287,7 @@ class AFVD_Shortcodes {
      */
     private function error($message) {
         if (current_user_can('edit_posts')) {
-            return '<p class="afvd-error"><strong>AFVD Data:</strong> ' . esc_html($message) . '</p>';
+            return '<p class="afvd-error"><strong>AFVData:</strong> ' . esc_html($message) . '</p>';
         }
         return '';
     }

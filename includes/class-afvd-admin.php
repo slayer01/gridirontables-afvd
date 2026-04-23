@@ -15,8 +15,8 @@ class AFVD_Admin {
 
     public function add_menu_page() {
         add_menu_page(
-            __('AFVD Data', 'afvd-data'),
-            __('AFVD Data', 'afvd-data'),
+            __('AFVData', 'afvd-data'),
+            __('AFVData', 'afvd-data'),
             'manage_options',
             'afvd-data',
             [$this, 'render_page'],
