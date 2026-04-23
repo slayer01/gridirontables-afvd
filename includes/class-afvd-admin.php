@@ -111,10 +111,15 @@ class AFVD_Admin {
         check_admin_referer('afvd_save_leagues', 'afvd_nonce');
 
         $leagues    = [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- individual values sanitized in loop below
         $slugs      = isset($_POST['league_slug']) ? wp_unslash($_POST['league_slug']) : [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $labels     = isset($_POST['league_label']) ? wp_unslash($_POST['league_label']) : [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $codes      = isset($_POST['league_code']) ? wp_unslash($_POST['league_code']) : [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $team_names = isset($_POST['league_team_name']) ? wp_unslash($_POST['league_team_name']) : [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $actives    = isset($_POST['league_active']) ? wp_unslash($_POST['league_active']) : [];
 
         foreach ($slugs as $i => $slug) {
