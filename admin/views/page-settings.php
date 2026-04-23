@@ -1,7 +1,7 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- variables scoped to included view
+// phpcs:disable WordPress.Security.NonceVerification.Recommended -- nonce checked in handler
 defined('ABSPATH') || exit;
-
-// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce checked in handler, this is a display-only view
 $active_tab       = sanitize_key($_GET['tab'] ?? 'settings');
 $base_url         = get_option('afvd_data_api_base_url', 'http://vereine.football-verband.de/');
 $interval         = get_option('afvd_data_sync_interval', 'manual');

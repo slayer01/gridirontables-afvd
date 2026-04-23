@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- variables scoped to included view
 defined('ABSPATH') || exit;
 ?>
 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">

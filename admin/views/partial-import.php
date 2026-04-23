@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- variables scoped to included view
 defined('ABSPATH') || exit;
 ?>
 <h2><?php esc_html_e('Import Status', 'afvd-data'); ?></h2>
