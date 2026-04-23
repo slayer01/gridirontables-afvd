@@ -172,6 +172,7 @@ class AFVD_Shortcodes {
         $output = '';
         if ($gruppe) {
             $output .= '<span class="afvd-group-header">'
+                /* translators: %s: group name/letter */
                 . sprintf(esc_html__('Group %s', 'afvd-data'), esc_html($gruppe))
                 . '</span>';
         }
@@ -224,6 +225,7 @@ class AFVD_Shortcodes {
         $output = '';
         if ($gruppe) {
             $output .= '<span class="afvd-group-header">'
+                /* translators: %s: group name/letter */
                 . sprintf(esc_html__('Group %s', 'afvd-data'), esc_html($gruppe))
                 . '</span>';
         }

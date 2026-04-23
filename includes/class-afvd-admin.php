@@ -70,19 +70,19 @@ class AFVD_Admin {
 
     public function handle_save_settings() {
         if (!current_user_can('manage_options')) {
-            wp_die(__('Unauthorized', 'afvd-data'));
+            wp_die(esc_html__('Unauthorized', 'afvd-data'));
         }
 
         check_admin_referer('afvd_save_settings', 'afvd_nonce');
 
-        update_option('afvd_data_api_base_url', esc_url_raw($_POST['api_base_url'] ?? 'http://vereine.football-verband.de/'));
+        update_option('afvd_data_api_base_url', esc_url_raw(wp_unslash($_POST['api_base_url'] ?? 'http://vereine.football-verband.de/')));
 
-        update_option('afvd_data_color_header_bg', sanitize_hex_color($_POST['color_header_bg'] ?? '#333333'));
-        update_option('afvd_data_color_header_text', sanitize_hex_color($_POST['color_header_text'] ?? '#ffffff'));
-        update_option('afvd_data_color_highlight_bg', sanitize_hex_color($_POST['color_highlight_bg'] ?? ''));
+        update_option('afvd_data_color_header_bg', sanitize_hex_color(wp_unslash($_POST['color_header_bg'] ?? '#333333')));
+        update_option('afvd_data_color_header_text', sanitize_hex_color(wp_unslash($_POST['color_header_text'] ?? '#ffffff')));
+        update_option('afvd_data_color_highlight_bg', sanitize_hex_color(wp_unslash($_POST['color_highlight_bg'] ?? '')));
 
         $allowed_intervals = ['manual', 'hourly', 'twicedaily', 'daily'];
-        $interval = sanitize_key($_POST['sync_interval'] ?? 'manual');
+        $interval = sanitize_key(wp_unslash($_POST['sync_interval'] ?? 'manual'));
         if (!in_array($interval, $allowed_intervals, true)) {
             $interval = 'manual';
         }
@@ -95,7 +95,7 @@ class AFVD_Admin {
             AFVD_Cron::schedule();
         }
 
-        wp_redirect(add_query_arg([
+        wp_safe_redirect(add_query_arg([
             'page'    => 'afvd-data',
             'tab'     => 'settings',
             'updated' => '1',
@@ -105,17 +105,17 @@ class AFVD_Admin {
 
     public function handle_save_leagues() {
         if (!current_user_can('manage_options')) {
-            wp_die(__('Unauthorized', 'afvd-data'));
+            wp_die(esc_html__('Unauthorized', 'afvd-data'));
         }
 
         check_admin_referer('afvd_save_leagues', 'afvd_nonce');
 
         $leagues    = [];
-        $slugs      = $_POST['league_slug'] ?? [];
-        $labels     = $_POST['league_label'] ?? [];
-        $codes      = $_POST['league_code'] ?? [];
-        $team_names = $_POST['league_team_name'] ?? [];
-        $actives    = $_POST['league_active'] ?? [];
+        $slugs      = isset($_POST['league_slug']) ? wp_unslash($_POST['league_slug']) : [];
+        $labels     = isset($_POST['league_label']) ? wp_unslash($_POST['league_label']) : [];
+        $codes      = isset($_POST['league_code']) ? wp_unslash($_POST['league_code']) : [];
+        $team_names = isset($_POST['league_team_name']) ? wp_unslash($_POST['league_team_name']) : [];
+        $actives    = isset($_POST['league_active']) ? wp_unslash($_POST['league_active']) : [];
 
         foreach ($slugs as $i => $slug) {
             $slug = sanitize_key($slug);
@@ -135,7 +135,7 @@ class AFVD_Admin {
 
         update_option('afvd_data_leagues', $leagues);
 
-        wp_redirect(add_query_arg([
+        wp_safe_redirect(add_query_arg([
             'page'    => 'afvd-data',
             'tab'     => 'leagues',
             'updated' => '1',
@@ -150,7 +150,7 @@ class AFVD_Admin {
             wp_send_json_error(__('Unauthorized', 'afvd-data'));
         }
 
-        $liga_code = sanitize_text_field($_POST['liga_code'] ?? '');
+        $liga_code = sanitize_text_field(wp_unslash($_POST['liga_code'] ?? ''));
         if ('' === $liga_code) {
             wp_send_json_error(__('No league specified', 'afvd-data'));
         }
@@ -185,8 +185,8 @@ class AFVD_Admin {
             wp_send_json_error(__('Unauthorized', 'afvd-data'));
         }
 
-        $liga_code = sanitize_text_field($_POST['liga_code'] ?? '');
-        $type      = sanitize_key($_POST['type'] ?? '');
+        $liga_code = sanitize_text_field(wp_unslash($_POST['liga_code'] ?? ''));
+        $type      = sanitize_key(wp_unslash($_POST['type'] ?? ''));
 
         if ('' === $liga_code || !in_array($type, ['standings', 'schedule'], true)) {
             wp_send_json_error(__('Invalid request', 'afvd-data'));

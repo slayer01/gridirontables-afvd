@@ -187,6 +187,7 @@ class AFVD_Importer {
         if (200 !== $code) {
             return new WP_Error(
                 'afvd_http_error',
+                /* translators: %d: HTTP status code */
                 sprintf(__('HTTP %d from AFVD API', 'afvd-data'), $code)
             );
         }
@@ -203,6 +204,7 @@ class AFVD_Importer {
             $errors = libxml_get_errors();
             libxml_clear_errors();
             $msg = !empty($errors) ? $errors[0]->message : __('Unknown XML parse error', 'afvd-data');
+            /* translators: %s: XML error message */
             return new WP_Error('afvd_xml_error', sprintf(__('XML parse error: %s', 'afvd-data'), trim($msg)));
         }
 

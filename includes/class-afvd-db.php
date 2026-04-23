@@ -86,7 +86,9 @@ class AFVD_DB {
         global $wpdb;
         $table = self::standings_table();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->query($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "INSERT INTO {$table}
                 (liga_code, bezeichnung, gruppe, platz, team, teamname, kuerzel,
                  p_plus, p_minus, td_plus, td_minus, imported_at)
@@ -123,7 +125,9 @@ class AFVD_DB {
         global $wpdb;
         $table = self::schedule_table();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->query($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "INSERT INTO {$table}
                 (game_id, liga_code, bezeichnung, gruppe, datum1, datum2, kickoff,
                  heim, heimname, heimkuerzel, gast, gastname, gastkuerzel,
@@ -190,7 +194,9 @@ class AFVD_DB {
      */
     public static function cleanup_stale($table, $liga_code, $import_started_at) {
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->query($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "DELETE FROM {$table} WHERE liga_code = %s AND imported_at < %s",
             $liga_code,
             $import_started_at
@@ -205,14 +211,18 @@ class AFVD_DB {
         $table = self::standings_table();
 
         if ($gruppe) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             return $wpdb->get_results($wpdb->prepare(
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
                 "SELECT * FROM {$table} WHERE liga_code = %s AND gruppe = %s ORDER BY platz ASC",
                 $liga_code,
                 $gruppe
             ), ARRAY_A);
         }
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         return $wpdb->get_results($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "SELECT * FROM {$table} WHERE liga_code = %s ORDER BY gruppe ASC, platz ASC",
             $liga_code
         ), ARRAY_A);
@@ -264,8 +274,11 @@ class AFVD_DB {
             $limit = $wpdb->prepare('LIMIT %d', $args['limit']);
         }
 
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $sql = "SELECT * FROM {$table} WHERE {$where_sql} {$order} {$limit}";
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
         return $wpdb->get_results($wpdb->prepare($sql, ...$params), ARRAY_A);
     }
 
@@ -277,12 +290,16 @@ class AFVD_DB {
         $standings_table = self::standings_table();
         $schedule_table  = self::schedule_table();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $standings_count = (int) $wpdb->get_var($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "SELECT COUNT(*) FROM {$standings_table} WHERE liga_code = %s",
             $liga_code
         ));
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $schedule_count = (int) $wpdb->get_var($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "SELECT COUNT(*) FROM {$schedule_table} WHERE liga_code = %s",
             $liga_code
         ));
@@ -300,7 +317,9 @@ class AFVD_DB {
         global $wpdb;
         $table = self::standings_table();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         return $wpdb->get_col($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "SELECT DISTINCT gruppe FROM {$table} WHERE liga_code = %s AND gruppe != '' ORDER BY gruppe ASC",
             $liga_code
         ));
@@ -313,7 +332,9 @@ class AFVD_DB {
         global $wpdb;
         $table = self::schedule_table();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         return $wpdb->get_col($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "SELECT DISTINCT gruppe FROM {$table} WHERE liga_code = %s AND gruppe != '' ORDER BY gruppe ASC",
             $liga_code
         ));
@@ -326,14 +347,18 @@ class AFVD_DB {
         global $wpdb;
         $table = self::standings_table();
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $name = $wpdb->get_var($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "SELECT bezeichnung FROM {$table} WHERE liga_code = %s LIMIT 1",
             $liga_code
         ));
 
         if (!$name) {
             $table = self::schedule_table();
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $name = $wpdb->get_var($wpdb->prepare(
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
                 "SELECT bezeichnung FROM {$table} WHERE liga_code = %s LIMIT 1",
                 $liga_code
             ));
@@ -347,7 +372,11 @@ class AFVD_DB {
      */
     public static function uninstall() {
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $wpdb->query("DROP TABLE IF EXISTS " . self::standings_table());
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $wpdb->query("DROP TABLE IF EXISTS " . self::schedule_table());
     }
 }
