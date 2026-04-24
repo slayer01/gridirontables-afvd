@@ -148,6 +148,9 @@ class AFVData_Shortcodes {
             foreach ($groups as $gruppe) {
                 $args = array_merge($query_args, ['gruppe' => $gruppe]);
                 $rows = AFVData_DB::get_schedule($liga_code, $args);
+                if (empty($rows) && $home_only) {
+                    continue;
+                }
                 $output .= $this->build_schedule_table($rows, $highlight, $gruppe);
             }
         } else {
