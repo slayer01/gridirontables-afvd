@@ -1,21 +1,16 @@
 <?php
 defined('ABSPATH') || exit;
 
-class FootballData_Importer {
+class DSFooboo_Football_Data_Importer {
 
     private $base_url;
 
     public function __construct() {
-        $this->base_url = rtrim(get_option('footballdata_api_base_url', 'http://vereine.football-verband.de/'), '/');
+        $this->base_url = rtrim(get_option('dsfooboo_football_data_api_base_url', 'http://vereine.football-verband.de/'), '/');
     }
 
-    /**
-     * Import all active leagues. Called by cron and the "Import All" button.
-     *
-     * @return array Results keyed by liga_code.
-     */
     public function import_all_active() {
-        $leagues = get_option('footballdata_leagues', []);
+        $leagues = get_option('dsfooboo_football_data_leagues', []);
         $results = [];
 
         foreach ($leagues as $league) {
@@ -32,17 +27,11 @@ class FootballData_Importer {
             }
         }
 
-        update_option('footballdata_last_sync', time());
+        update_option('dsfooboo_football_data_last_sync', time());
 
         return $results;
     }
 
-    /**
-     * Import standings and schedule for a single league.
-     *
-     * @param string $liga_code The league code.
-     * @return array|WP_Error Result summary or error.
-     */
     public function import_league($liga_code) {
         $liga_code = sanitize_text_field($liga_code);
         $now = current_time('mysql');
@@ -52,17 +41,17 @@ class FootballData_Importer {
 
         if (is_wp_error($standings_result) && is_wp_error($schedule_result)) {
             return new WP_Error(
-                'footballdata_import_failed',
+                'dsfooboo_football_data_import_failed',
                 sprintf(
                     /* translators: 1: standings error, 2: schedule error */
-                    __('Standings: %1$s | Schedule: %2$s', 'footballdata'),
+                    __('Standings: %1$s | Schedule: %2$s', 'dsfooboo_football_data'),
                     $standings_result->get_error_message(),
                     $schedule_result->get_error_message()
                 )
             );
         }
 
-        $counts = FootballData_DB::get_counts($liga_code);
+        $counts = DSFooboo_Football_Data_DB::get_counts($liga_code);
 
         return [
             'liga_code'       => $liga_code,
@@ -73,9 +62,6 @@ class FootballData_Importer {
         ];
     }
 
-    /**
-     * Import standings for a league from XML.
-     */
     private function import_standings($liga_code, $import_time) {
         $url = $this->base_url . '/xmltabelle.php5?Liga=' . urlencode($liga_code);
         $xml = $this->fetch_xml($url);
@@ -86,7 +72,7 @@ class FootballData_Importer {
 
         $count = 0;
         foreach ($xml->children() as $row) {
-            FootballData_DB::upsert_standing([
+            DSFooboo_Football_Data_DB::upsert_standing([
                 'liga_code'   => sanitize_text_field((string) $row->Liga),
                 'bezeichnung' => sanitize_text_field((string) $row->Bezeichnung),
                 'gruppe'      => sanitize_text_field((string) $row->Gruppe),
@@ -104,15 +90,12 @@ class FootballData_Importer {
         }
 
         if ($count > 0) {
-            FootballData_DB::cleanup_stale(FootballData_DB::standings_table(), $liga_code, $import_time);
+            DSFooboo_Football_Data_DB::cleanup_stale(DSFooboo_Football_Data_DB::standings_table(), $liga_code, $import_time);
         }
 
         return $count;
     }
 
-    /**
-     * Import schedule for a league from XML.
-     */
     private function import_schedule($liga_code, $import_time) {
         $url = $this->base_url . '/xmlspielplan.php5?Liga=' . urlencode($liga_code);
         $xml = $this->fetch_xml($url);
@@ -126,7 +109,7 @@ class FootballData_Importer {
             $datum1 = (string) $row->Datum1;
             $datum2 = (string) $row->Datum2;
 
-            FootballData_DB::upsert_game([
+            DSFooboo_Football_Data_DB::upsert_game([
                 'game_id'      => sanitize_text_field((string) $row->ID),
                 'liga_code'    => sanitize_text_field((string) $row->Liga),
                 'bezeichnung'  => sanitize_text_field((string) $row->Bezeichnung),
@@ -158,22 +141,16 @@ class FootballData_Importer {
         }
 
         if ($count > 0) {
-            FootballData_DB::cleanup_stale(FootballData_DB::schedule_table(), $liga_code, $import_time);
+            DSFooboo_Football_Data_DB::cleanup_stale(DSFooboo_Football_Data_DB::schedule_table(), $liga_code, $import_time);
         }
 
         return $count;
     }
 
-    /**
-     * Fetch and parse XML from a URL.
-     *
-     * @param string $url
-     * @return SimpleXMLElement|WP_Error
-     */
     private function fetch_xml($url) {
         $response = wp_remote_get($url, [
             'timeout'    => 30,
-            'user-agent' => 'FootballData-WordPress-Plugin/' . FOOTBALLDATA_VERSION,
+            'user-agent' => 'DSFOOBOO-Football-Data-WordPress-Plugin/' . DSFOOBOO_FOOTBALL_DATA_VERSION,
         ]);
 
         if (is_wp_error($response)) {
@@ -183,15 +160,15 @@ class FootballData_Importer {
         $code = wp_remote_retrieve_response_code($response);
         if (200 !== $code) {
             return new WP_Error(
-                'footballdata_http_error',
+                'dsfooboo_football_data_http_error',
                 /* translators: %d: HTTP status code */
-                sprintf(__('HTTP %d from data API', 'footballdata'), $code)
+                sprintf(__('HTTP %d from data API', 'dsfooboo_football_data'), $code)
             );
         }
 
         $body = wp_remote_retrieve_body($response);
         if (empty($body)) {
-            return new WP_Error('footballdata_empty_response', __('Empty response from data API', 'footballdata'));
+            return new WP_Error('dsfooboo_football_data_empty_response', __('Empty response from data API', 'dsfooboo_football_data'));
         }
 
         libxml_use_internal_errors(true);
@@ -200,17 +177,14 @@ class FootballData_Importer {
         if (false === $xml) {
             $errors = libxml_get_errors();
             libxml_clear_errors();
-            $msg = !empty($errors) ? $errors[0]->message : __('Unknown XML parse error', 'footballdata');
+            $msg = !empty($errors) ? $errors[0]->message : __('Unknown XML parse error', 'dsfooboo_football_data');
             /* translators: %s: XML error message */
-            return new WP_Error('footballdata_xml_error', sprintf(__('XML parse error: %s', 'footballdata'), trim($msg)));
+            return new WP_Error('dsfooboo_football_data_xml_error', sprintf(__('XML parse error: %s', 'dsfooboo_football_data'), trim($msg)));
         }
 
         return $xml;
     }
 
-    /**
-     * Parse a date string to Y-m-d format, or return null.
-     */
     private function parse_date($date_string) {
         if (empty($date_string)) {
             return null;

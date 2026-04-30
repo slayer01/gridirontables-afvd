@@ -1,54 +1,68 @@
 <?php
 defined('ABSPATH') || exit;
 
-class FootballData_DB {
+class DSFooboo_Football_Data_DB {
 
     public static function standings_table() {
         global $wpdb;
-        return $wpdb->prefix . 'footballdata_standings';
+        return $wpdb->prefix . 'dsfooboo_football_data_standings';
     }
 
     public static function schedule_table() {
         global $wpdb;
-        return $wpdb->prefix . 'footballdata_schedule';
-    }
-
-    public static function legacy_standings_table() {
-        global $wpdb;
-        return $wpdb->prefix . 'afvdata_standings';
-    }
-
-    public static function legacy_schedule_table() {
-        global $wpdb;
-        return $wpdb->prefix . 'afvdata_schedule';
+        return $wpdb->prefix . 'dsfooboo_football_data_schedule';
     }
 
     /**
-     * Rename legacy afvdata_* tables to footballdata_* if present.
+     * Pairs of [legacy_table, new_table] used by the migration.
+     * The first matching legacy table that exists wins.
+     */
+    private static function legacy_table_pairs() {
+        global $wpdb;
+        return [
+            'standings' => [
+                $wpdb->prefix . 'footballdata_standings',
+                $wpdb->prefix . 'afvdata_standings',
+            ],
+            'schedule' => [
+                $wpdb->prefix . 'footballdata_schedule',
+                $wpdb->prefix . 'afvdata_schedule',
+            ],
+        ];
+    }
+
+    /**
+     * Rename legacy *_standings / *_schedule tables to dsfooboo_football_data_* if any exist.
      * Idempotent: bails out cleanly when nothing to migrate.
      */
     public static function migrate_from_legacy() {
         global $wpdb;
 
-        $pairs = [
-            [self::legacy_standings_table(), self::standings_table()],
-            [self::legacy_schedule_table(),  self::schedule_table()],
+        $targets = [
+            'standings' => self::standings_table(),
+            'schedule'  => self::schedule_table(),
         ];
 
-        foreach ($pairs as $pair) {
-            list($old, $new) = $pair;
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            $old_exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $old)) === $old;
+        foreach (self::legacy_table_pairs() as $kind => $legacy_tables) {
+            $new = $targets[$kind];
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             $new_exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $new)) === $new;
 
-            if ($old_exists && !$new_exists) {
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-                $wpdb->query("RENAME TABLE {$old} TO {$new}");
-            } elseif ($old_exists && $new_exists) {
-                // New table already created (e.g. by activation hook on a fresh install). Drop the orphan legacy table.
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-                $wpdb->query("DROP TABLE IF EXISTS {$old}");
+            foreach ($legacy_tables as $old) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+                $old_exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $old)) === $old;
+                if (!$old_exists) {
+                    continue;
+                }
+
+                if (!$new_exists) {
+                    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+                    $wpdb->query("RENAME TABLE {$old} TO {$new}");
+                    $new_exists = true;
+                } else {
+                    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+                    $wpdb->query("DROP TABLE IF EXISTS {$old}");
+                }
             }
         }
     }
@@ -116,12 +130,9 @@ class FootballData_DB {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
-        update_option('footballdata_db_version', FOOTBALLDATA_DB_VERSION);
+        update_option('dsfooboo_football_data_db_version', DSFOOBOO_FOOTBALL_DATA_DB_VERSION);
     }
 
-    /**
-     * Upsert a standings row.
-     */
     public static function upsert_standing($data) {
         global $wpdb;
         $table = self::standings_table();
@@ -158,9 +169,6 @@ class FootballData_DB {
         ));
     }
 
-    /**
-     * Upsert a schedule row.
-     */
     public static function upsert_game($data) {
         global $wpdb;
         $table = self::schedule_table();
@@ -229,9 +237,6 @@ class FootballData_DB {
         ));
     }
 
-    /**
-     * Remove stale rows after an import (rows not updated in this run).
-     */
     public static function cleanup_stale($table, $liga_code, $import_started_at) {
         global $wpdb;
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
@@ -243,9 +248,6 @@ class FootballData_DB {
         ));
     }
 
-    /**
-     * Get standings for a league, ordered by group then rank.
-     */
     public static function get_standings($liga_code, $gruppe = null) {
         global $wpdb;
         $table = self::standings_table();
@@ -268,9 +270,6 @@ class FootballData_DB {
         ), ARRAY_A);
     }
 
-    /**
-     * Get schedule for a league, ordered by date.
-     */
     public static function get_schedule($liga_code, $args = []) {
         global $wpdb;
         $table = self::schedule_table();
@@ -321,9 +320,6 @@ class FootballData_DB {
         return $wpdb->get_results($wpdb->prepare($sql, ...$params), ARRAY_A);
     }
 
-    /**
-     * Get row counts per league for the import status display.
-     */
     public static function get_counts($liga_code) {
         global $wpdb;
         $standings_table = self::standings_table();
@@ -349,9 +345,6 @@ class FootballData_DB {
         ];
     }
 
-    /**
-     * Get distinct groups for a league's standings.
-     */
     public static function get_standing_groups($liga_code) {
         global $wpdb;
         $table = self::standings_table();
@@ -364,9 +357,6 @@ class FootballData_DB {
         ));
     }
 
-    /**
-     * Get distinct groups for a league's schedule.
-     */
     public static function get_schedule_groups($liga_code) {
         global $wpdb;
         $table = self::schedule_table();
@@ -379,9 +369,6 @@ class FootballData_DB {
         ));
     }
 
-    /**
-     * Get the league display name (bezeichnung) from stored data.
-     */
     public static function get_league_name($liga_code) {
         global $wpdb;
         $table = self::standings_table();
@@ -407,17 +394,20 @@ class FootballData_DB {
     }
 
     /**
-     * Drop all plugin tables. Used by uninstall.php.
+     * Drop all plugin tables (current + legacy). Used by uninstall.php.
      */
     public static function uninstall() {
         global $wpdb;
         $tables = [
             self::standings_table(),
             self::schedule_table(),
-            self::legacy_standings_table(),
-            self::legacy_schedule_table(),
         ];
-        foreach ($tables as $table) {
+        foreach (self::legacy_table_pairs() as $legacy_tables) {
+            foreach ($legacy_tables as $t) {
+                $tables[] = $t;
+            }
+        }
+        foreach (array_unique($tables) as $table) {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             $wpdb->query("DROP TABLE IF EXISTS {$table}");
         }

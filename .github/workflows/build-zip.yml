@@ -17,24 +17,24 @@ jobs:
 
       - name: Read version
         run: |
-          VERSION=$(grep -oP "Version:\s+\K[0-9]+\.[0-9]+\.[0-9]+" football-data.php | head -1)
+          VERSION=$(grep -oP "Version:\s+\K[0-9]+\.[0-9]+\.[0-9]+" dsfooboo-football-data.php | head -1)
           echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
           echo "Plugin version: ${VERSION}"
 
       - name: Build ZIP
         run: |
-          mkdir -p footballdata
-          cp -r football-data.php uninstall.php readme.txt README.md includes/ admin/ public/ footballdata/
-          zip -r footballdata.zip footballdata/
+          mkdir -p dsfooboo-football-data
+          cp -r dsfooboo-football-data.php uninstall.php readme.txt README.md includes/ admin/ public/ dsfooboo-football-data/
+          zip -r dsfooboo-football-data.zip dsfooboo-football-data/
 
       - name: Create or update release
         run: |
           TAG="v${VERSION}"
           if gh release view "$TAG" > /dev/null 2>&1; then
-            gh release upload "$TAG" footballdata.zip --clobber
+            gh release upload "$TAG" dsfooboo-football-data.zip --clobber
           else
-            gh release create "$TAG" footballdata.zip \
-              --title "FootballData ${VERSION}" \
+            gh release create "$TAG" dsfooboo-football-data.zip \
+              --title "DSFOOBOO Football Data ${VERSION}" \
               --notes "Release ${VERSION}" \
               --latest
           fi

@@ -1,4 +1,4 @@
-# FootballData – League Tables & Schedules
+# DSFOOBOO Football Data – League Tables & Schedules
 
 WordPress-Plugin zur Anzeige von American Football Spielplänen und Tabellen. Nutzt den öffentlichen XML-Export von `vereine.football-verband.de`.
 
@@ -14,7 +14,7 @@ Dieses Plugin ist ein unabhängiges Projekt und steht in keiner Verbindung zum A
 
 ### 1. Ligen konfigurieren
 
-**FootballData → Leagues**
+**DSFOOBOO Football Data → Leagues**
 
 Für jede Liga eine Zeile anlegen:
 
@@ -28,14 +28,14 @@ Für jede Liga eine Zeile anlegen:
 
 ### 2. Daten importieren
 
-**FootballData → Import**
+**DSFOOBOO Football Data → Import**
 
 - **Import** pro Liga oder **Import All Active Leagues** für alle auf einmal.
 - Rohdaten können über die Buttons **Standings** / **Schedule** eingesehen werden.
 
 ### 3. Einstellungen
 
-**FootballData → Settings**
+**DSFOOBOO Football Data → Settings**
 
 - **API Base URL** — Standard: `http://vereine.football-verband.de/` — normalerweise nicht ändern.
 - **Auto Sync** — Automatischer Datenabgleich per WP-Cron (stündlich, 2x täglich, täglich oder manuell).
@@ -44,11 +44,11 @@ Für jede Liga eine Zeile anlegen:
 ## Shortcodes
 
 ```
-[footballdata_standings league="herren"]
-[footballdata_schedule league="herren"]
+[dsfooboo_football_data_standings league="herren"]
+[dsfooboo_football_data_schedule league="herren"]
 ```
 
-Die alten Shortcodes `[afvdata_standings]` und `[afvdata_schedule]` funktionieren weiterhin als Aliase.
+Die alten Shortcodes `[footballdata_standings]`, `[footballdata_schedule]`, `[afvdata_standings]` und `[afvdata_schedule]` funktionieren weiterhin als Aliase.
 
 ### Optionale Attribute
 
@@ -65,21 +65,21 @@ Die alten Shortcodes `[afvdata_standings]` und `[afvdata_schedule]` funktioniere
 ### Beispiele
 
 ```
-[footballdata_standings league="u16" group="A"]
-[footballdata_schedule league="herren" home_only="1"]
-[footballdata_schedule league="herren" show="upcoming" limit="5"]
+[dsfooboo_football_data_standings league="u16" group="A"]
+[dsfooboo_football_data_schedule league="herren" home_only="1"]
+[dsfooboo_football_data_schedule league="herren" show="upcoming" limit="5"]
 ```
 
-## Migration vom alten `afvdata`-Prefix
+## Migration aus älteren Versionen
 
-Beim ersten Laden nach dem Update werden Datenbanktabellen und Optionen automatisch vom alten `afvdata_*`-Prefix auf `footballdata_*` umgezogen. Bestehende Inhalte (Ligen-Konfiguration, Farben, importierte Daten) bleiben erhalten. Die alten Shortcodes funktionieren weiterhin als Aliase.
+Beim ersten Laden nach dem Update werden Datenbanktabellen und Optionen automatisch von den älteren Prefixes (`footballdata_*` oder `afvdata_*`) auf `dsfooboo_football_data_*` umgezogen. Bestehende Inhalte (Ligen-Konfiguration, Farben, importierte Daten) bleiben erhalten. Die alten Shortcodes funktionieren weiterhin als Aliase.
 
 ## CSS anpassen
 
-Die Tabellen verwenden die Klasse `.footballdata-league-table`. Beispiel für eigene Farben im Theme-CSS:
+Die Tabellen verwenden die Klasse `.dsfooboo_football_data_league_table`. Beispiel für eigene Farben im Theme-CSS:
 
 ```css
-table.footballdata-league-table th {
+table.dsfooboo_football_data_league_table th {
     background-color: #dd3333;
     color: #fff;
 }
