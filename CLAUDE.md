@@ -83,7 +83,7 @@ The `league` attribute accepts either a configured slug or a raw liga code. Grou
 - Text domain: `footballdata`
 - Admin page slug: `footballdata`
 - File names use `class-footballdata-*.php` and `football-data.php`/`football-data.css`
-- The repository folder and GitHub Pages slug remain `afvdata` for now (Plugin URI still points to slayer01.github.io/afvdata)
+- GitHub repo and Pages slug are `footballdata` (Plugin URI: `https://slayer01.github.io/footballdata/`); the local working-copy folder still happens to be named `afvdata` for legacy reasons
 
 ## Security Conventions
 

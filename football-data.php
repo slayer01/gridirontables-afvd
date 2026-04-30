@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:  FootballData – League Tables & Schedules
- * Plugin URI:   https://slayer01.github.io/afvdata/
+ * Plugin URI:   https://slayer01.github.io/footballdata/
  * Description:  Display American football league standings and schedules from publicly available XML data on your WordPress site.
- * Version:      2.4.0
+ * Version:      2.4.1
  * Requires at least: 5.9
  * Requires PHP:  7.4
  * Author:       Daniel Schmidt-Richert
@@ -15,7 +15,7 @@
 
 defined('ABSPATH') || exit;
 
-define('FOOTBALLDATA_VERSION', '2.4.0');
+define('FOOTBALLDATA_VERSION', '2.4.1');
 define('FOOTBALLDATA_DB_VERSION', '1.1');
 define('FOOTBALLDATA_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('FOOTBALLDATA_PLUGIN_URL', plugin_dir_url(__FILE__));

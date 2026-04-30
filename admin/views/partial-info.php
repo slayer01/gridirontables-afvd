@@ -40,7 +40,7 @@ defined('ABSPATH') || exit;
         </tr>
         <tr>
             <th scope="row"><?php esc_html_e('Source Code', 'footballdata'); ?></th>
-            <td><a href="https://github.com/slayer01/afvdata" target="_blank" rel="noopener">github.com/slayer01/afvdata</a></td>
+            <td><a href="https://github.com/slayer01/footballdata" target="_blank" rel="noopener">github.com/slayer01/footballdata</a></td>
         </tr>
         <tr>
             <th scope="row"><?php esc_html_e('License', 'footballdata'); ?></th>

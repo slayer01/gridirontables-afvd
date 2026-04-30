@@ -4,7 +4,7 @@ Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.4.0
+Stable tag: 2.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,9 @@ The legacy `[afvdata_standings]` and `[afvdata_schedule]` shortcodes still work 
 4. Import data and use shortcodes on your pages
 
 == Changelog ==
+
+= 2.4.1 =
+* GitHub repository renamed from `afvdata` to `footballdata`; Plugin URI and documentation links updated accordingly
 
 = 2.4.0 =
 * Renamed plugin from "AFVData" to "FootballData"
