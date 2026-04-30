@@ -1,4 +1,4 @@
-# DSFOOBOO Football Data – League Tables & Schedules
+# DSFOOBOO Football Data – League tables & schedules - data provided by AFVD
 
 WordPress-Plugin zur Anzeige von American Football Spielplänen und Tabellen. Nutzt den öffentlichen XML-Export von `vereine.football-verband.de`.
 

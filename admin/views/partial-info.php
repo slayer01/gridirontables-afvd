@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
     <div style="text-align:center;margin:30px 0;">
         <img src="<?php echo esc_url(DSFOOBOO_FOOTBALL_DATA_PLUGIN_URL . 'admin/img/logo.png'); ?>" alt="DSFOOBOO Football Data" style="height:128px;">
-        <h2 style="margin-top:12px;">DSFOOBOO Football Data &ndash; League Tables &amp; Schedules</h2>
+        <h2 style="margin-top:12px;">DSFOOBOO Football Data &ndash; League tables &amp; schedules - data provided by AFVD</h2>
         <p style="color:#666;">Version <?php echo esc_html(DSFOOBOO_FOOTBALL_DATA_VERSION); ?></p>
     </div>
 

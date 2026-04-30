@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A WordPress plugin ("DSFOOBOO Football Data – League Tables & Schedules") that fetches American football league standings and game schedules from a publicly available XML API at `vereine.football-verband.de`, stores them locally, and displays them via shortcodes.
+A WordPress plugin ("DSFOOBOO Football Data – League tables & schedules - data provided by AFVD") that fetches American football league standings and game schedules from a publicly available XML API at `vereine.football-verband.de`, stores them locally, and displays them via shortcodes.
 
 This plugin is independent and not affiliated with the AFVD (American Football Verband Deutschland) or any of its member associations.
 
