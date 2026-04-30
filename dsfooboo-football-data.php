@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:  DSFOOBOO Football Data – League Tables & Schedules
- * Plugin URI:   https://slayer01.github.io/footballdata/
+ * Plugin URI:   https://slayer01.github.io/dsfooboo-football-data/
  * Description:  Display American football league standings and schedules from publicly available XML data on your WordPress site.
- * Version:      2.5.0
+ * Version:      2.5.1
  * Requires at least: 5.9
  * Requires PHP:  7.4
  * Author:       Daniel Schmidt-Richert
@@ -15,7 +15,7 @@
 
 defined('ABSPATH') || exit;
 
-define('DSFOOBOO_FOOTBALL_DATA_VERSION', '2.5.0');
+define('DSFOOBOO_FOOTBALL_DATA_VERSION', '2.5.1');
 define('DSFOOBOO_FOOTBALL_DATA_DB_VERSION', '1.2');
 define('DSFOOBOO_FOOTBALL_DATA_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('DSFOOBOO_FOOTBALL_DATA_PLUGIN_URL', plugin_dir_url(__FILE__));

@@ -4,7 +4,7 @@ Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,9 @@ The legacy `[footballdata_*]` and `[afvdata_*]` shortcodes still work as aliases
 4. Import data and use shortcodes on your pages
 
 == Changelog ==
+
+= 2.5.1 =
+* GitHub repository renamed from `footballdata` to `dsfooboo-football-data`; Plugin URI and documentation links updated accordingly
 
 = 2.5.0 =
 * Renamed plugin to "DSFOOBOO Football Data"

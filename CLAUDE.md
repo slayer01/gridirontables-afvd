@@ -76,7 +76,7 @@ The `league` attribute accepts either a configured slug or a raw liga code. Grou
 - All options, DB tables, AJAX actions, cron hook, text domain, menu page slug, CSS classes, CSS custom properties: `dsfooboo_football_data_*` (snake_case with underscores everywhere — also in CSS classes, deviating from typical hyphenated convention; matches the user's stated preference)
 - Cron hook: `dsfooboo_football_data_sync` (legacy `footballdata_sync` and `afvdata_sync` are unscheduled during migration)
 - Plugin file and class file names use hyphens (WP convention for plugin slug paths): `dsfooboo-football-data.php`, `class-dsfooboo-football-data-*.php`, `dsfooboo-football-data.css`
-- GitHub repo: `slayer01/footballdata`; Pages URL `https://slayer01.github.io/footballdata/`. Local working-copy folder is still named `afvdata` for legacy reasons.
+- GitHub repo: `slayer01/dsfooboo-football-data`; Pages URL `https://slayer01.github.io/dsfooboo-football-data/`. Local working-copy folder is still named `afvdata` for legacy reasons.
 
 ## Security Conventions
 
