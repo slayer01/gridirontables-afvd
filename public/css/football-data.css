@@ -1,55 +1,55 @@
 /* ==========================================================================
-   AFVData – Frontend Styles
+   FootballData – Frontend Styles
    ========================================================================== */
 
 /* --- League Table (Standings + Schedule) --- */
 
-table.afvdata-league-table {
+table.footballdata-league-table {
     width: 100%;
     border-collapse: collapse;
     font-family: inherit;
     margin-bottom: 0;
 }
 
-table.afvdata-league-table th {
-    background-color: var(--afvdata-header-bg, #333);
-    color: var(--afvdata-header-text, #fff);
+table.footballdata-league-table th {
+    background-color: var(--footballdata-header-bg, #333);
+    color: var(--footballdata-header-text, #fff);
     padding: 8px 10px;
     text-align: left;
     font-weight: 600;
 }
 
-table.afvdata-league-table td {
+table.footballdata-league-table td {
     background-color: #fff;
     padding: 6px 10px;
     border-bottom: 1px solid #eee;
 }
 
-table.afvdata-league-table .odd td {
+table.footballdata-league-table .odd td {
     background-color: #f5f5f5;
 }
 
 /* --- Highlighting --- */
 
-table.afvdata-league-table td.afvdata-highlight {
+table.footballdata-league-table td.footballdata-highlight {
     font-weight: bold;
 }
 
-table.afvdata-league-table tr.afvdata-highlight td {
+table.footballdata-league-table tr.footballdata-highlight td {
     font-weight: bold;
-    background-color: var(--afvdata-highlight-bg);
+    background-color: var(--footballdata-highlight-bg);
 }
 
 /* --- Numeric columns --- */
 
-.afvdata-league-table .afvdata-num {
+.footballdata-league-table .footballdata-num {
     font-size: 0.9em;
     font-variant-numeric: tabular-nums;
 }
 
 /* --- Group header --- */
 
-span.afvdata-group-header {
+span.footballdata-group-header {
     font-weight: bold;
     display: block;
     padding: 10px 0;
@@ -57,20 +57,20 @@ span.afvdata-group-header {
 
 /* --- Disclaimer --- */
 
-span.afvdata-disclaimer {
+span.footballdata-disclaimer {
     font-size: 0.75em;
     color: #aaa;
     display: block;
     margin-top: 6px;
 }
 
-span.afvdata-disclaimer a {
+span.footballdata-disclaimer a {
     color: #999;
 }
 
 /* --- Error (editors only) --- */
 
-p.afvdata-error {
+p.footballdata-error {
     color: #dc3232;
     background: #fef7f7;
     border-left: 4px solid #dc3232;
@@ -83,37 +83,37 @@ p.afvdata-error {
 
 @media all and (max-width: 640px) {
 
-    table.afvdata-schedule-table,
-    table.afvdata-schedule-table thead,
-    table.afvdata-schedule-table tbody,
-    table.afvdata-schedule-table tr,
-    table.afvdata-schedule-table th,
-    table.afvdata-schedule-table td {
+    table.footballdata-schedule-table,
+    table.footballdata-schedule-table thead,
+    table.footballdata-schedule-table tbody,
+    table.footballdata-schedule-table tr,
+    table.footballdata-schedule-table th,
+    table.footballdata-schedule-table td {
         display: block;
     }
 
-    table.afvdata-schedule-table {
+    table.footballdata-schedule-table {
         text-align: right;
     }
 
-    table.afvdata-schedule-table thead {
+    table.footballdata-schedule-table thead {
         position: absolute;
         left: -9999px;
         top: -9999px;
     }
 
-    table.afvdata-schedule-table tr {
+    table.footballdata-schedule-table tr {
         margin-bottom: 10px;
         border: 1px solid #ddd;
     }
 
-    table.afvdata-schedule-table td {
+    table.footballdata-schedule-table td {
         position: relative;
         padding-left: 50%;
         text-align: right;
     }
 
-    table.afvdata-schedule-table td::before {
+    table.footballdata-schedule-table td::before {
         content: attr(data-label) ":";
         position: absolute;
         left: 10px;
@@ -121,7 +121,7 @@ p.afvdata-error {
         text-align: left;
     }
 
-    .afvdata-nomobile {
+    .footballdata-nomobile {
         display: none;
     }
 }

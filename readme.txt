@@ -1,10 +1,10 @@
-=== AFVData – League Tables & Schedules ===
+=== FootballData – League Tables & Schedules ===
 Contributors: slayer01
 Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.3.8
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Display American football league standings and game schedules on your WordPress 
 
 == Description ==
 
-AFVData fetches league standings and game schedules from a publicly available XML API, stores them locally, and displays them via shortcodes.
+FootballData fetches league standings and game schedules from a publicly available XML API, stores them locally, and displays them via shortcodes.
 
 This plugin is an independent project and is not affiliated with, endorsed by, or in any way officially connected to the AFVD (American Football Verband Deutschland) or any of its member associations.
 
@@ -29,8 +29,10 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 
 = Shortcodes =
 
-* `[afvdata_standings league="slug"]` — League standings table
-* `[afvdata_schedule league="slug"]` — Game schedule table
+* `[footballdata_standings league="slug"]` — League standings table
+* `[footballdata_schedule league="slug"]` — Game schedule table
+
+The legacy `[afvdata_standings]` and `[afvdata_schedule]` shortcodes still work as aliases.
 
 = Schedule Attributes =
 
@@ -49,10 +51,17 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 
 1. Upload the plugin folder to `/wp-content/plugins/`
 2. Activate the plugin through the Plugins menu
-3. Go to **AFVData** in the admin menu to configure leagues
+3. Go to **FootballData** in the admin menu to configure leagues
 4. Import data and use shortcodes on your pages
 
 == Changelog ==
+
+= 2.4.0 =
+* Renamed plugin from "AFVData" to "FootballData"
+* New shortcodes `[footballdata_standings]` and `[footballdata_schedule]`; old `[afvdata_*]` shortcodes still work as aliases
+* All internal prefixes (classes, options, CSS, AJAX hooks, text domain) renamed from `afvdata` to `footballdata`
+* Automatic one-time migration on activation: renames database tables and copies options from the old prefix
+* DB schema bumped to 1.1
 
 = 2.3.0 =
 * Complete rename of all internal prefixes to afvdata

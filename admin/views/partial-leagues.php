@@ -3,33 +3,33 @@
 defined('ABSPATH') || exit;
 ?>
 <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-    <input type="hidden" name="action" value="afvdata_save_leagues">
-    <?php wp_nonce_field('afvdata_save_leagues', 'afvdata_nonce'); ?>
+    <input type="hidden" name="action" value="footballdata_save_leagues">
+    <?php wp_nonce_field('footballdata_save_leagues', 'footballdata_nonce'); ?>
 
     <p class="description">
-        <?php esc_html_e('Configure the leagues to import. The slug is used in shortcodes, e.g. [afvdata_standings league="mensteam"]. The Liga Code is the AFVD identifier (e.g., "olm", "mu19ol").', 'afvdata'); ?>
+        <?php esc_html_e('Configure the leagues to import. The slug is used in shortcodes, e.g. [footballdata_standings league="mensteam"]. The Liga Code is the league identifier from the XML API (e.g., "olm", "mu19ol").', 'footballdata'); ?>
     </p>
 
-    <table class="widefat afvdata-leagues-table" id="afvdata-leagues-table">
+    <table class="widefat footballdata-leagues-table" id="footballdata-leagues-table">
         <thead>
             <tr>
-                <th><?php esc_html_e('Slug', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Label', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Liga Code', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Team Name', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Active', 'afvdata'); ?></th>
+                <th><?php esc_html_e('Slug', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Label', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Liga Code', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Team Name', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Active', 'footballdata'); ?></th>
                 <th></th>
             </tr>
         </thead>
-        <tbody id="afvdata-leagues-body">
+        <tbody id="footballdata-leagues-body">
             <?php if (!empty($leagues)) : ?>
                 <?php foreach ($leagues as $i => $league) : ?>
-                    <tr class="afvdata-league-row">
+                    <tr class="footballdata-league-row">
                         <td>
                             <input type="text" name="league_slug[]"
                                    value="<?php echo esc_attr($league['slug']); ?>"
                                    class="regular-text" required pattern="[a-z0-9\-]+"
-                                   title="<?php esc_attr_e('Lowercase letters, numbers, and hyphens only', 'afvdata'); ?>">
+                                   title="<?php esc_attr_e('Lowercase letters, numbers, and hyphens only', 'footballdata'); ?>">
                         </td>
                         <td>
                             <input type="text" name="league_label[]"
@@ -45,15 +45,15 @@ defined('ABSPATH') || exit;
                             <input type="text" name="league_team_name[]"
                                    value="<?php echo esc_attr($league['team_name'] ?? ''); ?>"
                                    class="regular-text"
-                                   placeholder="<?php esc_attr_e('e.g. Wetterau Bulls', 'afvdata'); ?>">
+                                   placeholder="<?php esc_attr_e('e.g. Wetterau Bulls', 'footballdata'); ?>">
                         </td>
                         <td>
                             <input type="checkbox" name="league_active[<?php echo (int) $i; ?>]"
                                    <?php checked(!empty($league['active'])); ?>>
                         </td>
                         <td>
-                            <button type="button" class="button afvdata-remove-league">
-                                <?php esc_html_e('Remove', 'afvdata'); ?>
+                            <button type="button" class="button footballdata-remove-league">
+                                <?php esc_html_e('Remove', 'footballdata'); ?>
                             </button>
                         </td>
                     </tr>
@@ -63,21 +63,21 @@ defined('ABSPATH') || exit;
     </table>
 
     <p>
-        <button type="button" class="button" id="afvdata-add-league">
-            <?php esc_html_e('+ Add League', 'afvdata'); ?>
+        <button type="button" class="button" id="footballdata-add-league">
+            <?php esc_html_e('+ Add League', 'footballdata'); ?>
         </button>
     </p>
 
-    <?php submit_button(__('Save Leagues', 'afvdata')); ?>
+    <?php submit_button(__('Save Leagues', 'footballdata')); ?>
 </form>
 
-<script type="text/html" id="tmpl-afvdata-league-row">
-    <tr class="afvdata-league-row">
-        <td><input type="text" name="league_slug[]" class="regular-text" required pattern="[a-z0-9\-]+" title="<?php esc_attr_e('Lowercase letters, numbers, and hyphens only', 'afvdata'); ?>"></td>
+<script type="text/html" id="tmpl-footballdata-league-row">
+    <tr class="footballdata-league-row">
+        <td><input type="text" name="league_slug[]" class="regular-text" required pattern="[a-z0-9\-]+" title="<?php esc_attr_e('Lowercase letters, numbers, and hyphens only', 'footballdata'); ?>"></td>
         <td><input type="text" name="league_label[]" class="regular-text"></td>
         <td><input type="text" name="league_code[]" class="small-text" required></td>
-        <td><input type="text" name="league_team_name[]" class="regular-text" placeholder="<?php esc_attr_e('e.g. Wetterau Bulls', 'afvdata'); ?>"></td>
+        <td><input type="text" name="league_team_name[]" class="regular-text" placeholder="<?php esc_attr_e('e.g. Wetterau Bulls', 'footballdata'); ?>"></td>
         <td><input type="checkbox" name="league_active[{{INDEX}}]" checked></td>
-        <td><button type="button" class="button afvdata-remove-league"><?php esc_html_e('Remove', 'afvdata'); ?></button></td>
+        <td><button type="button" class="button footballdata-remove-league"><?php esc_html_e('Remove', 'footballdata'); ?></button></td>
     </tr>
 </script>

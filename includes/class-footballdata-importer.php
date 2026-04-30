@@ -1,12 +1,12 @@
 <?php
 defined('ABSPATH') || exit;
 
-class AFVData_Importer {
+class FootballData_Importer {
 
     private $base_url;
 
     public function __construct() {
-        $this->base_url = rtrim(get_option('afvdata_api_base_url', 'http://vereine.football-verband.de/'), '/');
+        $this->base_url = rtrim(get_option('footballdata_api_base_url', 'http://vereine.football-verband.de/'), '/');
     }
 
     /**
@@ -15,7 +15,7 @@ class AFVData_Importer {
      * @return array Results keyed by liga_code.
      */
     public function import_all_active() {
-        $leagues = get_option('afvdata_leagues', []);
+        $leagues = get_option('footballdata_leagues', []);
         $results = [];
 
         foreach ($leagues as $league) {
@@ -32,7 +32,7 @@ class AFVData_Importer {
             }
         }
 
-        update_option('afvdata_last_sync', time());
+        update_option('footballdata_last_sync', time());
 
         return $results;
     }
@@ -40,32 +40,29 @@ class AFVData_Importer {
     /**
      * Import standings and schedule for a single league.
      *
-     * @param string $liga_code The AFVD league code.
+     * @param string $liga_code The league code.
      * @return array|WP_Error Result summary or error.
      */
     public function import_league($liga_code) {
         $liga_code = sanitize_text_field($liga_code);
         $now = current_time('mysql');
 
-        // Find the slug for this liga_code
-        $slug = $this->get_slug_for_code($liga_code);
-
         $standings_result = $this->import_standings($liga_code, $now);
         $schedule_result  = $this->import_schedule($liga_code, $now);
 
         if (is_wp_error($standings_result) && is_wp_error($schedule_result)) {
             return new WP_Error(
-                'afvdata_import_failed',
+                'footballdata_import_failed',
                 sprintf(
                     /* translators: 1: standings error, 2: schedule error */
-                    __('Standings: %1$s | Schedule: %2$s', 'afvdata'),
+                    __('Standings: %1$s | Schedule: %2$s', 'footballdata'),
                     $standings_result->get_error_message(),
                     $schedule_result->get_error_message()
                 )
             );
         }
 
-        $counts = AFVData_DB::get_counts($liga_code);
+        $counts = FootballData_DB::get_counts($liga_code);
 
         return [
             'liga_code'       => $liga_code,
@@ -77,7 +74,7 @@ class AFVData_Importer {
     }
 
     /**
-     * Import standings for a league from AFVD XML.
+     * Import standings for a league from XML.
      */
     private function import_standings($liga_code, $import_time) {
         $url = $this->base_url . '/xmltabelle.php5?Liga=' . urlencode($liga_code);
@@ -89,7 +86,7 @@ class AFVData_Importer {
 
         $count = 0;
         foreach ($xml->children() as $row) {
-            AFVData_DB::upsert_standing([
+            FootballData_DB::upsert_standing([
                 'liga_code'   => sanitize_text_field((string) $row->Liga),
                 'bezeichnung' => sanitize_text_field((string) $row->Bezeichnung),
                 'gruppe'      => sanitize_text_field((string) $row->Gruppe),
@@ -107,14 +104,14 @@ class AFVData_Importer {
         }
 
         if ($count > 0) {
-            AFVData_DB::cleanup_stale(AFVData_DB::standings_table(), $liga_code, $import_time);
+            FootballData_DB::cleanup_stale(FootballData_DB::standings_table(), $liga_code, $import_time);
         }
 
         return $count;
     }
 
     /**
-     * Import schedule for a league from AFVD XML.
+     * Import schedule for a league from XML.
      */
     private function import_schedule($liga_code, $import_time) {
         $url = $this->base_url . '/xmlspielplan.php5?Liga=' . urlencode($liga_code);
@@ -129,7 +126,7 @@ class AFVData_Importer {
             $datum1 = (string) $row->Datum1;
             $datum2 = (string) $row->Datum2;
 
-            AFVData_DB::upsert_game([
+            FootballData_DB::upsert_game([
                 'game_id'      => sanitize_text_field((string) $row->ID),
                 'liga_code'    => sanitize_text_field((string) $row->Liga),
                 'bezeichnung'  => sanitize_text_field((string) $row->Bezeichnung),
@@ -161,7 +158,7 @@ class AFVData_Importer {
         }
 
         if ($count > 0) {
-            AFVData_DB::cleanup_stale(AFVData_DB::schedule_table(), $liga_code, $import_time);
+            FootballData_DB::cleanup_stale(FootballData_DB::schedule_table(), $liga_code, $import_time);
         }
 
         return $count;
@@ -176,7 +173,7 @@ class AFVData_Importer {
     private function fetch_xml($url) {
         $response = wp_remote_get($url, [
             'timeout'    => 30,
-            'user-agent' => 'AFVData-WordPress-Plugin/' . AFVDATA_VERSION,
+            'user-agent' => 'FootballData-WordPress-Plugin/' . FOOTBALLDATA_VERSION,
         ]);
 
         if (is_wp_error($response)) {
@@ -186,15 +183,15 @@ class AFVData_Importer {
         $code = wp_remote_retrieve_response_code($response);
         if (200 !== $code) {
             return new WP_Error(
-                'afvdata_http_error',
+                'footballdata_http_error',
                 /* translators: %d: HTTP status code */
-                sprintf(__('HTTP %d from AFVD API', 'afvdata'), $code)
+                sprintf(__('HTTP %d from data API', 'footballdata'), $code)
             );
         }
 
         $body = wp_remote_retrieve_body($response);
         if (empty($body)) {
-            return new WP_Error('afvdata_empty_response', __('Empty response from AFVD API', 'afvdata'));
+            return new WP_Error('footballdata_empty_response', __('Empty response from data API', 'footballdata'));
         }
 
         libxml_use_internal_errors(true);
@@ -203,9 +200,9 @@ class AFVData_Importer {
         if (false === $xml) {
             $errors = libxml_get_errors();
             libxml_clear_errors();
-            $msg = !empty($errors) ? $errors[0]->message : __('Unknown XML parse error', 'afvdata');
+            $msg = !empty($errors) ? $errors[0]->message : __('Unknown XML parse error', 'footballdata');
             /* translators: %s: XML error message */
-            return new WP_Error('afvdata_xml_error', sprintf(__('XML parse error: %s', 'afvdata'), trim($msg)));
+            return new WP_Error('footballdata_xml_error', sprintf(__('XML parse error: %s', 'footballdata'), trim($msg)));
         }
 
         return $xml;
@@ -220,18 +217,5 @@ class AFVData_Importer {
         }
         $ts = strtotime($date_string);
         return $ts ? gmdate('Y-m-d', $ts) : null;
-    }
-
-    /**
-     * Get the slug for a liga_code from the leagues config.
-     */
-    private function get_slug_for_code($liga_code) {
-        $leagues = get_option('afvdata_leagues', []);
-        foreach ($leagues as $league) {
-            if ($league['liga_code'] === $liga_code) {
-                return $league['slug'];
-            }
-        }
-        return $liga_code;
     }
 }

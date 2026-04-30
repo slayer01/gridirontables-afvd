@@ -2,69 +2,69 @@
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- variables scoped to included view
 defined('ABSPATH') || exit;
 ?>
-<h2><?php esc_html_e('Import Status', 'afvdata'); ?></h2>
+<h2><?php esc_html_e('Import Status', 'footballdata'); ?></h2>
 
 <?php if ($last_sync) : ?>
     <p>
         <?php
         printf(
             /* translators: %s: date/time string */
-            esc_html__('Last full sync: %s', 'afvdata'),
+            esc_html__('Last full sync: %s', 'footballdata'),
             esc_html(wp_date(get_option('date_format') . ' ' . get_option('time_format'), $last_sync))
         );
         ?>
     </p>
 <?php else : ?>
-    <p><?php esc_html_e('No import has been run yet.', 'afvdata'); ?></p>
+    <p><?php esc_html_e('No import has been run yet.', 'footballdata'); ?></p>
 <?php endif; ?>
 
 <?php if (empty($leagues)) : ?>
-    <p><?php esc_html_e('No leagues configured. Go to the Leagues tab to add some.', 'afvdata'); ?></p>
+    <p><?php esc_html_e('No leagues configured. Go to the Leagues tab to add some.', 'footballdata'); ?></p>
 <?php else : ?>
     <table class="widefat">
         <thead>
             <tr>
-                <th><?php esc_html_e('League', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Liga Code', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Active', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Standings Rows', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Schedule Rows', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Raw Data', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Action', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Status', 'afvdata'); ?></th>
+                <th><?php esc_html_e('League', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Liga Code', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Active', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Standings Rows', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Schedule Rows', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Raw Data', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Action', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Status', 'footballdata'); ?></th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($leagues as $league) :
-                $counts = AFVData_DB::get_counts($league['liga_code']);
+                $counts = FootballData_DB::get_counts($league['liga_code']);
             ?>
                 <tr>
                     <td><?php echo esc_html($league['label'] ?: $league['slug']); ?></td>
                     <td><code><?php echo esc_html($league['liga_code']); ?></code></td>
                     <td><?php echo !empty($league['active']) ? '&#10003;' : '&#10007;'; ?></td>
-                    <td class="afvdata-count-standings" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
+                    <td class="footballdata-count-standings" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
                         <?php echo (int) $counts['standings']; ?>
                     </td>
-                    <td class="afvdata-count-schedule" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
+                    <td class="footballdata-count-schedule" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
                         <?php echo (int) $counts['schedule']; ?>
                     </td>
                     <td>
-                        <button type="button" class="button button-small afvdata-view-raw"
+                        <button type="button" class="button button-small footballdata-view-raw"
                                 data-liga="<?php echo esc_attr($league['liga_code']); ?>" data-type="standings">
-                            <?php esc_html_e('Standings', 'afvdata'); ?>
+                            <?php esc_html_e('Standings', 'footballdata'); ?>
                         </button>
-                        <button type="button" class="button button-small afvdata-view-raw"
+                        <button type="button" class="button button-small footballdata-view-raw"
                                 data-liga="<?php echo esc_attr($league['liga_code']); ?>" data-type="schedule">
-                            <?php esc_html_e('Schedule', 'afvdata'); ?>
+                            <?php esc_html_e('Schedule', 'footballdata'); ?>
                         </button>
                     </td>
                     <td>
-                        <button type="button" class="button afvdata-import-league"
+                        <button type="button" class="button footballdata-import-league"
                                 data-liga="<?php echo esc_attr($league['liga_code']); ?>">
-                            <?php esc_html_e('Import', 'afvdata'); ?>
+                            <?php esc_html_e('Import', 'footballdata'); ?>
                         </button>
                     </td>
-                    <td class="afvdata-import-status" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
+                    <td class="footballdata-import-status" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
                         &mdash;
                     </td>
                 </tr>
@@ -73,46 +73,46 @@ defined('ABSPATH') || exit;
     </table>
 
     <p style="margin-top: 15px;">
-        <button type="button" class="button button-primary" id="afvdata-import-all">
-            <?php esc_html_e('Import All Active Leagues', 'afvdata'); ?>
+        <button type="button" class="button button-primary" id="footballdata-import-all">
+            <?php esc_html_e('Import All Active Leagues', 'footballdata'); ?>
         </button>
-        <span id="afvdata-import-all-status"></span>
+        <span id="footballdata-import-all-status"></span>
     </p>
 
-    <div id="afvdata-raw-data-wrap" style="display:none; margin-top:20px;">
-        <h3 id="afvdata-raw-data-title"></h3>
-        <div id="afvdata-raw-data-content" style="overflow-x:auto;"></div>
+    <div id="footballdata-raw-data-wrap" style="display:none; margin-top:20px;">
+        <h3 id="footballdata-raw-data-title"></h3>
+        <div id="footballdata-raw-data-content" style="overflow-x:auto;"></div>
     </div>
 
-    <h3><?php esc_html_e('Shortcode Reference', 'afvdata'); ?></h3>
+    <h3><?php esc_html_e('Shortcode Reference', 'footballdata'); ?></h3>
     <table class="widefat">
         <thead>
             <tr>
-                <th><?php esc_html_e('Shortcode', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Description', 'afvdata'); ?></th>
+                <th><?php esc_html_e('Shortcode', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Description', 'footballdata'); ?></th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($leagues as $league) : ?>
                 <tr>
-                    <td><code>[afvdata_standings league="<?php echo esc_attr($league['slug']); ?>"]</code></td>
+                    <td><code>[footballdata_standings league="<?php echo esc_attr($league['slug']); ?>"]</code></td>
                     <td>
                         <?php
                         printf(
                             /* translators: %s: league label */
-                            esc_html__('Standings table for %s', 'afvdata'),
+                            esc_html__('Standings table for %s', 'footballdata'),
                             esc_html($league['label'] ?: $league['slug'])
                         );
                         ?>
                     </td>
                 </tr>
                 <tr>
-                    <td><code>[afvdata_schedule league="<?php echo esc_attr($league['slug']); ?>"]</code></td>
+                    <td><code>[footballdata_schedule league="<?php echo esc_attr($league['slug']); ?>"]</code></td>
                     <td>
                         <?php
                         printf(
                             /* translators: %s: league label */
-                            esc_html__('Game schedule for %s', 'afvdata'),
+                            esc_html__('Game schedule for %s', 'footballdata'),
                             esc_html($league['label'] ?: $league['slug'])
                         );
                         ?>
@@ -121,66 +121,69 @@ defined('ABSPATH') || exit;
             <?php endforeach; ?>
         </tbody>
     </table>
+    <p class="description">
+        <?php esc_html_e('Note: the legacy [afvdata_standings] and [afvdata_schedule] shortcodes still work as aliases.', 'footballdata'); ?>
+    </p>
 
-    <h3><?php esc_html_e('Attribute Reference', 'afvdata'); ?></h3>
+    <h3><?php esc_html_e('Attribute Reference', 'footballdata'); ?></h3>
 
-    <h4><?php esc_html_e('Standings & Schedule', 'afvdata'); ?></h4>
+    <h4><?php esc_html_e('Standings & Schedule', 'footballdata'); ?></h4>
     <table class="widefat">
         <thead>
             <tr>
-                <th><?php esc_html_e('Attribute', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Values', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Description', 'afvdata'); ?></th>
+                <th><?php esc_html_e('Attribute', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Values', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Description', 'footballdata'); ?></th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><code>league</code></td>
-                <td><?php esc_html_e('Slug or Liga Code', 'afvdata'); ?></td>
-                <td><?php esc_html_e('Required. The league to display, e.g. league="herren".', 'afvdata'); ?></td>
+                <td><?php esc_html_e('Slug or Liga Code', 'footballdata'); ?></td>
+                <td><?php esc_html_e('Required. The league to display, e.g. league="herren".', 'footballdata'); ?></td>
             </tr>
             <tr>
                 <td><code>group</code></td>
-                <td><?php esc_html_e('e.g. "A", "B"', 'afvdata'); ?></td>
-                <td><?php esc_html_e('Show only a specific group. Without this, all groups from the imported data are shown automatically.', 'afvdata'); ?></td>
+                <td><?php esc_html_e('e.g. "A", "B"', 'footballdata'); ?></td>
+                <td><?php esc_html_e('Show only a specific group. Without this, all groups from the imported data are shown automatically.', 'footballdata'); ?></td>
             </tr>
             <tr>
                 <td><code>highlight</code></td>
-                <td><?php esc_html_e('Team name', 'afvdata'); ?></td>
-                <td><?php esc_html_e('Override the team name to highlight. Defaults to the team name configured for this league.', 'afvdata'); ?></td>
+                <td><?php esc_html_e('Team name', 'footballdata'); ?></td>
+                <td><?php esc_html_e('Override the team name to highlight. Defaults to the team name configured for this league.', 'footballdata'); ?></td>
             </tr>
             <tr>
                 <td><code>class</code></td>
-                <td><?php esc_html_e('CSS class name', 'afvdata'); ?></td>
-                <td><?php esc_html_e('Add a custom CSS class to the wrapper element for styling.', 'afvdata'); ?></td>
+                <td><?php esc_html_e('CSS class name', 'footballdata'); ?></td>
+                <td><?php esc_html_e('Add a custom CSS class to the wrapper element for styling.', 'footballdata'); ?></td>
             </tr>
         </tbody>
     </table>
 
-    <h4><?php esc_html_e('Schedule only', 'afvdata'); ?></h4>
+    <h4><?php esc_html_e('Schedule only', 'footballdata'); ?></h4>
     <table class="widefat">
         <thead>
             <tr>
-                <th><?php esc_html_e('Attribute', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Values', 'afvdata'); ?></th>
-                <th><?php esc_html_e('Description', 'afvdata'); ?></th>
+                <th><?php esc_html_e('Attribute', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Values', 'footballdata'); ?></th>
+                <th><?php esc_html_e('Description', 'footballdata'); ?></th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><code>home_only</code></td>
                 <td><code>"1"</code></td>
-                <td><?php esc_html_e('Show only home games of the configured team. Requires a team name set in the league config.', 'afvdata'); ?></td>
+                <td><?php esc_html_e('Show only home games of the configured team. Requires a team name set in the league config.', 'footballdata'); ?></td>
             </tr>
             <tr>
                 <td><code>show</code></td>
                 <td><code>"all"</code>, <code>"upcoming"</code>, <code>"past"</code></td>
-                <td><?php esc_html_e('Filter by time. "upcoming" = today and future, "past" = before today. Default: "all".', 'afvdata'); ?></td>
+                <td><?php esc_html_e('Filter by time. "upcoming" = today and future, "past" = before today. Default: "all".', 'footballdata'); ?></td>
             </tr>
             <tr>
                 <td><code>limit</code></td>
-                <td><?php esc_html_e('Number', 'afvdata'); ?></td>
-                <td><?php esc_html_e('Maximum number of games to show. Useful with show="upcoming" to display the next N games.', 'afvdata'); ?></td>
+                <td><?php esc_html_e('Number', 'footballdata'); ?></td>
+                <td><?php esc_html_e('Maximum number of games to show. Useful with show="upcoming" to display the next N games.', 'footballdata'); ?></td>
             </tr>
         </tbody>
     </table>

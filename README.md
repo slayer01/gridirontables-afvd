@@ -1,4 +1,4 @@
-# AFVData – League Tables & Schedules
+# FootballData – League Tables & Schedules
 
 WordPress-Plugin zur Anzeige von American Football Spielplänen und Tabellen. Nutzt den öffentlichen XML-Export von `vereine.football-verband.de`.
 
@@ -14,7 +14,7 @@ Dieses Plugin ist ein unabhängiges Projekt und steht in keiner Verbindung zum A
 
 ### 1. Ligen konfigurieren
 
-**AFVData → Leagues**
+**FootballData → Leagues**
 
 Für jede Liga eine Zeile anlegen:
 
@@ -28,14 +28,14 @@ Für jede Liga eine Zeile anlegen:
 
 ### 2. Daten importieren
 
-**AFVData → Import**
+**FootballData → Import**
 
 - **Import** pro Liga oder **Import All Active Leagues** für alle auf einmal.
 - Rohdaten können über die Buttons **Standings** / **Schedule** eingesehen werden.
 
 ### 3. Einstellungen
 
-**AFVData → Settings**
+**FootballData → Settings**
 
 - **API Base URL** — Standard: `http://vereine.football-verband.de/` — normalerweise nicht ändern.
 - **Auto Sync** — Automatischer Datenabgleich per WP-Cron (stündlich, 2x täglich, täglich oder manuell).
@@ -44,9 +44,11 @@ Für jede Liga eine Zeile anlegen:
 ## Shortcodes
 
 ```
-[afvdata_standings league="herren"]
-[afvdata_schedule league="herren"]
+[footballdata_standings league="herren"]
+[footballdata_schedule league="herren"]
 ```
+
+Die alten Shortcodes `[afvdata_standings]` und `[afvdata_schedule]` funktionieren weiterhin als Aliase.
 
 ### Optionale Attribute
 
@@ -63,17 +65,21 @@ Für jede Liga eine Zeile anlegen:
 ### Beispiele
 
 ```
-[afvdata_standings league="u16" group="A"]
-[afvdata_schedule league="herren" home_only="1"]
-[afvdata_schedule league="herren" show="upcoming" limit="5"]
+[footballdata_standings league="u16" group="A"]
+[footballdata_schedule league="herren" home_only="1"]
+[footballdata_schedule league="herren" show="upcoming" limit="5"]
 ```
+
+## Migration vom alten `afvdata`-Prefix
+
+Beim ersten Laden nach dem Update werden Datenbanktabellen und Optionen automatisch vom alten `afvdata_*`-Prefix auf `footballdata_*` umgezogen. Bestehende Inhalte (Ligen-Konfiguration, Farben, importierte Daten) bleiben erhalten. Die alten Shortcodes funktionieren weiterhin als Aliase.
 
 ## CSS anpassen
 
-Die Tabellen verwenden die Klasse `.afvdata-league-table`. Beispiel für eigene Farben im Theme-CSS:
+Die Tabellen verwenden die Klasse `.footballdata-league-table`. Beispiel für eigene Farben im Theme-CSS:
 
 ```css
-table.afvdata-league-table th {
+table.footballdata-league-table th {
     background-color: #dd3333;
     color: #fff;
 }

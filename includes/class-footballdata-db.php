@@ -1,16 +1,56 @@
 <?php
 defined('ABSPATH') || exit;
 
-class AFVData_DB {
+class FootballData_DB {
 
     public static function standings_table() {
         global $wpdb;
-        return $wpdb->prefix . 'afvdata_standings';
+        return $wpdb->prefix . 'footballdata_standings';
     }
 
     public static function schedule_table() {
         global $wpdb;
+        return $wpdb->prefix . 'footballdata_schedule';
+    }
+
+    public static function legacy_standings_table() {
+        global $wpdb;
+        return $wpdb->prefix . 'afvdata_standings';
+    }
+
+    public static function legacy_schedule_table() {
+        global $wpdb;
         return $wpdb->prefix . 'afvdata_schedule';
+    }
+
+    /**
+     * Rename legacy afvdata_* tables to footballdata_* if present.
+     * Idempotent: bails out cleanly when nothing to migrate.
+     */
+    public static function migrate_from_legacy() {
+        global $wpdb;
+
+        $pairs = [
+            [self::legacy_standings_table(), self::standings_table()],
+            [self::legacy_schedule_table(),  self::schedule_table()],
+        ];
+
+        foreach ($pairs as $pair) {
+            list($old, $new) = $pair;
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $old_exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $old)) === $old;
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $new_exists = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $new)) === $new;
+
+            if ($old_exists && !$new_exists) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+                $wpdb->query("RENAME TABLE {$old} TO {$new}");
+            } elseif ($old_exists && $new_exists) {
+                // New table already created (e.g. by activation hook on a fresh install). Drop the orphan legacy table.
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+                $wpdb->query("DROP TABLE IF EXISTS {$old}");
+            }
+        }
     }
 
     public static function install() {
@@ -76,7 +116,7 @@ class AFVData_DB {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
-        update_option('afvdata_db_version', AFVDATA_DB_VERSION);
+        update_option('footballdata_db_version', FOOTBALLDATA_DB_VERSION);
     }
 
     /**
@@ -371,9 +411,15 @@ class AFVData_DB {
      */
     public static function uninstall() {
         global $wpdb;
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-        $wpdb->query("DROP TABLE IF EXISTS " . self::standings_table());
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-        $wpdb->query("DROP TABLE IF EXISTS " . self::schedule_table());
+        $tables = [
+            self::standings_table(),
+            self::schedule_table(),
+            self::legacy_standings_table(),
+            self::legacy_schedule_table(),
+        ];
+        foreach ($tables as $table) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $wpdb->query("DROP TABLE IF EXISTS {$table}");
+        }
     }
 }

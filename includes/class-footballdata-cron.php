@@ -1,9 +1,9 @@
 <?php
 defined('ABSPATH') || exit;
 
-class AFVData_Cron {
+class FootballData_Cron {
 
-    const HOOK = 'afvdata_sync';
+    const HOOK = 'footballdata_sync';
 
     public function __construct() {
         add_action(self::HOOK, [$this, 'run']);
@@ -13,7 +13,7 @@ class AFVData_Cron {
      * Cron callback: import all active leagues.
      */
     public function run() {
-        $importer = new AFVData_Importer();
+        $importer = new FootballData_Importer();
         $importer->import_all_active();
     }
 
@@ -21,7 +21,7 @@ class AFVData_Cron {
      * Schedule the cron event based on settings.
      */
     public static function schedule() {
-        $interval = get_option('afvdata_sync_interval', 'manual');
+        $interval = get_option('footballdata_sync_interval', 'manual');
 
         if ('manual' === $interval) {
             return;

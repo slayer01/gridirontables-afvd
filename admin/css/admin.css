@@ -1,46 +1,46 @@
-.afvdata-tab-content {
+.footballdata-tab-content {
     margin-top: 15px;
 }
 
-.afvdata-leagues-table input.regular-text {
+.footballdata-leagues-table input.regular-text {
     width: 100%;
 }
 
-.afvdata-leagues-table input.small-text {
+.footballdata-leagues-table input.small-text {
     width: 100%;
 }
 
-.afvdata-leagues-table th,
-.afvdata-leagues-table td {
+.footballdata-leagues-table th,
+.footballdata-leagues-table td {
     padding: 8px;
 }
 
-.afvdata-leagues-table .afvdata-league-row td {
+.footballdata-leagues-table .footballdata-league-row td {
     vertical-align: middle;
 }
 
-.afvdata-import-status {
+.footballdata-import-status {
     font-style: italic;
     color: #666;
 }
 
-.afvdata-import-status.success {
+.footballdata-import-status.success {
     color: #46b450;
     font-style: normal;
 }
 
-.afvdata-import-status.error {
+.footballdata-import-status.error {
     color: #dc3232;
     font-style: normal;
 }
 
-.afvdata-import-league:disabled,
-#afvdata-import-all:disabled {
+.footballdata-import-league:disabled,
+#footballdata-import-all:disabled {
     opacity: 0.6;
     cursor: wait;
 }
 
-#afvdata-import-all-status {
+#footballdata-import-all-status {
     margin-left: 10px;
     font-style: italic;
 }

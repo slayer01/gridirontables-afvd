@@ -1,40 +1,44 @@
 <?php
 defined('ABSPATH') || exit;
 
-class AFVData_Shortcodes {
+class FootballData_Shortcodes {
 
     private $colors_enqueued = false;
 
     public function __construct() {
+        add_shortcode('footballdata_standings', [$this, 'render_standings']);
+        add_shortcode('footballdata_schedule', [$this, 'render_schedule']);
+
+        // Deprecated aliases for backwards compatibility with the old afvdata_* prefix.
         add_shortcode('afvdata_standings', [$this, 'render_standings']);
         add_shortcode('afvdata_schedule', [$this, 'render_schedule']);
     }
 
     private function enqueue_styles() {
-        wp_enqueue_style('afvdata-public', AFVDATA_PLUGIN_URL . 'public/css/afvd-data.css', [], AFVDATA_VERSION);
+        wp_enqueue_style('footballdata-public', FOOTBALLDATA_PLUGIN_URL . 'public/css/football-data.css', [], FOOTBALLDATA_VERSION);
 
         if ($this->colors_enqueued) {
             return;
         }
         $this->colors_enqueued = true;
 
-        $header_bg  = get_option('afvdata_color_header_bg', '#333333');
-        $header_txt = get_option('afvdata_color_header_text', '#ffffff');
-        $highlight  = get_option('afvdata_color_highlight_bg', '');
+        $header_bg  = get_option('footballdata_color_header_bg', '#333333');
+        $header_txt = get_option('footballdata_color_header_text', '#ffffff');
+        $highlight  = get_option('footballdata_color_highlight_bg', '');
 
         $css = ':root{';
-        $css .= '--afvdata-header-bg:' . esc_attr($header_bg) . ';';
-        $css .= '--afvdata-header-text:' . esc_attr($header_txt) . ';';
+        $css .= '--footballdata-header-bg:' . esc_attr($header_bg) . ';';
+        $css .= '--footballdata-header-text:' . esc_attr($header_txt) . ';';
         if ($highlight) {
-            $css .= '--afvdata-highlight-bg:' . esc_attr($highlight) . ';';
+            $css .= '--footballdata-highlight-bg:' . esc_attr($highlight) . ';';
         }
         $css .= '}';
 
-        wp_add_inline_style('afvdata-public', $css);
+        wp_add_inline_style('footballdata-public', $css);
     }
 
     /**
-     * [afvdata_standings league="mensteam" group="A" highlight="Wetterau Bulls"]
+     * [footballdata_standings league="mensteam" group="A" highlight="Wetterau Bulls"]
      */
     public function render_standings($atts) {
         $atts = shortcode_atts([
@@ -42,13 +46,13 @@ class AFVData_Shortcodes {
             'group'     => '',
             'highlight' => '',
             'class'     => '',
-        ], $atts, 'afvdata_standings');
+        ], $atts, 'footballdata_standings');
 
-        $league_config = AFVData_Admin::get_league_by_slug($atts['league']);
+        $league_config = FootballData_Admin::get_league_by_slug($atts['league']);
         if (!$league_config) {
             return $this->error(sprintf(
                 /* translators: %s: league identifier */
-                __('League "%s" not found. Check the slug in Settings → AFVData → Leagues.', 'afvdata'),
+                __('League "%s" not found. Check the slug in Settings → FootballData → Leagues.', 'footballdata'),
                 $atts['league']
             ));
         }
@@ -58,18 +62,17 @@ class AFVData_Shortcodes {
 
         $this->enqueue_styles();
 
-        // Determine groups from shortcode attribute or imported data
         if (!empty($atts['group'])) {
             $groups = [$atts['group']];
         } else {
-            $groups = AFVData_DB::get_standing_groups($liga_code);
+            $groups = FootballData_DB::get_standing_groups($liga_code);
         }
 
         $output = '';
-        $league_name = AFVData_DB::get_league_name($liga_code);
+        $league_name = FootballData_DB::get_league_name($liga_code);
         $output .= '<h2>' . esc_html($league_name) . '</h2>';
 
-        $wrapper_class = 'afvdata-standings-wrap';
+        $wrapper_class = 'footballdata-standings-wrap';
         if ($atts['class']) {
             $wrapper_class .= ' ' . esc_attr($atts['class']);
         }
@@ -77,11 +80,11 @@ class AFVData_Shortcodes {
 
         if (!empty($groups)) {
             foreach ($groups as $gruppe) {
-                $rows = AFVData_DB::get_standings($liga_code, $gruppe);
+                $rows = FootballData_DB::get_standings($liga_code, $gruppe);
                 $output .= $this->build_standings_table($rows, $highlight, $gruppe);
             }
         } else {
-            $rows = AFVData_DB::get_standings($liga_code);
+            $rows = FootballData_DB::get_standings($liga_code);
             $output .= $this->build_standings_table($rows, $highlight);
         }
 
@@ -92,7 +95,7 @@ class AFVData_Shortcodes {
     }
 
     /**
-     * [afvdata_schedule league="mensteam" group="A" home_only="1" show="upcoming" highlight="Wetterau Bulls"]
+     * [footballdata_schedule league="mensteam" group="A" home_only="1" show="upcoming" highlight="Wetterau Bulls"]
      */
     public function render_schedule($atts) {
         $atts = shortcode_atts([
@@ -103,13 +106,13 @@ class AFVData_Shortcodes {
             'limit'     => 0,
             'highlight' => '',
             'class'     => '',
-        ], $atts, 'afvdata_schedule');
+        ], $atts, 'footballdata_schedule');
 
-        $league_config = AFVData_Admin::get_league_by_slug($atts['league']);
+        $league_config = FootballData_Admin::get_league_by_slug($atts['league']);
         if (!$league_config) {
             return $this->error(sprintf(
                 /* translators: %s: league identifier */
-                __('League "%s" not found. Check the slug in Settings → AFVData → Leagues.', 'afvdata'),
+                __('League "%s" not found. Check the slug in Settings → FootballData → Leagues.', 'footballdata'),
                 $atts['league']
             ));
         }
@@ -119,11 +122,10 @@ class AFVData_Shortcodes {
 
         $this->enqueue_styles();
 
-        // Determine groups from shortcode attribute or imported data
         if (!empty($atts['group'])) {
             $groups = [$atts['group']];
         } else {
-            $groups = AFVData_DB::get_schedule_groups($liga_code);
+            $groups = FootballData_DB::get_schedule_groups($liga_code);
         }
 
         $home_only  = !empty($atts['home_only']);
@@ -135,10 +137,10 @@ class AFVData_Shortcodes {
         ];
 
         $output = '';
-        $league_name = AFVData_DB::get_league_name($liga_code);
+        $league_name = FootballData_DB::get_league_name($liga_code);
         $output .= '<h2>' . esc_html($league_name) . '</h2>';
 
-        $wrapper_class = 'afvdata-schedule-wrap';
+        $wrapper_class = 'footballdata-schedule-wrap';
         if ($atts['class']) {
             $wrapper_class .= ' ' . esc_attr($atts['class']);
         }
@@ -147,14 +149,14 @@ class AFVData_Shortcodes {
         if (!empty($groups)) {
             foreach ($groups as $gruppe) {
                 $args = array_merge($query_args, ['gruppe' => $gruppe]);
-                $rows = AFVData_DB::get_schedule($liga_code, $args);
+                $rows = FootballData_DB::get_schedule($liga_code, $args);
                 if (empty($rows) && $home_only) {
                     continue;
                 }
                 $output .= $this->build_schedule_table($rows, $highlight, $gruppe);
             }
         } else {
-            $rows = AFVData_DB::get_schedule($liga_code, $query_args);
+            $rows = FootballData_DB::get_schedule($liga_code, $query_args);
             $output .= $this->build_schedule_table($rows, $highlight);
         }
 
@@ -169,25 +171,25 @@ class AFVData_Shortcodes {
      */
     private function build_standings_table($rows, $highlight, $gruppe = null) {
         if (empty($rows)) {
-            return '<p>' . esc_html__('No standings data available.', 'afvdata') . '</p>';
+            return '<p>' . esc_html__('No standings data available.', 'footballdata') . '</p>';
         }
 
         $output = '';
         if ($gruppe) {
-            $output .= '<span class="afvdata-group-header">'
+            $output .= '<span class="footballdata-group-header">'
                 /* translators: %s: group name/letter */
-                . sprintf(esc_html__('Group %s', 'afvdata'), esc_html($gruppe))
+                . sprintf(esc_html__('Group %s', 'footballdata'), esc_html($gruppe))
                 . '</span>';
         }
 
-        $output .= '<table class="afvdata-league-table">';
+        $output .= '<table class="footballdata-league-table">';
         $output .= '<thead><tr>';
-        $output .= '<th>' . esc_html__('Rank', 'afvdata') . '</th>';
-        $output .= '<th>' . esc_html__('Team', 'afvdata') . '</th>';
-        $output .= '<th>' . esc_html__('P+', 'afvdata') . '</th>';
-        $output .= '<th>' . esc_html__('P-', 'afvdata') . '</th>';
-        $output .= '<th class="afvdata-nomobile">' . esc_html__('TD+', 'afvdata') . '</th>';
-        $output .= '<th class="afvdata-nomobile">' . esc_html__('TD-', 'afvdata') . '</th>';
+        $output .= '<th>' . esc_html__('Rank', 'footballdata') . '</th>';
+        $output .= '<th>' . esc_html__('Team', 'footballdata') . '</th>';
+        $output .= '<th>' . esc_html__('P+', 'footballdata') . '</th>';
+        $output .= '<th>' . esc_html__('P-', 'footballdata') . '</th>';
+        $output .= '<th class="footballdata-nomobile">' . esc_html__('TD+', 'footballdata') . '</th>';
+        $output .= '<th class="footballdata-nomobile">' . esc_html__('TD-', 'footballdata') . '</th>';
         $output .= '</tr></thead>';
         $output .= '<tbody>';
 
@@ -198,7 +200,7 @@ class AFVData_Shortcodes {
                 $row_class[] = 'odd';
             }
             if ($is_highlight) {
-                $row_class[] = 'afvdata-highlight';
+                $row_class[] = 'footballdata-highlight';
             }
             $class_attr = !empty($row_class) ? ' class="' . esc_attr(implode(' ', $row_class)) . '"' : '';
 
@@ -207,8 +209,8 @@ class AFVData_Shortcodes {
             $output .= '<td>' . esc_html($row['team']) . '</td>';
             $output .= '<td>' . esc_html($row['p_plus']) . '</td>';
             $output .= '<td>' . esc_html($row['p_minus']) . '</td>';
-            $output .= '<td class="afvdata-nomobile">' . esc_html($row['td_plus']) . '</td>';
-            $output .= '<td class="afvdata-nomobile">' . esc_html($row['td_minus']) . '</td>';
+            $output .= '<td class="footballdata-nomobile">' . esc_html($row['td_plus']) . '</td>';
+            $output .= '<td class="footballdata-nomobile">' . esc_html($row['td_minus']) . '</td>';
             $output .= '</tr>';
         }
 
@@ -222,25 +224,25 @@ class AFVData_Shortcodes {
      */
     private function build_schedule_table($rows, $highlight, $gruppe = null) {
         if (empty($rows)) {
-            return '<p>' . esc_html__('No schedule data available.', 'afvdata') . '</p>';
+            return '<p>' . esc_html__('No schedule data available.', 'footballdata') . '</p>';
         }
 
         $output = '';
         if ($gruppe) {
-            $output .= '<span class="afvdata-group-header">'
+            $output .= '<span class="footballdata-group-header">'
                 /* translators: %s: group name/letter */
-                . sprintf(esc_html__('Group %s', 'afvdata'), esc_html($gruppe))
+                . sprintf(esc_html__('Group %s', 'footballdata'), esc_html($gruppe))
                 . '</span>';
         }
 
-        $output .= '<table class="afvdata-league-table afvdata-schedule-table">';
+        $output .= '<table class="footballdata-league-table footballdata-schedule-table">';
         $output .= '<thead><tr>';
-        $output .= '<th>' . esc_html__('Date', 'afvdata') . '</th>';
-        $output .= '<th>' . esc_html__('Kickoff', 'afvdata') . '</th>';
-        $output .= '<th>' . esc_html__('Home', 'afvdata') . '</th>';
-        $output .= '<th>' . esc_html__('Away', 'afvdata') . '</th>';
-        $output .= '<th class="afvdata-nomobile">' . esc_html__('Score', 'afvdata') . '</th>';
-        $output .= '<th>' . esc_html__('Stadium', 'afvdata') . '</th>';
+        $output .= '<th>' . esc_html__('Date', 'footballdata') . '</th>';
+        $output .= '<th>' . esc_html__('Kickoff', 'footballdata') . '</th>';
+        $output .= '<th>' . esc_html__('Home', 'footballdata') . '</th>';
+        $output .= '<th>' . esc_html__('Away', 'footballdata') . '</th>';
+        $output .= '<th class="footballdata-nomobile">' . esc_html__('Score', 'footballdata') . '</th>';
+        $output .= '<th>' . esc_html__('Stadium', 'footballdata') . '</th>';
         $output .= '</tr></thead>';
         $output .= '<tbody>';
 
@@ -258,12 +260,12 @@ class AFVData_Shortcodes {
             }
 
             $output .= '<tr' . $row_class . '>';
-            $output .= '<td data-label="' . esc_attr__('Date', 'afvdata') . '" class="afvdata-num">' . esc_html($date_display) . '</td>';
-            $output .= '<td data-label="' . esc_attr__('Kickoff', 'afvdata') . '" class="afvdata-num">' . esc_html($row['kickoff']) . '</td>';
-            $output .= '<td data-label="' . esc_attr__('Home', 'afvdata') . '"' . ($home_highlight ? ' class="afvdata-highlight"' : '') . '>' . esc_html($row['heim']) . '</td>';
-            $output .= '<td data-label="' . esc_attr__('Away', 'afvdata') . '"' . ($away_highlight ? ' class="afvdata-highlight"' : '') . '>' . esc_html($row['gast']) . '</td>';
-            $output .= '<td data-label="' . esc_attr__('Score', 'afvdata') . '" class="afvdata-num afvdata-nomobile">' . esc_html($score) . '</td>';
-            $output .= '<td data-label="' . esc_attr__('Stadium', 'afvdata') . '">' . esc_html($row['stadion']) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Date', 'footballdata') . '" class="footballdata-num">' . esc_html($date_display) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Kickoff', 'footballdata') . '" class="footballdata-num">' . esc_html($row['kickoff']) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Home', 'footballdata') . '"' . ($home_highlight ? ' class="footballdata-highlight"' : '') . '>' . esc_html($row['heim']) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Away', 'footballdata') . '"' . ($away_highlight ? ' class="footballdata-highlight"' : '') . '>' . esc_html($row['gast']) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Score', 'footballdata') . '" class="footballdata-num footballdata-nomobile">' . esc_html($score) . '</td>';
+            $output .= '<td data-label="' . esc_attr__('Stadium', 'footballdata') . '">' . esc_html($row['stadion']) . '</td>';
             $output .= '</tr>';
         }
 
@@ -273,13 +275,13 @@ class AFVData_Shortcodes {
     }
 
     /**
-     * Disclaimer linking to AFVD.
+     * Disclaimer linking to the AFVD data source.
      */
     private function disclaimer() {
-        return '<span class="afvdata-disclaimer">'
+        return '<span class="footballdata-disclaimer">'
             . sprintf(
                 /* translators: %s: link to AFVD */
-                esc_html__('Data provided by %s', 'afvdata'),
+                esc_html__('Data provided by %s', 'footballdata'),
                 '<a href="https://www.afvd.de" target="_blank" rel="noopener">AFVD</a>'
             )
             . '</span>';
@@ -290,7 +292,7 @@ class AFVData_Shortcodes {
      */
     private function error($message) {
         if (current_user_can('edit_posts')) {
-            return '<p class="afvdata-error"><strong>AFVData:</strong> ' . esc_html($message) . '</p>';
+            return '<p class="footballdata-error"><strong>FootballData:</strong> ' . esc_html($message) . '</p>';
         }
         return '';
     }
