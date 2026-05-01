@@ -4,11 +4,11 @@ Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Display American football league standings and game schedules on your WordPress site using publicly available XML data from vereine.football-verband.de.
+Display American football league standings and schedules from publicly available XML data on your WordPress site.
 
 == Description ==
 
@@ -55,6 +55,11 @@ The legacy `[dsfooboo_football_data_*]`, `[footballdata_*]` and `[afvdata_*]` sh
 4. Import data and use shortcodes on your pages
 
 == Changelog ==
+
+= 3.0.1 =
+* Trim short description to fit the 150-character readme limit
+* Suppress remaining `WordPress.DB.PreparedSQL.InterpolatedNotPrepared` warnings on the legacy-table RENAME / DROP queries (table names cannot be passed as prepared placeholders)
+* Scope `uninstall.php` cleanup loop in a closure so its variables are no longer flagged as unprefixed globals
 
 = 3.0.0 =
 * Renamed plugin to "Gridirontables AFVD" (third rename) to match the WordPress.org plugin slug `gridirontables-afvd`

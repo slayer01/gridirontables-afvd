@@ -3,7 +3,7 @@
  * Plugin Name:  Gridirontables AFVD – League tables & schedules - data provided by AFVD
  * Plugin URI:   https://slayer01.github.io/gridirontables-afvd/
  * Description:  Display American football league standings and schedules from publicly available XML data on your WordPress site.
- * Version:      3.0.0
+ * Version:      3.0.1
  * Requires at least: 5.9
  * Requires PHP:  7.4
  * Author:       Daniel Schmidt-Richert
@@ -15,7 +15,7 @@
 
 defined('ABSPATH') || exit;
 
-define('GRIDIRONTABLES_AFVD_VERSION', '3.0.0');
+define('GRIDIRONTABLES_AFVD_VERSION', '3.0.1');
 define('GRIDIRONTABLES_AFVD_DB_VERSION', '1.3');
 define('GRIDIRONTABLES_AFVD_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('GRIDIRONTABLES_AFVD_PLUGIN_URL', plugin_dir_url(__FILE__));
