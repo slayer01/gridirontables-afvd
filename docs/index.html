@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSFOOBOO Football Data – League tables & schedules - data provided by AFVD</title>
+    <title>Gridirontables AFVD – League tables & schedules - data provided by AFVD</title>
     <style>
         :root {
             --primary: #1b2a4a;
@@ -273,11 +273,11 @@
 
 <!-- Hero -->
 <header class="hero">
-    <img src="logo.png" alt="DSFOOBOO Football Data Logo">
-    <h1>DSFOOBOO Football Data</h1>
+    <img src="logo.png" alt="Gridirontables AFVD Logo">
+    <h1>Gridirontables AFVD</h1>
     <p>League tables & schedules - data provided by AFVD</p>
-    <a href="https://github.com/slayer01/dsfooboo-football-data/releases/latest" class="btn">Download (ZIP)</a>
-    <a href="https://github.com/slayer01/dsfooboo-football-data" class="btn">GitHub</a>
+    <a href="https://github.com/slayer01/gridirontables-afvd/releases/latest" class="btn">Download (ZIP)</a>
+    <a href="https://github.com/slayer01/gridirontables-afvd" class="btn">GitHub</a>
 </header>
 
 <!-- Navigation -->
@@ -331,10 +331,10 @@
     <div class="container">
         <h2>Installation</h2>
         <ol>
-            <li>Die aktuelle Version als ZIP von <a href="https://github.com/slayer01/dsfooboo-football-data/releases/latest">GitHub Releases</a> herunterladen.</li>
+            <li>Die aktuelle Version als ZIP von <a href="https://github.com/slayer01/gridirontables-afvd/releases/latest">GitHub Releases</a> herunterladen.</li>
             <li>Im WordPress-Admin unter <strong>Plugins → Installieren → Plugin hochladen</strong> das ZIP hochladen.</li>
             <li>Plugin aktivieren.</li>
-            <li>Im Admin-Menü erscheint der Punkt <strong>DSFOOBOO Football Data</strong>.</li>
+            <li>Im Admin-Menü erscheint der Punkt <strong>Gridirontables AFVD</strong>.</li>
         </ol>
         <div class="notice">
             <strong>Hinweis:</strong> Alternativ kann der Ordner manuell nach <code>wp-content/plugins/</code> kopiert werden.
@@ -348,7 +348,7 @@
         <h2>Einrichtung</h2>
 
         <h3>1. Liga hinzufügen</h3>
-        <p>Unter <strong>DSFOOBOO Football Data → Leagues</strong> eine neue Zeile anlegen:</p>
+        <p>Unter <strong>Gridirontables AFVD → Leagues</strong> eine neue Zeile anlegen:</p>
         <table>
             <tr><th>Feld</th><th>Beispiel</th><th>Beschreibung</th></tr>
             <tr><td><code>Slug</code></td><td><code>herren</code></td><td>Wird im Shortcode verwendet. Nur Kleinbuchstaben, Zahlen, Bindestriche.</td></tr>
@@ -359,10 +359,10 @@
         </table>
 
         <h3>2. Daten importieren</h3>
-        <p>Unter <strong>DSFOOBOO Football Data → Import</strong> einzelne Ligen oder alle auf einmal importieren. Die Rohdaten können über die Buttons <em>Standings</em> / <em>Schedule</em> eingesehen werden.</p>
+        <p>Unter <strong>Gridirontables AFVD → Import</strong> einzelne Ligen oder alle auf einmal importieren. Die Rohdaten können über die Buttons <em>Standings</em> / <em>Schedule</em> eingesehen werden.</p>
 
         <h3>3. Einstellungen</h3>
-        <p>Unter <strong>DSFOOBOO Football Data → Settings</strong> können die API-URL, der Sync-Intervall und die Tabellenfarben konfiguriert werden.</p>
+        <p>Unter <strong>Gridirontables AFVD → Settings</strong> können die API-URL, der Sync-Intervall und die Tabellenfarben konfiguriert werden.</p>
     </div>
 </section>
 
@@ -372,12 +372,12 @@
         <h2>Shortcodes</h2>
 
         <h3>Tabelle anzeigen</h3>
-        <pre><code>[dsfooboo_football_data_standings league="herren"]</code></pre>
+        <pre><code>[gridirontables_afvd_standings league="herren"]</code></pre>
 
         <h3>Spielplan anzeigen</h3>
-        <pre><code>[dsfooboo_football_data_schedule league="herren"]</code></pre>
+        <pre><code>[gridirontables_afvd_schedule league="herren"]</code></pre>
 
-        <p style="font-size:0.9em;color:var(--muted);">Die alten Shortcodes <code>[footballdata_*]</code> und <code>[afvdata_*]</code> funktionieren weiterhin als Aliase.</p>
+        <p style="font-size:0.9em;color:var(--muted);">Die alten Shortcodes <code>[dsfooboo_football_data_*]</code>, <code>[footballdata_*]</code> und <code>[afvdata_*]</code> funktionieren weiterhin als Aliase.</p>
 
         <h3>Alle Attribute</h3>
         <table>
@@ -406,36 +406,36 @@
                 <li>Importieren</li>
                 <li>Auf der gewünschten Seite einfügen:</li>
             </ol>
-            <pre><code>[dsfooboo_football_data_standings league="herren"]
-[dsfooboo_football_data_schedule league="herren"]</code></pre>
+            <pre><code>[gridirontables_afvd_standings league="herren"]
+[gridirontables_afvd_schedule league="herren"]</code></pre>
             <p>Dein Teamname wird automatisch fett hervorgehoben.</p>
         </div>
 
         <div class="scenario">
             <h3>Nur die nächsten 5 Heimspiele</h3>
             <p>Auf der Startseite sollen nur die kommenden Heimspiele angezeigt werden — kompakt als Vorschau.</p>
-            <pre><code>[dsfooboo_football_data_schedule league="herren" home_only="1" show="upcoming" limit="5"]</code></pre>
+            <pre><code>[gridirontables_afvd_schedule league="herren" home_only="1" show="upcoming" limit="5"]</code></pre>
         </div>
 
         <div class="scenario">
             <h3>Mehrere Ligen auf einer Seite</h3>
             <p>Dein Verein hat Herren, Damen und U19. Für jede Liga einen eigenen Slug anlegen und alle auf einer Seite einbinden:</p>
-            <pre><code>[dsfooboo_football_data_standings league="herren"]
-[dsfooboo_football_data_standings league="damen"]
-[dsfooboo_football_data_standings league="u19"]</code></pre>
+            <pre><code>[gridirontables_afvd_standings league="herren"]
+[gridirontables_afvd_standings league="damen"]
+[gridirontables_afvd_standings league="u19"]</code></pre>
         </div>
 
         <div class="scenario">
             <h3>Nur eine bestimmte Gruppe</h3>
             <p>Die Liga hat Gruppen A, B, C, D — du willst nur Gruppe B zeigen:</p>
-            <pre><code>[dsfooboo_football_data_standings league="jugend" group="B"]
-[dsfooboo_football_data_schedule league="jugend" group="B"]</code></pre>
+            <pre><code>[gridirontables_afvd_standings league="jugend" group="B"]
+[gridirontables_afvd_schedule league="jugend" group="B"]</code></pre>
         </div>
 
         <div class="scenario">
             <h3>Ergebnisse der bisherigen Saison</h3>
             <p>Eine Seite mit allen vergangenen Spielen und Ergebnissen:</p>
-            <pre><code>[dsfooboo_football_data_schedule league="herren" show="past"]</code></pre>
+            <pre><code>[gridirontables_afvd_schedule league="herren" show="past"]</code></pre>
         </div>
 
         <div class="scenario">
@@ -452,26 +452,26 @@
         <p>Die Tabellenfarben können im Backend unter <strong>Settings</strong> konfiguriert werden. Für weitergehende Anpassungen kann eigenes CSS im Theme verwendet werden.</p>
 
         <h3>Eigene Header-Farbe</h3>
-        <pre><code>table.dsfooboo_football_data_league_table th {
+        <pre><code>table.gridirontables_afvd_league_table th {
     background-color: #dd3333;
     color: #fff;
 }</code></pre>
 
         <h3>Highlight-Zeilen einfärben</h3>
-        <pre><code>table.dsfooboo_football_data_league_table tr.dsfooboo_football_data_highlight td {
+        <pre><code>table.gridirontables_afvd_league_table tr.gridirontables_afvd_highlight td {
     background-color: #fff3cd;
 }</code></pre>
 
         <h3>Verfügbare CSS-Klassen</h3>
         <table>
             <tr><th>Klasse</th><th>Beschreibung</th></tr>
-            <tr><td><code>.dsfooboo_football_data_league_table</code></td><td>Jede Tabelle (Standings & Schedule)</td></tr>
-            <tr><td><code>.dsfooboo_football_data_schedule_table</code></td><td>Zusätzlich auf Spielplan-Tabellen</td></tr>
-            <tr><td><code>.dsfooboo_football_data_highlight</code></td><td>Hervorgehobenes Team (Standings: auf <code>tr</code>, Schedule: auf <code>td</code>)</td></tr>
-            <tr><td><code>.dsfooboo_football_data_standings_wrap</code></td><td>Wrapper um Standings</td></tr>
-            <tr><td><code>.dsfooboo_football_data_schedule_wrap</code></td><td>Wrapper um Schedule</td></tr>
-            <tr><td><code>.dsfooboo_football_data_group_header</code></td><td>Gruppen-Überschrift</td></tr>
-            <tr><td><code>.dsfooboo_football_data_disclaimer</code></td><td>Datenquellen-Hinweis</td></tr>
+            <tr><td><code>.gridirontables_afvd_league_table</code></td><td>Jede Tabelle (Standings & Schedule)</td></tr>
+            <tr><td><code>.gridirontables_afvd_schedule_table</code></td><td>Zusätzlich auf Spielplan-Tabellen</td></tr>
+            <tr><td><code>.gridirontables_afvd_highlight</code></td><td>Hervorgehobenes Team (Standings: auf <code>tr</code>, Schedule: auf <code>td</code>)</td></tr>
+            <tr><td><code>.gridirontables_afvd_standings_wrap</code></td><td>Wrapper um Standings</td></tr>
+            <tr><td><code>.gridirontables_afvd_schedule_wrap</code></td><td>Wrapper um Schedule</td></tr>
+            <tr><td><code>.gridirontables_afvd_group_header</code></td><td>Gruppen-Überschrift</td></tr>
+            <tr><td><code>.gridirontables_afvd_disclaimer</code></td><td>Datenquellen-Hinweis</td></tr>
         </table>
     </div>
 </section>
@@ -488,10 +488,10 @@
         <p>Der Liga-Code steht in der URL des Spielplans auf der Verbandsseite. Beispiel: In <code>xmlspielplan.php5?Liga=<strong>olm</strong></code> ist <code>olm</code> der Liga-Code.</p>
 
         <h3>Die Daten sind nicht aktuell?</h3>
-        <p>Unter <strong>DSFOOBOO Football Data → Import</strong> manuell importieren. Für automatische Updates den Sync-Intervall unter <strong>Settings</strong> einstellen. Beachte: WP-Cron läuft nur bei Seitenaufrufen. Für zuverlässige Intervalle einen Server-Cronjob einrichten, der <code>wp-cron.php</code> aufruft.</p>
+        <p>Unter <strong>Gridirontables AFVD → Import</strong> manuell importieren. Für automatische Updates den Sync-Intervall unter <strong>Settings</strong> einstellen. Beachte: WP-Cron läuft nur bei Seitenaufrufen. Für zuverlässige Intervalle einen Server-Cronjob einrichten, der <code>wp-cron.php</code> aufruft.</p>
 
         <h3>Kann ich die Tabelle auch ohne WordPress nutzen?</h3>
-        <p>Nein, DSFOOBOO Football Data ist ein WordPress-Plugin und benötigt eine WordPress-Installation.</p>
+        <p>Nein, Gridirontables AFVD ist ein WordPress-Plugin und benötigt eine WordPress-Installation.</p>
 
         <h3>Welche WordPress-Version wird benötigt?</h3>
         <p>Mindestens WordPress 5.9 und PHP 7.4.</p>
@@ -500,7 +500,7 @@
 
 <!-- Footer -->
 <footer>
-    <p>DSFOOBOO Football Data – League tables & schedules - data provided by AFVD &middot; Open Source unter <a href="https://github.com/slayer01/dsfooboo-football-data">GPL v2</a></p>
+    <p>Gridirontables AFVD – League tables & schedules - data provided by AFVD &middot; Open Source unter <a href="https://github.com/slayer01/gridirontables-afvd">GPL v2</a></p>
     <p style="margin-top:8px;">Dieses Plugin ist ein unabhängiges Projekt und steht in keiner Verbindung zum AFVD oder einem seiner Mitgliedsverbände.</p>
 </footer>
 

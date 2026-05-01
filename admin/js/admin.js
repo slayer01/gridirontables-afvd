@@ -3,35 +3,35 @@
 
     $(function () {
 
-        var cfg = window.dsfooboo_football_data_config;
+        var cfg = window.gridirontables_afvd_config;
 
         if ($.fn.wpColorPicker) {
             var palettes = cfg && cfg.themePalette && cfg.themePalette.length ? cfg.themePalette : true;
-            $('.dsfooboo_football_data_color_picker').wpColorPicker({ palettes: palettes });
+            $('.gridirontables_afvd_color_picker').wpColorPicker({ palettes: palettes });
         }
 
-        $('#dsfooboo_football_data_add_league').on('click', function () {
-            var tbody = $('#dsfooboo_football_data_leagues_body');
+        $('#gridirontables_afvd_add_league').on('click', function () {
+            var tbody = $('#gridirontables_afvd_leagues_body');
             var index = tbody.find('tr').length;
-            var template = $('#tmpl-dsfooboo_football_data_league_row').html();
+            var template = $('#tmpl-gridirontables_afvd_league_row').html();
             template = template.replace(/\{\{INDEX\}\}/g, index);
             tbody.append(template);
         });
 
-        $(document).on('click', '.dsfooboo_football_data_remove_league', function () {
+        $(document).on('click', '.gridirontables_afvd_remove_league', function () {
             $(this).closest('tr').remove();
         });
 
-        $(document).on('click', '.dsfooboo_football_data_import_league', function () {
+        $(document).on('click', '.gridirontables_afvd_import_league', function () {
             var btn = $(this);
             var liga = btn.data('liga');
-            var statusCell = $('.dsfooboo_football_data_import_status[data-liga="' + liga + '"]');
+            var statusCell = $('.gridirontables_afvd_import_status[data-liga="' + liga + '"]');
 
             btn.prop('disabled', true);
             statusCell.removeClass('success error').text(cfg.i18n.importing);
 
             $.post(cfg.ajaxUrl, {
-                action: 'dsfooboo_football_data_import',
+                action: 'gridirontables_afvd_import',
                 nonce: cfg.nonce,
                 liga_code: liga
             })
@@ -43,8 +43,8 @@
                         data.standings_count + ' standings, ' +
                         data.schedule_count + ' schedule'
                     );
-                    $('.dsfooboo_football_data_count_standings[data-liga="' + liga + '"]').text(data.standings_count);
-                    $('.dsfooboo_football_data_count_schedule[data-liga="' + liga + '"]').text(data.schedule_count);
+                    $('.gridirontables_afvd_count_standings[data-liga="' + liga + '"]').text(data.standings_count);
+                    $('.gridirontables_afvd_count_schedule[data-liga="' + liga + '"]').text(data.schedule_count);
                 } else {
                     statusCell.addClass('error').text(cfg.i18n.error + ': ' + response.data);
                 }
@@ -57,20 +57,20 @@
             });
         });
 
-        $('#dsfooboo_football_data_import_all').on('click', function () {
+        $('#gridirontables_afvd_import_all').on('click', function () {
             if (!confirm(cfg.i18n.confirm)) {
                 return;
             }
 
             var btn = $(this);
-            var statusSpan = $('#dsfooboo_football_data_import_all_status');
+            var statusSpan = $('#gridirontables_afvd_import_all_status');
 
             btn.prop('disabled', true);
-            $('.dsfooboo_football_data_import_league').prop('disabled', true);
+            $('.gridirontables_afvd_import_league').prop('disabled', true);
             statusSpan.text(cfg.i18n.importing);
 
             $.post(cfg.ajaxUrl, {
-                action: 'dsfooboo_football_data_import_all',
+                action: 'gridirontables_afvd_import_all',
                 nonce: cfg.nonce
             })
             .done(function (response) {
@@ -80,7 +80,7 @@
                     var fail = 0;
 
                     $.each(results, function (liga, result) {
-                        var statusCell = $('.dsfooboo_football_data_import_status[data-liga="' + liga + '"]');
+                        var statusCell = $('.gridirontables_afvd_import_status[data-liga="' + liga + '"]');
                         if (result.error) {
                             fail++;
                             statusCell.addClass('error').text(cfg.i18n.error + ': ' + result.error);
@@ -91,8 +91,8 @@
                                 result.standings_count + ' standings, ' +
                                 result.schedule_count + ' schedule'
                             );
-                            $('.dsfooboo_football_data_count_standings[data-liga="' + liga + '"]').text(result.standings_count);
-                            $('.dsfooboo_football_data_count_schedule[data-liga="' + liga + '"]').text(result.schedule_count);
+                            $('.gridirontables_afvd_count_standings[data-liga="' + liga + '"]').text(result.standings_count);
+                            $('.gridirontables_afvd_count_schedule[data-liga="' + liga + '"]').text(result.schedule_count);
                         }
                     });
 
@@ -106,17 +106,17 @@
             })
             .always(function () {
                 btn.prop('disabled', false);
-                $('.dsfooboo_football_data_import_league').prop('disabled', false);
+                $('.gridirontables_afvd_import_league').prop('disabled', false);
             });
         });
 
-        $(document).on('click', '.dsfooboo_football_data_view_raw', function () {
+        $(document).on('click', '.gridirontables_afvd_view_raw', function () {
             var btn = $(this);
             var liga = btn.data('liga');
             var type = btn.data('type');
-            var wrap = $('#dsfooboo_football_data_raw_data_wrap');
-            var title = $('#dsfooboo_football_data_raw_data_title');
-            var content = $('#dsfooboo_football_data_raw_data_content');
+            var wrap = $('#gridirontables_afvd_raw_data_wrap');
+            var title = $('#gridirontables_afvd_raw_data_title');
+            var content = $('#gridirontables_afvd_raw_data_content');
 
             btn.prop('disabled', true);
             content.html('<em>' + cfg.i18n.importing + '</em>');
@@ -124,7 +124,7 @@
             wrap.show();
 
             $.post(cfg.ajaxUrl, {
-                action: 'dsfooboo_football_data_raw_data',
+                action: 'gridirontables_afvd_raw_data',
                 nonce: cfg.nonce,
                 liga_code: liga,
                 type: type

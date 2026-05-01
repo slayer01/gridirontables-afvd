@@ -17,24 +17,24 @@ jobs:
 
       - name: Read version
         run: |
-          VERSION=$(grep -oP "Version:\s+\K[0-9]+\.[0-9]+\.[0-9]+" dsfooboo-football-data.php | head -1)
+          VERSION=$(grep -oP "Version:\s+\K[0-9]+\.[0-9]+\.[0-9]+" gridirontables-afvd.php | head -1)
           echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
           echo "Plugin version: ${VERSION}"
 
       - name: Build ZIP
         run: |
-          mkdir -p dsfooboo-football-data
-          cp -r dsfooboo-football-data.php uninstall.php readme.txt README.md includes/ admin/ public/ dsfooboo-football-data/
-          zip -r dsfooboo-football-data.zip dsfooboo-football-data/
+          mkdir -p gridirontables-afvd
+          cp -r gridirontables-afvd.php uninstall.php readme.txt README.md includes/ admin/ public/ gridirontables-afvd/
+          zip -r gridirontables-afvd.zip gridirontables-afvd/
 
       - name: Create or update release
         run: |
           TAG="v${VERSION}"
           if gh release view "$TAG" > /dev/null 2>&1; then
-            gh release upload "$TAG" dsfooboo-football-data.zip --clobber
+            gh release upload "$TAG" gridirontables-afvd.zip --clobber
           else
-            gh release create "$TAG" dsfooboo-football-data.zip \
-              --title "DSFOOBOO Football Data ${VERSION}" \
+            gh release create "$TAG" gridirontables-afvd.zip \
+              --title "Gridirontables AFVD ${VERSION}" \
               --notes "Release ${VERSION}" \
               --latest
           fi

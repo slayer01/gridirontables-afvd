@@ -1,10 +1,10 @@
-=== DSFOOBOO Football Data – League tables & schedules - data provided by AFVD ===
+=== Gridirontables AFVD – League tables & schedules - data provided by AFVD ===
 Contributors: slayer01
 Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.5.2
+Stable tag: 3.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Display American football league standings and game schedules on your WordPress 
 
 == Description ==
 
-DSFOOBOO Football Data fetches league standings and game schedules from a publicly available XML API, stores them locally, and displays them via shortcodes.
+Gridirontables AFVD fetches league standings and game schedules from a publicly available XML API, stores them locally, and displays them via shortcodes.
 
 This plugin is an independent project and is not affiliated with, endorsed by, or in any way officially connected to the AFVD (American Football Verband Deutschland) or any of its member associations.
 
@@ -29,10 +29,10 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 
 = Shortcodes =
 
-* `[dsfooboo_football_data_standings league="slug"]` — League standings table
-* `[dsfooboo_football_data_schedule league="slug"]` — Game schedule table
+* `[gridirontables_afvd_standings league="slug"]` — League standings table
+* `[gridirontables_afvd_schedule league="slug"]` — Game schedule table
 
-The legacy `[footballdata_*]` and `[afvdata_*]` shortcodes still work as aliases.
+The legacy `[dsfooboo_football_data_*]`, `[footballdata_*]` and `[afvdata_*]` shortcodes still work as aliases.
 
 = Schedule Attributes =
 
@@ -51,10 +51,18 @@ The legacy `[footballdata_*]` and `[afvdata_*]` shortcodes still work as aliases
 
 1. Upload the plugin folder to `/wp-content/plugins/`
 2. Activate the plugin through the Plugins menu
-3. Go to **DSFOOBOO Football Data** in the admin menu to configure leagues
+3. Go to **Gridirontables AFVD** in the admin menu to configure leagues
 4. Import data and use shortcodes on your pages
 
 == Changelog ==
+
+= 3.0.0 =
+* Renamed plugin to "Gridirontables AFVD" (third rename) to match the WordPress.org plugin slug `gridirontables-afvd`
+* Text domain changed to `gridirontables-afvd` (hyphenated, as required by WordPress.org)
+* New shortcodes `[gridirontables_afvd_standings]` and `[gridirontables_afvd_schedule]`; previous `[dsfooboo_football_data_*]`, `[footballdata_*]` and `[afvdata_*]` shortcodes still work as aliases
+* All internal prefixes (classes, options, CSS, AJAX hooks, cron hook) renamed to `gridirontables_afvd_*`
+* Migration on activation/load handles tables and options from all three prior prefixes (`dsfooboo_football_data_*`, `footballdata_*`, `afvdata_*`)
+* DB schema bumped to 1.3
 
 = 2.5.2 =
 * Updated tagline to "League tables & schedules - data provided by AFVD"

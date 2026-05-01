@@ -4,24 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A WordPress plugin ("DSFOOBOO Football Data – League tables & schedules - data provided by AFVD") that fetches American football league standings and game schedules from a publicly available XML API at `vereine.football-verband.de`, stores them locally, and displays them via shortcodes.
+A WordPress plugin ("Gridirontables AFVD – League tables & schedules - data provided by AFVD") that fetches American football league standings and game schedules from a publicly available XML API at `vereine.football-verband.de`, stores them locally, and displays them via shortcodes.
 
 This plugin is independent and not affiliated with the AFVD (American Football Verband Deutschland) or any of its member associations.
 
-The plugin has been renamed twice: originally "AFVData" (`afvdata_*` prefix), then briefly "FootballData" (`footballdata_*` prefix in v2.4.x), and from v2.5.0 onward "DSFOOBOO Football Data" (`dsfooboo_football_data_*` prefix). The two prior prefixes live on only as deprecated shortcode aliases and as the source side of a one-time migration.
+The plugin has been renamed three times: originally "AFVData" (`afvdata_*` prefix), then "FootballData" (`footballdata_*` prefix in v2.4.x), then "DSFOOBOO Football Data" (`dsfooboo_football_data_*` prefix in v2.5.x), and from v3.0.0 onward "Gridirontables AFVD" (`gridirontables_afvd_*` snake-case prefix; `gridirontables-afvd` hyphenated text domain to satisfy the WordPress.org plugin slug requirement). All three prior prefixes live on only as deprecated shortcode aliases and as the source side of a one-time migration.
 
 ## Architecture
 
 ```
-dsfooboo-football-data.php                              → Bootstrap: constants, requires, activation/deactivation hooks
+gridirontables-afvd.php                                 → Bootstrap: constants, requires, activation/deactivation hooks
 uninstall.php                                           → Cleanup: drops tables (all known prefixes) and deletes options
 includes/
-  class-dsfooboo-football-data-plugin.php               → Singleton orchestrator, DB version + legacy migration, wires all classes
-  class-dsfooboo-football-data-db.php                   → Schema (dbDelta), upsert/query methods, all $wpdb->prepare(), legacy table rename
-  class-dsfooboo-football-data-importer.php             → Fetches XML via wp_remote_get(), parses with simplexml, upserts into DB
-  class-dsfooboo-football-data-admin.php                → Top-level admin menu (4 tabs: Settings, Leagues, Import, Info), AJAX handlers
-  class-dsfooboo-football-data-shortcodes.php           → [dsfooboo_football_data_*] shortcodes + legacy [footballdata_*] / [afvdata_*] aliases
-  class-dsfooboo-football-data-cron.php                 → WP-Cron scheduling for automatic imports
+  class-gridirontables-afvd-plugin.php                  → Singleton orchestrator, DB version + legacy migration, wires all classes
+  class-gridirontables-afvd-db.php                      → Schema (dbDelta), upsert/query methods, all $wpdb->prepare(), legacy table rename
+  class-gridirontables-afvd-importer.php                → Fetches XML via wp_remote_get(), parses with simplexml, upserts into DB
+  class-gridirontables-afvd-admin.php                   → Top-level admin menu (4 tabs: Settings, Leagues, Import, Info), AJAX handlers
+  class-gridirontables-afvd-shortcodes.php              → [gridirontables_afvd_*] shortcodes + legacy [dsfooboo_football_data_*] / [footballdata_*] / [afvdata_*] aliases
+  class-gridirontables-afvd-cron.php                    → WP-Cron scheduling for automatic imports
 admin/
   views/page-settings.php                               → Main admin page with tab navigation
   views/partial-leagues.php                             → League configuration form
@@ -31,27 +31,27 @@ admin/
   js/admin.js                                           → Color picker, league management, import AJAX, raw data viewer
   img/logo.png                                          → Plugin logo (transparent PNG)
 public/
-  css/dsfooboo-football-data.css                        → Frontend table styles with CSS custom properties
+  css/gridirontables-afvd.css                           → Frontend table styles with CSS custom properties
 ```
 
 ## Data Flow
 
 1. XML API (`vereine.football-verband.de/xmltabelle.php5?Liga=XXX` / `xmlspielplan.php5?Liga=XXX`)
-2. `DSFooboo_Football_Data_Importer` fetches + parses XML, upserts into `{prefix}dsfooboo_football_data_standings` / `{prefix}dsfooboo_football_data_schedule`
-3. Shortcodes query `DSFooboo_Football_Data_DB` methods and render HTML tables
+2. `Gridirontables_AFVD_Importer` fetches + parses XML, upserts into `{prefix}gridirontables_afvd_standings` / `{prefix}gridirontables_afvd_schedule`
+3. Shortcodes query `Gridirontables_AFVD_DB` methods and render HTML tables
 
 Import uses upsert (`INSERT ... ON DUPLICATE KEY UPDATE`) + stale-row cleanup, so there's no empty-table window during sync.
 
 ## Database Tables
 
-- `{prefix}dsfooboo_football_data_standings` — league standings, unique on `(liga_code, gruppe, kuerzel)`
-- `{prefix}dsfooboo_football_data_schedule` — game schedule, unique on `(liga_code, game_id)`
+- `{prefix}gridirontables_afvd_standings` — league standings, unique on `(liga_code, gruppe, kuerzel)`
+- `{prefix}gridirontables_afvd_schedule` — game schedule, unique on `(liga_code, game_id)`
 
-Created via `dbDelta()` on activation. Dropped via `uninstall.php`. On first load after upgrade from any earlier version, `DSFooboo_Football_Data_DB::migrate_from_legacy()` renames whichever older table set exists (`{prefix}footballdata_*` or `{prefix}afvdata_*`) in place; the option `dsfooboo_football_data_legacy_migrated` is set to skip the migration on subsequent loads.
+Created via `dbDelta()` on activation. Dropped via `uninstall.php`. On first load after upgrade from any earlier version, `Gridirontables_AFVD_DB::migrate_from_legacy()` renames whichever older table set exists (`{prefix}dsfooboo_football_data_*`, `{prefix}footballdata_*`, or `{prefix}afvdata_*`) in place; the option `gridirontables_afvd_legacy_migrated` is set to skip the migration on subsequent loads.
 
 ## Configuration
 
-All stored in `wp_options` under `dsfooboo_football_data_*`:
+All stored in `wp_options` under `gridirontables_afvd_*`:
 - `..._api_base_url` — XML endpoint base URL
 - `..._sync_interval` — cron interval (manual/hourly/twicedaily/daily)
 - `..._leagues` — serialized array of league configs (slug, label, liga_code, team_name, active)
@@ -62,21 +62,22 @@ All stored in `wp_options` under `dsfooboo_football_data_*`:
 
 ## Shortcodes
 
-- `[dsfooboo_football_data_standings league="slug"]` — standings table. Attrs: `group`, `highlight`, `class`
-- `[dsfooboo_football_data_schedule league="slug"]` — game schedule. Attrs: `group`, `home_only`, `show` (all/upcoming/past), `limit`, `highlight`, `class`
+- `[gridirontables_afvd_standings league="slug"]` — standings table. Attrs: `group`, `highlight`, `class`
+- `[gridirontables_afvd_schedule league="slug"]` — game schedule. Attrs: `group`, `home_only`, `show` (all/upcoming/past), `limit`, `highlight`, `class`
 
-Deprecated aliases `[footballdata_*]` and `[afvdata_*]` are registered for backwards compatibility.
+Deprecated aliases `[dsfooboo_football_data_*]`, `[footballdata_*]`, and `[afvdata_*]` are registered for backwards compatibility.
 
 The `league` attribute accepts either a configured slug or a raw liga code. Groups are auto-detected from imported data.
 
 ## Naming Conventions
 
-- All PHP classes: `DSFooboo_Football_Data_*`
-- All PHP constants: `DSFOOBOO_FOOTBALL_DATA_*`
-- All options, DB tables, AJAX actions, cron hook, text domain, menu page slug, CSS classes, CSS custom properties: `dsfooboo_football_data_*` (snake_case with underscores everywhere — also in CSS classes, deviating from typical hyphenated convention; matches the user's stated preference)
-- Cron hook: `dsfooboo_football_data_sync` (legacy `footballdata_sync` and `afvdata_sync` are unscheduled during migration)
-- Plugin file and class file names use hyphens (WP convention for plugin slug paths): `dsfooboo-football-data.php`, `class-dsfooboo-football-data-*.php`, `dsfooboo-football-data.css`
-- GitHub repo: `slayer01/dsfooboo-football-data`; Pages URL `https://slayer01.github.io/dsfooboo-football-data/`. Local working-copy folder is still named `afvdata` for legacy reasons.
+- All PHP classes: `Gridirontables_AFVD_*`
+- All PHP constants: `GRIDIRONTABLES_AFVD_*`
+- All options, DB tables, AJAX actions, cron hook, menu page slug, CSS classes, CSS custom properties: `gridirontables_afvd_*` (snake_case with underscores everywhere — also in CSS classes, deviating from typical hyphenated convention; matches the user's stated preference)
+- **Text domain is the one exception**: `gridirontables-afvd` (hyphens) — WordPress.org's automated plugin scan requires the text domain header to be lowercase letters, numbers, and hyphens only, and to match the plugin slug. So `__('...', 'gridirontables-afvd')` not `'gridirontables_afvd'`.
+- Cron hook: `gridirontables_afvd_sync` (legacy `dsfooboo_football_data_sync`, `footballdata_sync`, and `afvdata_sync` are unscheduled during migration)
+- Plugin file and class file names use hyphens (WP convention for plugin slug paths): `gridirontables-afvd.php`, `class-gridirontables-afvd-*.php`, `gridirontables-afvd.css`
+- GitHub repo: `slayer01/gridirontables-afvd`; Pages URL `https://slayer01.github.io/gridirontables-afvd/`. Local working-copy folder is still named `afvdata` for legacy reasons.
 
 ## Security Conventions
 
@@ -92,11 +93,11 @@ The `league` attribute accepts either a configured slug or a raw liga code. Grou
 ## Development Notes
 
 - This is a standalone WordPress plugin — no build step, no npm, no composer
-- To test: drop the folder into `wp-content/plugins/`, activate, configure under "DSFOOBOO Football Data" in the admin menu
-- The plugin is i18n-ready (text domain: `dsfooboo_football_data`) but no translation files exist yet
+- To test: drop the folder into `wp-content/plugins/`, activate, configure under "Gridirontables AFVD" in the admin menu
+- The plugin is i18n-ready (text domain: `gridirontables-afvd`) but no translation files exist yet
 - Frontend CSS is only enqueued on pages that actually use a shortcode
 - Table colors are configurable in Settings with WordPress color picker; active theme palette colors are offered as presets
-- The default table header color is neutral (#333) — users can customize via Settings or theme CSS targeting `.dsfooboo_football_data_league_table th`
+- The default table header color is neutral (#333) — users can customize via Settings or theme CSS targeting `.gridirontables_afvd_league_table th`
 - GitHub Actions pipeline builds a ZIP and creates a release on every push
-- Version must be bumped in `dsfooboo-football-data.php` (header + constant) and `readme.txt` (stable tag) before each push
+- Version must be bumped in `gridirontables-afvd.php` (header + constant) and `readme.txt` (stable tag) before each push
 - Contact: Daniel Schmidt-Richert, afvdata@foo.boo

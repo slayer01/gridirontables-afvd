@@ -1,16 +1,16 @@
 <?php
 defined('ABSPATH') || exit;
 
-class DSFooboo_Football_Data_Importer {
+class Gridirontables_AFVD_Importer {
 
     private $base_url;
 
     public function __construct() {
-        $this->base_url = rtrim(get_option('dsfooboo_football_data_api_base_url', 'http://vereine.football-verband.de/'), '/');
+        $this->base_url = rtrim(get_option('gridirontables_afvd_api_base_url', 'http://vereine.football-verband.de/'), '/');
     }
 
     public function import_all_active() {
-        $leagues = get_option('dsfooboo_football_data_leagues', []);
+        $leagues = get_option('gridirontables_afvd_leagues', []);
         $results = [];
 
         foreach ($leagues as $league) {
@@ -27,7 +27,7 @@ class DSFooboo_Football_Data_Importer {
             }
         }
 
-        update_option('dsfooboo_football_data_last_sync', time());
+        update_option('gridirontables_afvd_last_sync', time());
 
         return $results;
     }
@@ -41,17 +41,17 @@ class DSFooboo_Football_Data_Importer {
 
         if (is_wp_error($standings_result) && is_wp_error($schedule_result)) {
             return new WP_Error(
-                'dsfooboo_football_data_import_failed',
+                'gridirontables_afvd_import_failed',
                 sprintf(
                     /* translators: 1: standings error, 2: schedule error */
-                    __('Standings: %1$s | Schedule: %2$s', 'dsfooboo_football_data'),
+                    __('Standings: %1$s | Schedule: %2$s', 'gridirontables-afvd'),
                     $standings_result->get_error_message(),
                     $schedule_result->get_error_message()
                 )
             );
         }
 
-        $counts = DSFooboo_Football_Data_DB::get_counts($liga_code);
+        $counts = Gridirontables_AFVD_DB::get_counts($liga_code);
 
         return [
             'liga_code'       => $liga_code,
@@ -72,7 +72,7 @@ class DSFooboo_Football_Data_Importer {
 
         $count = 0;
         foreach ($xml->children() as $row) {
-            DSFooboo_Football_Data_DB::upsert_standing([
+            Gridirontables_AFVD_DB::upsert_standing([
                 'liga_code'   => sanitize_text_field((string) $row->Liga),
                 'bezeichnung' => sanitize_text_field((string) $row->Bezeichnung),
                 'gruppe'      => sanitize_text_field((string) $row->Gruppe),
@@ -90,7 +90,7 @@ class DSFooboo_Football_Data_Importer {
         }
 
         if ($count > 0) {
-            DSFooboo_Football_Data_DB::cleanup_stale(DSFooboo_Football_Data_DB::standings_table(), $liga_code, $import_time);
+            Gridirontables_AFVD_DB::cleanup_stale(Gridirontables_AFVD_DB::standings_table(), $liga_code, $import_time);
         }
 
         return $count;
@@ -109,7 +109,7 @@ class DSFooboo_Football_Data_Importer {
             $datum1 = (string) $row->Datum1;
             $datum2 = (string) $row->Datum2;
 
-            DSFooboo_Football_Data_DB::upsert_game([
+            Gridirontables_AFVD_DB::upsert_game([
                 'game_id'      => sanitize_text_field((string) $row->ID),
                 'liga_code'    => sanitize_text_field((string) $row->Liga),
                 'bezeichnung'  => sanitize_text_field((string) $row->Bezeichnung),
@@ -141,7 +141,7 @@ class DSFooboo_Football_Data_Importer {
         }
 
         if ($count > 0) {
-            DSFooboo_Football_Data_DB::cleanup_stale(DSFooboo_Football_Data_DB::schedule_table(), $liga_code, $import_time);
+            Gridirontables_AFVD_DB::cleanup_stale(Gridirontables_AFVD_DB::schedule_table(), $liga_code, $import_time);
         }
 
         return $count;
@@ -150,7 +150,7 @@ class DSFooboo_Football_Data_Importer {
     private function fetch_xml($url) {
         $response = wp_remote_get($url, [
             'timeout'    => 30,
-            'user-agent' => 'DSFOOBOO-Football-Data-WordPress-Plugin/' . DSFOOBOO_FOOTBALL_DATA_VERSION,
+            'user-agent' => 'Gridirontables-AFVD-WordPress-Plugin/' . GRIDIRONTABLES_AFVD_VERSION,
         ]);
 
         if (is_wp_error($response)) {
@@ -160,15 +160,15 @@ class DSFooboo_Football_Data_Importer {
         $code = wp_remote_retrieve_response_code($response);
         if (200 !== $code) {
             return new WP_Error(
-                'dsfooboo_football_data_http_error',
+                'gridirontables_afvd_http_error',
                 /* translators: %d: HTTP status code */
-                sprintf(__('HTTP %d from data API', 'dsfooboo_football_data'), $code)
+                sprintf(__('HTTP %d from data API', 'gridirontables-afvd'), $code)
             );
         }
 
         $body = wp_remote_retrieve_body($response);
         if (empty($body)) {
-            return new WP_Error('dsfooboo_football_data_empty_response', __('Empty response from data API', 'dsfooboo_football_data'));
+            return new WP_Error('gridirontables_afvd_empty_response', __('Empty response from data API', 'gridirontables-afvd'));
         }
 
         libxml_use_internal_errors(true);
@@ -177,9 +177,9 @@ class DSFooboo_Football_Data_Importer {
         if (false === $xml) {
             $errors = libxml_get_errors();
             libxml_clear_errors();
-            $msg = !empty($errors) ? $errors[0]->message : __('Unknown XML parse error', 'dsfooboo_football_data');
+            $msg = !empty($errors) ? $errors[0]->message : __('Unknown XML parse error', 'gridirontables-afvd');
             /* translators: %s: XML error message */
-            return new WP_Error('dsfooboo_football_data_xml_error', sprintf(__('XML parse error: %s', 'dsfooboo_football_data'), trim($msg)));
+            return new WP_Error('gridirontables_afvd_xml_error', sprintf(__('XML parse error: %s', 'gridirontables-afvd'), trim($msg)));
         }
 
         return $xml;

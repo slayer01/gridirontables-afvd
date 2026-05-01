@@ -1,16 +1,16 @@
 <?php
 defined('ABSPATH') || exit;
 
-class DSFooboo_Football_Data_DB {
+class Gridirontables_AFVD_DB {
 
     public static function standings_table() {
         global $wpdb;
-        return $wpdb->prefix . 'dsfooboo_football_data_standings';
+        return $wpdb->prefix . 'gridirontables_afvd_standings';
     }
 
     public static function schedule_table() {
         global $wpdb;
-        return $wpdb->prefix . 'dsfooboo_football_data_schedule';
+        return $wpdb->prefix . 'gridirontables_afvd_schedule';
     }
 
     /**
@@ -21,10 +21,12 @@ class DSFooboo_Football_Data_DB {
         global $wpdb;
         return [
             'standings' => [
+                $wpdb->prefix . 'dsfooboo_football_data_standings',
                 $wpdb->prefix . 'footballdata_standings',
                 $wpdb->prefix . 'afvdata_standings',
             ],
             'schedule' => [
+                $wpdb->prefix . 'dsfooboo_football_data_schedule',
                 $wpdb->prefix . 'footballdata_schedule',
                 $wpdb->prefix . 'afvdata_schedule',
             ],
@@ -32,7 +34,7 @@ class DSFooboo_Football_Data_DB {
     }
 
     /**
-     * Rename legacy *_standings / *_schedule tables to dsfooboo_football_data_* if any exist.
+     * Rename legacy *_standings / *_schedule tables to gridirontables_afvd_* if any exist.
      * Idempotent: bails out cleanly when nothing to migrate.
      */
     public static function migrate_from_legacy() {
@@ -130,7 +132,7 @@ class DSFooboo_Football_Data_DB {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
-        update_option('dsfooboo_football_data_db_version', DSFOOBOO_FOOTBALL_DATA_DB_VERSION);
+        update_option('gridirontables_afvd_db_version', GRIDIRONTABLES_AFVD_DB_VERSION);
     }
 
     public static function upsert_standing($data) {

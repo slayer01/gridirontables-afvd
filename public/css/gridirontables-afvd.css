@@ -1,55 +1,55 @@
 /* ==========================================================================
-   DSFOOBOO Football Data – Frontend Styles
+   Gridirontables AFVD – Frontend Styles
    ========================================================================== */
 
 /* --- League Table (Standings + Schedule) --- */
 
-table.dsfooboo_football_data_league_table {
+table.gridirontables_afvd_league_table {
     width: 100%;
     border-collapse: collapse;
     font-family: inherit;
     margin-bottom: 0;
 }
 
-table.dsfooboo_football_data_league_table th {
-    background-color: var(--dsfooboo_football_data_header_bg, #333);
-    color: var(--dsfooboo_football_data_header_text, #fff);
+table.gridirontables_afvd_league_table th {
+    background-color: var(--gridirontables_afvd_header_bg, #333);
+    color: var(--gridirontables_afvd_header_text, #fff);
     padding: 8px 10px;
     text-align: left;
     font-weight: 600;
 }
 
-table.dsfooboo_football_data_league_table td {
+table.gridirontables_afvd_league_table td {
     background-color: #fff;
     padding: 6px 10px;
     border-bottom: 1px solid #eee;
 }
 
-table.dsfooboo_football_data_league_table .odd td {
+table.gridirontables_afvd_league_table .odd td {
     background-color: #f5f5f5;
 }
 
 /* --- Highlighting --- */
 
-table.dsfooboo_football_data_league_table td.dsfooboo_football_data_highlight {
+table.gridirontables_afvd_league_table td.gridirontables_afvd_highlight {
     font-weight: bold;
 }
 
-table.dsfooboo_football_data_league_table tr.dsfooboo_football_data_highlight td {
+table.gridirontables_afvd_league_table tr.gridirontables_afvd_highlight td {
     font-weight: bold;
-    background-color: var(--dsfooboo_football_data_highlight_bg);
+    background-color: var(--gridirontables_afvd_highlight_bg);
 }
 
 /* --- Numeric columns --- */
 
-.dsfooboo_football_data_league_table .dsfooboo_football_data_num {
+.gridirontables_afvd_league_table .gridirontables_afvd_num {
     font-size: 0.9em;
     font-variant-numeric: tabular-nums;
 }
 
 /* --- Group header --- */
 
-span.dsfooboo_football_data_group_header {
+span.gridirontables_afvd_group_header {
     font-weight: bold;
     display: block;
     padding: 10px 0;
@@ -57,20 +57,20 @@ span.dsfooboo_football_data_group_header {
 
 /* --- Disclaimer --- */
 
-span.dsfooboo_football_data_disclaimer {
+span.gridirontables_afvd_disclaimer {
     font-size: 0.75em;
     color: #aaa;
     display: block;
     margin-top: 6px;
 }
 
-span.dsfooboo_football_data_disclaimer a {
+span.gridirontables_afvd_disclaimer a {
     color: #999;
 }
 
 /* --- Error (editors only) --- */
 
-p.dsfooboo_football_data_error {
+p.gridirontables_afvd_error {
     color: #dc3232;
     background: #fef7f7;
     border-left: 4px solid #dc3232;
@@ -83,37 +83,37 @@ p.dsfooboo_football_data_error {
 
 @media all and (max-width: 640px) {
 
-    table.dsfooboo_football_data_schedule_table,
-    table.dsfooboo_football_data_schedule_table thead,
-    table.dsfooboo_football_data_schedule_table tbody,
-    table.dsfooboo_football_data_schedule_table tr,
-    table.dsfooboo_football_data_schedule_table th,
-    table.dsfooboo_football_data_schedule_table td {
+    table.gridirontables_afvd_schedule_table,
+    table.gridirontables_afvd_schedule_table thead,
+    table.gridirontables_afvd_schedule_table tbody,
+    table.gridirontables_afvd_schedule_table tr,
+    table.gridirontables_afvd_schedule_table th,
+    table.gridirontables_afvd_schedule_table td {
         display: block;
     }
 
-    table.dsfooboo_football_data_schedule_table {
+    table.gridirontables_afvd_schedule_table {
         text-align: right;
     }
 
-    table.dsfooboo_football_data_schedule_table thead {
+    table.gridirontables_afvd_schedule_table thead {
         position: absolute;
         left: -9999px;
         top: -9999px;
     }
 
-    table.dsfooboo_football_data_schedule_table tr {
+    table.gridirontables_afvd_schedule_table tr {
         margin-bottom: 10px;
         border: 1px solid #ddd;
     }
 
-    table.dsfooboo_football_data_schedule_table td {
+    table.gridirontables_afvd_schedule_table td {
         position: relative;
         padding-left: 50%;
         text-align: right;
     }
 
-    table.dsfooboo_football_data_schedule_table td::before {
+    table.gridirontables_afvd_schedule_table td::before {
         content: attr(data-label) ":";
         position: absolute;
         left: 10px;
@@ -121,7 +121,7 @@ p.dsfooboo_football_data_error {
         text-align: left;
     }
 
-    .dsfooboo_football_data_nomobile {
+    .gridirontables_afvd_nomobile {
         display: none;
     }
 }

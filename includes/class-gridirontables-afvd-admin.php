@@ -1,24 +1,24 @@
 <?php
 defined('ABSPATH') || exit;
 
-class DSFooboo_Football_Data_Admin {
+class Gridirontables_AFVD_Admin {
 
     public function __construct() {
         add_action('admin_menu', [$this, 'add_menu_page']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
-        add_action('admin_post_dsfooboo_football_data_save_settings', [$this, 'handle_save_settings']);
-        add_action('admin_post_dsfooboo_football_data_save_leagues', [$this, 'handle_save_leagues']);
-        add_action('wp_ajax_dsfooboo_football_data_import', [$this, 'ajax_import']);
-        add_action('wp_ajax_dsfooboo_football_data_import_all', [$this, 'ajax_import_all']);
-        add_action('wp_ajax_dsfooboo_football_data_raw_data', [$this, 'ajax_raw_data']);
+        add_action('admin_post_gridirontables_afvd_save_settings', [$this, 'handle_save_settings']);
+        add_action('admin_post_gridirontables_afvd_save_leagues', [$this, 'handle_save_leagues']);
+        add_action('wp_ajax_gridirontables_afvd_import', [$this, 'ajax_import']);
+        add_action('wp_ajax_gridirontables_afvd_import_all', [$this, 'ajax_import_all']);
+        add_action('wp_ajax_gridirontables_afvd_raw_data', [$this, 'ajax_raw_data']);
     }
 
     public function add_menu_page() {
         add_menu_page(
-            __('DSFOOBOO Football Data', 'dsfooboo_football_data'),
-            __('DSFOOBOO Football Data', 'dsfooboo_football_data'),
+            __('Gridirontables AFVD', 'gridirontables-afvd'),
+            __('Gridirontables AFVD', 'gridirontables-afvd'),
             'manage_options',
-            'dsfooboo_football_data',
+            'gridirontables_afvd',
             [$this, 'render_page'],
             'dashicons-awards',
             30
@@ -26,7 +26,7 @@ class DSFooboo_Football_Data_Admin {
     }
 
     public function enqueue_assets($hook) {
-        if ('toplevel_page_dsfooboo_football_data' !== $hook) {
+        if ('toplevel_page_gridirontables_afvd' !== $hook) {
             return;
         }
 
@@ -34,29 +34,29 @@ class DSFooboo_Football_Data_Admin {
         wp_enqueue_script('wp-color-picker');
 
         wp_enqueue_style(
-            'dsfooboo_football_data_admin',
-            DSFOOBOO_FOOTBALL_DATA_PLUGIN_URL . 'admin/css/admin.css',
+            'gridirontables_afvd_admin',
+            GRIDIRONTABLES_AFVD_PLUGIN_URL . 'admin/css/admin.css',
             [],
-            DSFOOBOO_FOOTBALL_DATA_VERSION
+            GRIDIRONTABLES_AFVD_VERSION
         );
 
         wp_enqueue_script(
-            'dsfooboo_football_data_admin',
-            DSFOOBOO_FOOTBALL_DATA_PLUGIN_URL . 'admin/js/admin.js',
+            'gridirontables_afvd_admin',
+            GRIDIRONTABLES_AFVD_PLUGIN_URL . 'admin/js/admin.js',
             ['jquery', 'wp-color-picker'],
-            DSFOOBOO_FOOTBALL_DATA_VERSION,
+            GRIDIRONTABLES_AFVD_VERSION,
             true
         );
 
-        wp_localize_script('dsfooboo_football_data_admin', 'dsfooboo_football_data_config', [
+        wp_localize_script('gridirontables_afvd_admin', 'gridirontables_afvd_config', [
             'ajaxUrl'       => admin_url('admin-ajax.php'),
-            'nonce'         => wp_create_nonce('dsfooboo_football_data_import'),
+            'nonce'         => wp_create_nonce('gridirontables_afvd_import'),
             'themePalette'  => self::get_theme_palette(),
             'i18n'          => [
-                'importing'  => __('Importing...', 'dsfooboo_football_data'),
-                'success'    => __('Import successful', 'dsfooboo_football_data'),
-                'error'      => __('Import failed', 'dsfooboo_football_data'),
-                'confirm'    => __('Import all active leagues now?', 'dsfooboo_football_data'),
+                'importing'  => __('Importing...', 'gridirontables-afvd'),
+                'success'    => __('Import successful', 'gridirontables-afvd'),
+                'error'      => __('Import failed', 'gridirontables-afvd'),
+                'confirm'    => __('Import all active leagues now?', 'gridirontables-afvd'),
             ],
         ]);
     }
@@ -65,21 +65,21 @@ class DSFooboo_Football_Data_Admin {
         if (!current_user_can('manage_options')) {
             return;
         }
-        include DSFOOBOO_FOOTBALL_DATA_PLUGIN_DIR . 'admin/views/page-settings.php';
+        include GRIDIRONTABLES_AFVD_PLUGIN_DIR . 'admin/views/page-settings.php';
     }
 
     public function handle_save_settings() {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Unauthorized', 'dsfooboo_football_data'));
+            wp_die(esc_html__('Unauthorized', 'gridirontables-afvd'));
         }
 
-        check_admin_referer('dsfooboo_football_data_save_settings', 'dsfooboo_football_data_nonce');
+        check_admin_referer('gridirontables_afvd_save_settings', 'gridirontables_afvd_nonce');
 
-        update_option('dsfooboo_football_data_api_base_url', esc_url_raw(wp_unslash($_POST['api_base_url'] ?? 'http://vereine.football-verband.de/')));
+        update_option('gridirontables_afvd_api_base_url', esc_url_raw(wp_unslash($_POST['api_base_url'] ?? 'http://vereine.football-verband.de/')));
 
-        update_option('dsfooboo_football_data_color_header_bg', sanitize_hex_color(wp_unslash($_POST['color_header_bg'] ?? '#333333')));
-        update_option('dsfooboo_football_data_color_header_text', sanitize_hex_color(wp_unslash($_POST['color_header_text'] ?? '#ffffff')));
-        update_option('dsfooboo_football_data_color_highlight_bg', sanitize_hex_color(wp_unslash($_POST['color_highlight_bg'] ?? '')));
+        update_option('gridirontables_afvd_color_header_bg', sanitize_hex_color(wp_unslash($_POST['color_header_bg'] ?? '#333333')));
+        update_option('gridirontables_afvd_color_header_text', sanitize_hex_color(wp_unslash($_POST['color_header_text'] ?? '#ffffff')));
+        update_option('gridirontables_afvd_color_highlight_bg', sanitize_hex_color(wp_unslash($_POST['color_highlight_bg'] ?? '')));
 
         $allowed_intervals = ['manual', 'hourly', 'twicedaily', 'daily'];
         $interval = sanitize_key(wp_unslash($_POST['sync_interval'] ?? 'manual'));
@@ -87,16 +87,16 @@ class DSFooboo_Football_Data_Admin {
             $interval = 'manual';
         }
 
-        $old_interval = get_option('dsfooboo_football_data_sync_interval', 'manual');
-        update_option('dsfooboo_football_data_sync_interval', $interval);
+        $old_interval = get_option('gridirontables_afvd_sync_interval', 'manual');
+        update_option('gridirontables_afvd_sync_interval', $interval);
 
         if ($old_interval !== $interval) {
-            DSFooboo_Football_Data_Cron::unschedule();
-            DSFooboo_Football_Data_Cron::schedule();
+            Gridirontables_AFVD_Cron::unschedule();
+            Gridirontables_AFVD_Cron::schedule();
         }
 
         wp_safe_redirect(add_query_arg([
-            'page'    => 'dsfooboo_football_data',
+            'page'    => 'gridirontables_afvd',
             'tab'     => 'settings',
             'updated' => '1',
         ], admin_url('admin.php')));
@@ -105,10 +105,10 @@ class DSFooboo_Football_Data_Admin {
 
     public function handle_save_leagues() {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Unauthorized', 'dsfooboo_football_data'));
+            wp_die(esc_html__('Unauthorized', 'gridirontables-afvd'));
         }
 
-        check_admin_referer('dsfooboo_football_data_save_leagues', 'dsfooboo_football_data_nonce');
+        check_admin_referer('gridirontables_afvd_save_leagues', 'gridirontables_afvd_nonce');
 
         $leagues    = [];
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- individual values sanitized in loop below
@@ -138,10 +138,10 @@ class DSFooboo_Football_Data_Admin {
             ];
         }
 
-        update_option('dsfooboo_football_data_leagues', $leagues);
+        update_option('gridirontables_afvd_leagues', $leagues);
 
         wp_safe_redirect(add_query_arg([
-            'page'    => 'dsfooboo_football_data',
+            'page'    => 'gridirontables_afvd',
             'tab'     => 'leagues',
             'updated' => '1',
         ], admin_url('admin.php')));
@@ -149,18 +149,18 @@ class DSFooboo_Football_Data_Admin {
     }
 
     public function ajax_import() {
-        check_ajax_referer('dsfooboo_football_data_import', 'nonce');
+        check_ajax_referer('gridirontables_afvd_import', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('Unauthorized', 'dsfooboo_football_data'));
+            wp_send_json_error(__('Unauthorized', 'gridirontables-afvd'));
         }
 
         $liga_code = sanitize_text_field(wp_unslash($_POST['liga_code'] ?? ''));
         if ('' === $liga_code) {
-            wp_send_json_error(__('No league specified', 'dsfooboo_football_data'));
+            wp_send_json_error(__('No league specified', 'gridirontables-afvd'));
         }
 
-        $importer = new DSFooboo_Football_Data_Importer();
+        $importer = new Gridirontables_AFVD_Importer();
         $result   = $importer->import_league($liga_code);
 
         if (is_wp_error($result)) {
@@ -171,36 +171,36 @@ class DSFooboo_Football_Data_Admin {
     }
 
     public function ajax_import_all() {
-        check_ajax_referer('dsfooboo_football_data_import', 'nonce');
+        check_ajax_referer('gridirontables_afvd_import', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('Unauthorized', 'dsfooboo_football_data'));
+            wp_send_json_error(__('Unauthorized', 'gridirontables-afvd'));
         }
 
-        $importer = new DSFooboo_Football_Data_Importer();
+        $importer = new Gridirontables_AFVD_Importer();
         $results  = $importer->import_all_active();
 
         wp_send_json_success($results);
     }
 
     public function ajax_raw_data() {
-        check_ajax_referer('dsfooboo_football_data_import', 'nonce');
+        check_ajax_referer('gridirontables_afvd_import', 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(__('Unauthorized', 'dsfooboo_football_data'));
+            wp_send_json_error(__('Unauthorized', 'gridirontables-afvd'));
         }
 
         $liga_code = sanitize_text_field(wp_unslash($_POST['liga_code'] ?? ''));
         $type      = sanitize_key(wp_unslash($_POST['type'] ?? ''));
 
         if ('' === $liga_code || !in_array($type, ['standings', 'schedule'], true)) {
-            wp_send_json_error(__('Invalid request', 'dsfooboo_football_data'));
+            wp_send_json_error(__('Invalid request', 'gridirontables-afvd'));
         }
 
         if ('standings' === $type) {
-            $rows = DSFooboo_Football_Data_DB::get_standings($liga_code);
+            $rows = Gridirontables_AFVD_DB::get_standings($liga_code);
         } else {
-            $rows = DSFooboo_Football_Data_DB::get_schedule($liga_code, []);
+            $rows = Gridirontables_AFVD_DB::get_schedule($liga_code, []);
         }
 
         wp_send_json_success([
@@ -238,7 +238,7 @@ class DSFooboo_Football_Data_Admin {
     }
 
     public static function get_leagues() {
-        return get_option('dsfooboo_football_data_leagues', []);
+        return get_option('gridirontables_afvd_leagues', []);
     }
 
     public static function get_league_by_slug($identifier) {
