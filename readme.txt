@@ -1,10 +1,10 @@
 === Gridirontables AFVD – League tables & schedules - data provided by AFVD ===
-Contributors: slayer01
+Contributors: dsfooboo
 Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,8 +32,6 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 * `[gridirontables_afvd_standings league="slug"]` — League standings table
 * `[gridirontables_afvd_schedule league="slug"]` — Game schedule table
 
-The legacy `[dsfooboo_football_data_*]`, `[footballdata_*]` and `[afvdata_*]` shortcodes still work as aliases.
-
 = Schedule Attributes =
 
 * `home_only="1"` — Show only home games of the configured team
@@ -55,6 +53,10 @@ The legacy `[dsfooboo_football_data_*]`, `[footballdata_*]` and `[afvdata_*]` sh
 4. Import data and use shortcodes on your pages
 
 == Changelog ==
+
+= 3.0.2 =
+* Corrected the `Contributors` field in `readme.txt` to the WordPress.org account that owns the plugin (`dsfooboo`)
+* Removed the deprecated `[dsfooboo_football_data_*]`, `[footballdata_*]` and `[afvdata_*]` shortcode aliases to satisfy the WordPress.org Plugin Check prefix requirement — only `[gridirontables_afvd_*]` is registered now (existing pages using the old tags must be updated)
 
 = 3.0.1 =
 * Trim short description to fit the 150-character readme limit

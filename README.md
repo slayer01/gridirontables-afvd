@@ -48,8 +48,6 @@ Für jede Liga eine Zeile anlegen:
 [gridirontables_afvd_schedule league="herren"]
 ```
 
-Die alten Shortcodes `[dsfooboo_football_data_*]`, `[footballdata_*]` und `[afvdata_*]` funktionieren weiterhin als Aliase.
-
 ### Optionale Attribute
 
 | Attribut | Werte | Gilt für | Beschreibung |
@@ -72,7 +70,7 @@ Die alten Shortcodes `[dsfooboo_football_data_*]`, `[footballdata_*]` und `[afvd
 
 ## Migration aus älteren Versionen
 
-Beim ersten Laden nach dem Update werden Datenbanktabellen und Optionen automatisch von den älteren Prefixes (`dsfooboo_football_data_*`, `footballdata_*` oder `afvdata_*`) auf `gridirontables_afvd_*` umgezogen. Bestehende Inhalte (Ligen-Konfiguration, Farben, importierte Daten) bleiben erhalten. Die alten Shortcodes funktionieren weiterhin als Aliase.
+Beim ersten Laden nach dem Update werden Datenbanktabellen und Optionen automatisch von den älteren Prefixes (`dsfooboo_football_data_*`, `footballdata_*` oder `afvdata_*`) auf `gridirontables_afvd_*` umgezogen. Bestehende Inhalte (Ligen-Konfiguration, Farben, importierte Daten) bleiben erhalten. Seit Version 3.0.2 wurden die alten Shortcode-Aliase (`[dsfooboo_football_data_*]`, `[footballdata_*]`, `[afvdata_*]`) entfernt, um den WordPress.org-Prefix-Anforderungen zu entsprechen — Seiten mit den alten Tags müssen auf `[gridirontables_afvd_*]` aktualisiert werden.
 
 ## CSS anpassen
 

@@ -121,9 +121,6 @@ defined('ABSPATH') || exit;
             <?php endforeach; ?>
         </tbody>
     </table>
-    <p class="description">
-        <?php esc_html_e('Note: the legacy [dsfooboo_football_data_*], [footballdata_*], and [afvdata_*] shortcodes still work as aliases.', 'gridirontables-afvd'); ?>
-    </p>
 
     <h3><?php esc_html_e('Attribute Reference', 'gridirontables-afvd'); ?></h3>
 

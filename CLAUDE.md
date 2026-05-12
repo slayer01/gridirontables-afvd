@@ -8,7 +8,7 @@ A WordPress plugin ("Gridirontables AFVD – League tables & schedules - data pr
 
 This plugin is independent and not affiliated with the AFVD (American Football Verband Deutschland) or any of its member associations.
 
-The plugin has been renamed three times: originally "AFVData" (`afvdata_*` prefix), then "FootballData" (`footballdata_*` prefix in v2.4.x), then "DSFOOBOO Football Data" (`dsfooboo_football_data_*` prefix in v2.5.x), and from v3.0.0 onward "Gridirontables AFVD" (`gridirontables_afvd_*` snake-case prefix; `gridirontables-afvd` hyphenated text domain to satisfy the WordPress.org plugin slug requirement). All three prior prefixes live on only as deprecated shortcode aliases and as the source side of a one-time migration.
+The plugin has been renamed three times: originally "AFVData" (`afvdata_*` prefix), then "FootballData" (`footballdata_*` prefix in v2.4.x), then "DSFOOBOO Football Data" (`dsfooboo_football_data_*` prefix in v2.5.x), and from v3.0.0 onward "Gridirontables AFVD" (`gridirontables_afvd_*` snake-case prefix; `gridirontables-afvd` hyphenated text domain to satisfy the WordPress.org plugin slug requirement). The three prior prefixes live on only as the source side of a one-time options/tables migration — the deprecated shortcode aliases were removed in v3.0.2 to satisfy the WordPress.org Plugin Check prefix rule, so pages still using `[dsfooboo_football_data_*]`, `[footballdata_*]` or `[afvdata_*]` must be updated to `[gridirontables_afvd_*]`.
 
 ## Architecture
 
@@ -20,7 +20,7 @@ includes/
   class-gridirontables-afvd-db.php                      → Schema (dbDelta), upsert/query methods, all $wpdb->prepare(), legacy table rename
   class-gridirontables-afvd-importer.php                → Fetches XML via wp_remote_get(), parses with simplexml, upserts into DB
   class-gridirontables-afvd-admin.php                   → Top-level admin menu (4 tabs: Settings, Leagues, Import, Info), AJAX handlers
-  class-gridirontables-afvd-shortcodes.php              → [gridirontables_afvd_*] shortcodes + legacy [dsfooboo_football_data_*] / [footballdata_*] / [afvdata_*] aliases
+  class-gridirontables-afvd-shortcodes.php              → [gridirontables_afvd_*] shortcodes (legacy aliases removed in v3.0.2)
   class-gridirontables-afvd-cron.php                    → WP-Cron scheduling for automatic imports
 admin/
   views/page-settings.php                               → Main admin page with tab navigation
@@ -64,8 +64,6 @@ All stored in `wp_options` under `gridirontables_afvd_*`:
 
 - `[gridirontables_afvd_standings league="slug"]` — standings table. Attrs: `group`, `highlight`, `class`
 - `[gridirontables_afvd_schedule league="slug"]` — game schedule. Attrs: `group`, `home_only`, `show` (all/upcoming/past), `limit`, `highlight`, `class`
-
-Deprecated aliases `[dsfooboo_football_data_*]`, `[footballdata_*]`, and `[afvdata_*]` are registered for backwards compatibility.
 
 The `league` attribute accepts either a configured slug or a raw liga code. Groups are auto-detected from imported data.
 

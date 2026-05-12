@@ -8,14 +8,6 @@ class Gridirontables_AFVD_Shortcodes {
     public function __construct() {
         add_shortcode('gridirontables_afvd_standings', [$this, 'render_standings']);
         add_shortcode('gridirontables_afvd_schedule', [$this, 'render_schedule']);
-
-        // Deprecated aliases for backwards compatibility with the previous prefixes.
-        add_shortcode('dsfooboo_football_data_standings', [$this, 'render_standings']);
-        add_shortcode('dsfooboo_football_data_schedule', [$this, 'render_schedule']);
-        add_shortcode('footballdata_standings', [$this, 'render_standings']);
-        add_shortcode('footballdata_schedule', [$this, 'render_schedule']);
-        add_shortcode('afvdata_standings', [$this, 'render_standings']);
-        add_shortcode('afvdata_schedule', [$this, 'render_schedule']);
     }
 
     private function enqueue_styles() {
