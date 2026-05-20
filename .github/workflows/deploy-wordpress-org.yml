@@ -1,0 +1,79 @@
+name: Deploy to WordPress.org
+
+# Manual trigger only. Approval is enforced by the `wordpress-org` environment
+# (configure required reviewers under Settings → Environments → wordpress-org).
+#
+# Required repository secrets:
+#   WP_ORG_USERNAME  – WordPress.org account username (case-sensitive)
+#   WP_ORG_PASSWORD  – WordPress.org SVN password (set via profiles.wordpress.org)
+#
+# Optional: place banners/icons/screenshots in `.wordpress-org/` at repo root.
+# They will be synced to the SVN `/assets` directory (not into the plugin ZIP).
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to WordPress.org SVN
+    runs-on: ubuntu-latest
+    environment:
+      name: wordpress-org
+      url: https://wordpress.org/plugins/gridirontables-afvd/
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read and validate version
+        id: version
+        run: |
+          PLUGIN_VERSION=$(grep -oP "Version:\s+\K[0-9]+\.[0-9]+\.[0-9]+" gridirontables-afvd.php | head -1)
+          README_STABLE=$(grep -oP "Stable tag:\s+\K[0-9]+\.[0-9]+\.[0-9]+" readme.txt | head -1)
+
+          if [ -z "$PLUGIN_VERSION" ]; then
+            echo "::error::Could not read Version from gridirontables-afvd.php"
+            exit 1
+          fi
+          if [ -z "$README_STABLE" ]; then
+            echo "::error::Could not read Stable tag from readme.txt"
+            exit 1
+          fi
+          if [ "$PLUGIN_VERSION" != "$README_STABLE" ]; then
+            echo "::error::Version mismatch: gridirontables-afvd.php has ${PLUGIN_VERSION} but readme.txt Stable tag is ${README_STABLE}"
+            exit 1
+          fi
+
+          echo "VERSION=${PLUGIN_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Deploying version: ${PLUGIN_VERSION}"
+
+      - name: Build plugin directory
+        run: |
+          mkdir -p build/gridirontables-afvd
+          cp -r gridirontables-afvd.php uninstall.php readme.txt README.md includes/ admin/ public/ build/gridirontables-afvd/
+
+          # Strip OS / editor cruft that may have been copied from subdirectories.
+          find build/gridirontables-afvd \( \
+            -name '.DS_Store' -o \
+            -name 'Thumbs.db' -o \
+            -name '*.swp' -o \
+            -name '*.swo' -o \
+            -name '*~' -o \
+            -name '*.bak' \
+          \) -delete
+
+          echo "--- Files that will be deployed to SVN trunk ---"
+          find build/gridirontables-afvd -type f | sort
+
+      - name: Deploy to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.WP_ORG_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.WP_ORG_PASSWORD }}
+          SLUG: gridirontables-afvd
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          BUILD_DIR: build/gridirontables-afvd
+          ASSETS_DIR: .wordpress-org

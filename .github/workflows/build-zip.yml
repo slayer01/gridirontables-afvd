@@ -25,6 +25,17 @@ jobs:
         run: |
           mkdir -p gridirontables-afvd
           cp -r gridirontables-afvd.php uninstall.php readme.txt README.md includes/ admin/ public/ gridirontables-afvd/
+
+          # Strip OS / editor cruft that may have been copied from subdirectories.
+          find gridirontables-afvd \( \
+            -name '.DS_Store' -o \
+            -name 'Thumbs.db' -o \
+            -name '*.swp' -o \
+            -name '*.swo' -o \
+            -name '*~' -o \
+            -name '*.bak' \
+          \) -delete
+
           zip -r gridirontables-afvd.zip gridirontables-afvd/
 
       - name: Create or update release
