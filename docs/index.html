@@ -55,24 +55,26 @@
 
         .hero .btn {
             display: inline-block;
-            background: var(--accent);
             color: #fff;
             text-decoration: none;
-            padding: 12px 28px;
+            padding: 16px 34px;
+            margin: 6px;
             border-radius: var(--radius);
-            font-weight: 600;
-            font-size: 1em;
-            transition: background 0.2s;
+            font-weight: 700;
+            font-size: 1.1em;
+            transition: background 0.2s, transform 0.1s;
         }
 
-        .hero .btn:hover { background: #a1202f; }
+        .hero .btn:hover { transform: translateY(-1px); }
 
-        .hero .btn + .btn {
-            margin-left: 12px;
-            background: var(--primary);
-        }
+        .hero .btn-download { background: var(--accent); }
+        .hero .btn-download:hover { background: #a1202f; }
 
-        .hero .btn + .btn:hover { background: #2a3d66; }
+        .hero .btn-github { background: var(--primary); }
+        .hero .btn-github:hover { background: #2a3d66; }
+
+        .hero .btn-wp { background: #21759b; }
+        .hero .btn-wp:hover { background: #195573; }
 
         /* Container */
         .container {
@@ -264,7 +266,6 @@
             .hero { padding: 40px 16px 36px; }
             .hero h1 { font-size: 1.6em; }
             .hero .btn { display: block; margin: 8px 0; }
-            .hero .btn + .btn { margin-left: 0; }
             section { padding: 32px 0; }
         }
     </style>
@@ -276,8 +277,9 @@
     <img src="logo.png" alt="Gridirontables AFVD Logo">
     <h1>Gridirontables AFVD</h1>
     <p>League tables & schedules - data provided by AFVD</p>
-    <a href="https://github.com/slayer01/gridirontables-afvd/releases/latest" class="btn">Download (ZIP)</a>
-    <a href="https://github.com/slayer01/gridirontables-afvd" class="btn">GitHub</a>
+    <a href="https://github.com/slayer01/gridirontables-afvd/releases/latest" class="btn btn-download">Download (ZIP)</a>
+    <a href="https://github.com/slayer01/gridirontables-afvd" class="btn btn-github">GitHub</a>
+    <a href="https://wordpress.org/plugins/gridirontables-afvd/" class="btn btn-wp">WordPress Plugin</a>
 </header>
 
 <!-- Navigation -->
