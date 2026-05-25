@@ -4,7 +4,7 @@ Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.1.1
+Stable tag: 3.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,9 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 4. Admin: run imports, view raw data, and look up shortcodes on the Import tab
 
 == Changelog ==
+
+= 3.1.2 =
+* Leagues form: when duplicate slugs or duplicate (liga_code, saison) pairs are submitted, **nothing is saved** and the form re-renders with the user's unsaved input intact plus a red error notice listing the row numbers and what to fix. Previously the duplicate row was silently skipped, which lost the user's typing.
 
 = 3.1.1 =
 * Two league entries can now coexist with the same Liga Code but different Saison values — useful for displaying current + archive data side by side. The `saison` column is part of the unique key on both DB tables; DB schema bumped to 1.5 (the key is migrated automatically on upgrade)

@@ -128,7 +128,7 @@ class Gridirontables_AFVD_Admin {
 
         $seen_slugs    = [];
         $seen_lc_pairs = [];
-        $skipped       = [];
+        $errors        = [];
 
         foreach ($slugs as $i => $slug) {
             $slug = sanitize_key($slug);
@@ -144,26 +144,7 @@ class Gridirontables_AFVD_Admin {
 
             $saison = sanitize_text_field($saisons[$i] ?? '');
 
-            if (in_array($slug, $seen_slugs, true)) {
-                /* translators: %s: duplicate slug */
-                $skipped[] = sprintf(__('Slug "%s" is duplicated — only the first entry was kept.', 'gridirontables-afvd'), $slug);
-                continue;
-            }
-
-            $pair_key = $code . '|' . $saison;
-            if (in_array($pair_key, $seen_lc_pairs, true)) {
-                $skipped[] = sprintf(
-                    /* translators: 1: liga code, 2: season label or "current" */
-                    __('Liga code "%1$s" with saison "%2$s" is duplicated — only the first entry was kept (data would overwrite).', 'gridirontables-afvd'),
-                    $code,
-                    '' === $saison ? __('(current)', 'gridirontables-afvd') : $saison
-                );
-                continue;
-            }
-
-            $seen_slugs[]    = $slug;
-            $seen_lc_pairs[] = $pair_key;
-
+            // Collect every row so we can re-render the form on error without losing input.
             $leagues[] = [
                 'slug'      => $slug,
                 'label'     => sanitize_text_field($labels[$i] ?? $slug),
@@ -173,13 +154,46 @@ class Gridirontables_AFVD_Admin {
                 'format'    => $format,
                 'active'    => isset($actives[$i]),
             ];
+
+            if (in_array($slug, $seen_slugs, true)) {
+                $errors[] = sprintf(
+                    /* translators: 1: row number, 2: duplicate slug */
+                    __('Row %1$d: slug "%2$s" is used by another row above. Slugs must be unique.', 'gridirontables-afvd'),
+                    count($leagues),
+                    $slug
+                );
+            } else {
+                $seen_slugs[] = $slug;
+            }
+
+            $pair_key = $code . '|' . $saison;
+            if (in_array($pair_key, $seen_lc_pairs, true)) {
+                $errors[] = sprintf(
+                    /* translators: 1: row number, 2: liga code, 3: season label or "current" */
+                    __('Row %1$d: Liga code "%2$s" with saison "%3$s" already appears above. Two entries with the same Liga Code + Saison would overwrite each other.', 'gridirontables-afvd'),
+                    count($leagues),
+                    $code,
+                    '' === $saison ? __('(current)', 'gridirontables-afvd') : $saison
+                );
+            } else {
+                $seen_lc_pairs[] = $pair_key;
+            }
+        }
+
+        if (!empty($errors)) {
+            // Do not persist. Stash the user's input and the errors so the form
+            // can re-render with the unsaved values + errors at the top.
+            set_transient('gridirontables_afvd_pending_leagues', $leagues, 300);
+            set_transient('gridirontables_afvd_save_errors', $errors, 300);
+            wp_safe_redirect(add_query_arg([
+                'page'  => 'gridirontables_afvd',
+                'tab'   => 'leagues',
+                'error' => '1',
+            ], admin_url('admin.php')));
+            exit;
         }
 
         update_option('gridirontables_afvd_leagues', $leagues);
-
-        if (!empty($skipped)) {
-            set_transient('gridirontables_afvd_save_warnings', $skipped, 60);
-        }
 
         wp_safe_redirect(add_query_arg([
             'page'    => 'gridirontables_afvd',

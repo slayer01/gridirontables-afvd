@@ -10,6 +10,19 @@ $color_header_txt = get_option('gridirontables_afvd_color_header_text', '#ffffff
 $color_highlight  = get_option('gridirontables_afvd_color_highlight_bg', '');
 $leagues    = get_option('gridirontables_afvd_leagues', []);
 $last_sync  = get_option('gridirontables_afvd_last_sync', 0);
+
+// On validation error, re-render the form with the user's unsaved input
+// instead of the persisted option so they can fix the duplicate without
+// retyping anything.
+$pending_leagues = get_transient('gridirontables_afvd_pending_leagues');
+if (false !== $pending_leagues) {
+    delete_transient('gridirontables_afvd_pending_leagues');
+    $leagues = $pending_leagues;
+}
+$save_errors = get_transient('gridirontables_afvd_save_errors');
+if (false !== $save_errors) {
+    delete_transient('gridirontables_afvd_save_errors');
+}
 ?>
 <div class="wrap">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
@@ -23,16 +36,12 @@ $last_sync  = get_option('gridirontables_afvd_last_sync', 0);
         </div>
     <?php endif; ?>
 
-    <?php
-    $save_warnings = get_transient('gridirontables_afvd_save_warnings');
-    if (!empty($save_warnings)) :
-        delete_transient('gridirontables_afvd_save_warnings');
-        ?>
-        <div class="notice notice-warning is-dismissible">
-            <p><strong><?php esc_html_e('Some league entries were skipped:', 'gridirontables-afvd'); ?></strong></p>
+    <?php if (!empty($save_errors)) : ?>
+        <div class="notice notice-error">
+            <p><strong><?php esc_html_e('Leagues were not saved. Please fix the following issues and submit again:', 'gridirontables-afvd'); ?></strong></p>
             <ul style="list-style:disc;margin-left:24px;">
-                <?php foreach ($save_warnings as $warning) : ?>
-                    <li><?php echo esc_html($warning); ?></li>
+                <?php foreach ($save_errors as $error_message) : ?>
+                    <li><?php echo esc_html($error_message); ?></li>
                 <?php endforeach; ?>
             </ul>
         </div>
