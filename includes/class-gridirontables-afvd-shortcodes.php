@@ -58,18 +58,18 @@ class Gridirontables_AFVD_Shortcodes {
         if (!in_array($format, ['wins', 'points'], true)) {
             $format = 'wins';
         }
-        $saison_label = $atts['saison'] !== '' ? $atts['saison'] : ($league_config['saison'] ?? '');
+        $saison = $atts['saison'] !== '' ? $atts['saison'] : ($league_config['saison'] ?? '');
 
         $this->enqueue_styles();
 
         if (!empty($atts['group'])) {
             $groups = [$atts['group']];
         } else {
-            $groups = Gridirontables_AFVD_DB::get_standing_groups($liga_code);
+            $groups = Gridirontables_AFVD_DB::get_standing_groups($liga_code, $saison);
         }
 
         $output = '';
-        $output .= '<h2>' . esc_html($this->compose_heading($liga_code, $saison_label)) . '</h2>';
+        $output .= '<h2>' . esc_html($this->compose_heading($liga_code, $saison)) . '</h2>';
 
         $wrapper_class = 'gridirontables_afvd_standings_wrap';
         if ($atts['class']) {
@@ -79,11 +79,11 @@ class Gridirontables_AFVD_Shortcodes {
 
         if (!empty($groups)) {
             foreach ($groups as $gruppe) {
-                $rows = Gridirontables_AFVD_DB::get_standings($liga_code, $gruppe);
+                $rows = Gridirontables_AFVD_DB::get_standings($liga_code, $gruppe, $saison);
                 $output .= $this->build_standings_table($rows, $highlight, $gruppe, $format);
             }
         } else {
-            $rows = Gridirontables_AFVD_DB::get_standings($liga_code);
+            $rows = Gridirontables_AFVD_DB::get_standings($liga_code, null, $saison);
             $output .= $this->build_standings_table($rows, $highlight, null, $format);
         }
 
@@ -116,14 +116,14 @@ class Gridirontables_AFVD_Shortcodes {
 
         $liga_code = $league_config['liga_code'];
         $highlight = $atts['highlight'] ?: ($league_config['team_name'] ?? '');
-        $saison_label = $atts['saison'] !== '' ? $atts['saison'] : ($league_config['saison'] ?? '');
+        $saison = $atts['saison'] !== '' ? $atts['saison'] : ($league_config['saison'] ?? '');
 
         $this->enqueue_styles();
 
         if (!empty($atts['group'])) {
             $groups = [$atts['group']];
         } else {
-            $groups = Gridirontables_AFVD_DB::get_schedule_groups($liga_code);
+            $groups = Gridirontables_AFVD_DB::get_schedule_groups($liga_code, $saison);
         }
 
         $home_only  = !empty($atts['home_only']);
@@ -132,10 +132,11 @@ class Gridirontables_AFVD_Shortcodes {
             'limit'     => (int) $atts['limit'],
             'team_name' => $home_only ? $highlight : '',
             'home_only' => $home_only,
+            'saison'    => $saison,
         ];
 
         $output = '';
-        $output .= '<h2>' . esc_html($this->compose_heading($liga_code, $saison_label)) . '</h2>';
+        $output .= '<h2>' . esc_html($this->compose_heading($liga_code, $saison)) . '</h2>';
 
         $wrapper_class = 'gridirontables_afvd_schedule_wrap';
         if ($atts['class']) {
@@ -164,8 +165,8 @@ class Gridirontables_AFVD_Shortcodes {
     }
 
     private function compose_heading($liga_code, $saison) {
-        $league_name = Gridirontables_AFVD_DB::get_league_name($liga_code);
         $saison = trim((string) $saison);
+        $league_name = Gridirontables_AFVD_DB::get_league_name($liga_code, $saison);
         if ('' !== $saison && false === strpos($league_name, $saison)) {
             $league_name .= ' ' . $saison;
         }

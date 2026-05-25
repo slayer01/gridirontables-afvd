@@ -18,12 +18,14 @@ class Gridirontables_AFVD_Importer {
                 continue;
             }
 
+            $slug = $league['slug'];
             $result = $this->import_league($league['liga_code'], $league['saison'] ?? '');
 
             if (is_wp_error($result)) {
-                $results[$league['liga_code']] = ['error' => $result->get_error_message()];
+                $results[$slug] = ['error' => $result->get_error_message()];
             } else {
-                $results[$league['liga_code']] = $result;
+                $result['slug'] = $slug;
+                $results[$slug] = $result;
             }
         }
 
@@ -84,6 +86,7 @@ class Gridirontables_AFVD_Importer {
         foreach ($xml->children() as $row) {
             Gridirontables_AFVD_DB::upsert_standing([
                 'liga_code'    => sanitize_text_field((string) $row->Liga),
+                'saison'       => $saison,
                 'bezeichnung'  => sanitize_text_field((string) $row->Bezeichnung),
                 'gruppe'       => sanitize_text_field((string) $row->Gruppe),
                 'platz'        => (int) $row->Platz,
@@ -110,7 +113,7 @@ class Gridirontables_AFVD_Importer {
         }
 
         if ($count > 0) {
-            Gridirontables_AFVD_DB::cleanup_stale(Gridirontables_AFVD_DB::standings_table(), $liga_code, $import_time);
+            Gridirontables_AFVD_DB::cleanup_stale(Gridirontables_AFVD_DB::standings_table(), $liga_code, $saison, $import_time);
         }
 
         return $count;
@@ -135,6 +138,7 @@ class Gridirontables_AFVD_Importer {
             Gridirontables_AFVD_DB::upsert_game([
                 'game_id'      => sanitize_text_field((string) $row->ID),
                 'liga_code'    => sanitize_text_field((string) $row->Liga),
+                'saison'       => $saison,
                 'bezeichnung'  => sanitize_text_field((string) $row->Bezeichnung),
                 'gruppe'       => sanitize_text_field((string) $row->Gruppe),
                 'datum1'       => $this->parse_date($datum1),
@@ -166,7 +170,7 @@ class Gridirontables_AFVD_Importer {
         }
 
         if ($count > 0) {
-            Gridirontables_AFVD_DB::cleanup_stale(Gridirontables_AFVD_DB::schedule_table(), $liga_code, $import_time);
+            Gridirontables_AFVD_DB::cleanup_stale(Gridirontables_AFVD_DB::schedule_table(), $liga_code, $saison, $import_time);
         }
 
         return $count;

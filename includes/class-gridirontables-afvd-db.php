@@ -79,6 +79,7 @@ class Gridirontables_AFVD_DB {
         $sql = "CREATE TABLE {$standings} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             liga_code varchar(50) NOT NULL,
+            saison varchar(10) NOT NULL DEFAULT '',
             bezeichnung varchar(255) NOT NULL DEFAULT '',
             gruppe varchar(50) NOT NULL DEFAULT '',
             platz int NOT NULL DEFAULT 0,
@@ -101,7 +102,7 @@ class Gridirontables_AFVD_DB {
             quotient decimal(6,4) NOT NULL DEFAULT 0.0000,
             imported_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
-            UNIQUE KEY standing_unique (liga_code, gruppe, kuerzel),
+            UNIQUE KEY standing_unique (liga_code, saison, gruppe, kuerzel),
             KEY idx_liga_code (liga_code)
         ) {$charset_collate};
 
@@ -109,6 +110,7 @@ class Gridirontables_AFVD_DB {
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             game_id varchar(50) NOT NULL DEFAULT '',
             liga_code varchar(50) NOT NULL,
+            saison varchar(10) NOT NULL DEFAULT '',
             bezeichnung varchar(255) NOT NULL DEFAULT '',
             gruppe varchar(50) NOT NULL DEFAULT '',
             datum1 date DEFAULT NULL,
@@ -136,7 +138,7 @@ class Gridirontables_AFVD_DB {
             kommentar text,
             imported_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
-            UNIQUE KEY game_unique (liga_code, game_id),
+            UNIQUE KEY game_unique (liga_code, saison, game_id),
             KEY idx_liga_code (liga_code),
             KEY idx_datum (datum1)
         ) {$charset_collate};";
@@ -144,7 +146,51 @@ class Gridirontables_AFVD_DB {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
 
+        // dbDelta adds the new saison column for upgrades from <1.5, but cannot
+        // modify existing unique keys. Drop+recreate the keys explicitly so the
+        // saison column actually participates in uniqueness.
+        self::ensure_saison_in_unique_keys();
+
         update_option('gridirontables_afvd_db_version', GRIDIRONTABLES_AFVD_DB_VERSION);
+    }
+
+    /**
+     * Idempotent: if the unique key on a table is missing the saison column,
+     * drop it and recreate with saison included.
+     */
+    private static function ensure_saison_in_unique_keys() {
+        global $wpdb;
+
+        $targets = [
+            self::standings_table() => [
+                'key'  => 'standing_unique',
+                'cols' => '(liga_code, saison, gruppe, kuerzel)',
+            ],
+            self::schedule_table() => [
+                'key'  => 'game_unique',
+                'cols' => '(liga_code, saison, game_id)',
+            ],
+        ];
+
+        foreach ($targets as $table => $spec) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $index_rows = $wpdb->get_results("SHOW INDEX FROM {$table} WHERE Key_name = '" . esc_sql($spec['key']) . "'");
+            if (empty($index_rows)) {
+                continue;
+            }
+
+            $cols_in_key = [];
+            foreach ($index_rows as $r) {
+                $cols_in_key[] = $r->Column_name;
+            }
+
+            if (in_array('saison', $cols_in_key, true)) {
+                continue;
+            }
+
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $wpdb->query("ALTER TABLE {$table} DROP INDEX {$spec['key']}, ADD UNIQUE KEY {$spec['key']} {$spec['cols']}");
+        }
     }
 
     public static function upsert_standing($data) {
@@ -155,13 +201,13 @@ class Gridirontables_AFVD_DB {
         $wpdb->query($wpdb->prepare(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "INSERT INTO {$table}
-                (liga_code, bezeichnung, gruppe, platz, team, teamname, kuerzel,
+                (liga_code, saison, bezeichnung, gruppe, platz, team, teamname, kuerzel,
                  p_plus, p_minus, td_plus, td_minus,
                  games_win, games_loose, games_tied,
                  home_win, home_loose, home_tied,
                  away_win, away_loose, away_tied,
                  quotient, imported_at)
-            VALUES (%s, %s, %s, %d, %s, %s, %s, %d, %d, %d, %d,
+            VALUES (%s, %s, %s, %s, %d, %s, %s, %s, %d, %d, %d, %d,
                     %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %s)
             ON DUPLICATE KEY UPDATE
                 bezeichnung = VALUES(bezeichnung),
@@ -184,6 +230,7 @@ class Gridirontables_AFVD_DB {
                 quotient = VALUES(quotient),
                 imported_at = VALUES(imported_at)",
             $data['liga_code'],
+            $data['saison'],
             $data['bezeichnung'],
             $data['gruppe'],
             $data['platz'],
@@ -216,12 +263,12 @@ class Gridirontables_AFVD_DB {
         $wpdb->query($wpdb->prepare(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "INSERT INTO {$table}
-                (game_id, liga_code, bezeichnung, gruppe, datum1, datum2, kickoff,
+                (game_id, liga_code, saison, bezeichnung, gruppe, datum1, datum2, kickoff,
                  heim, heimname, heimkuerzel, gast, gastname, gastkuerzel,
                  td_heim, td_gast, q1_heim, q1_gast, q2_heim, q2_gast,
                  q3_heim, q3_gast, q4_heim, q4_gast, ot_heim, ot_gast,
                  stadion, kommentar, imported_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                     %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 bezeichnung = VALUES(bezeichnung),
@@ -252,6 +299,7 @@ class Gridirontables_AFVD_DB {
                 imported_at = VALUES(imported_at)",
             $data['game_id'],
             $data['liga_code'],
+            $data['saison'],
             $data['bezeichnung'],
             $data['gruppe'],
             $data['datum1'],
@@ -281,18 +329,19 @@ class Gridirontables_AFVD_DB {
         ));
     }
 
-    public static function cleanup_stale($table, $liga_code, $import_started_at) {
+    public static function cleanup_stale($table, $liga_code, $saison, $import_started_at) {
         global $wpdb;
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $wpdb->query($wpdb->prepare(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            "DELETE FROM {$table} WHERE liga_code = %s AND imported_at < %s",
+            "DELETE FROM {$table} WHERE liga_code = %s AND saison = %s AND imported_at < %s",
             $liga_code,
+            $saison,
             $import_started_at
         ));
     }
 
-    public static function get_standings($liga_code, $gruppe = null) {
+    public static function get_standings($liga_code, $gruppe = null, $saison = '') {
         global $wpdb;
         $table = self::standings_table();
 
@@ -300,8 +349,9 @@ class Gridirontables_AFVD_DB {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
             return $wpdb->get_results($wpdb->prepare(
                 // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-                "SELECT * FROM {$table} WHERE liga_code = %s AND gruppe = %s ORDER BY platz ASC",
+                "SELECT * FROM {$table} WHERE liga_code = %s AND saison = %s AND gruppe = %s ORDER BY platz ASC",
                 $liga_code,
+                $saison,
                 $gruppe
             ), ARRAY_A);
         }
@@ -309,8 +359,9 @@ class Gridirontables_AFVD_DB {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         return $wpdb->get_results($wpdb->prepare(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            "SELECT * FROM {$table} WHERE liga_code = %s ORDER BY gruppe ASC, platz ASC",
-            $liga_code
+            "SELECT * FROM {$table} WHERE liga_code = %s AND saison = %s ORDER BY gruppe ASC, platz ASC",
+            $liga_code,
+            $saison
         ), ARRAY_A);
     }
 
@@ -318,8 +369,9 @@ class Gridirontables_AFVD_DB {
         global $wpdb;
         $table = self::schedule_table();
 
-        $where = ['liga_code = %s'];
-        $params = [$liga_code];
+        $saison = isset($args['saison']) ? (string) $args['saison'] : '';
+        $where  = ['liga_code = %s', 'saison = %s'];
+        $params = [$liga_code, $saison];
 
         if (!empty($args['gruppe'])) {
             $where[] = 'gruppe = %s';
@@ -364,7 +416,7 @@ class Gridirontables_AFVD_DB {
         return $wpdb->get_results($wpdb->prepare($sql, ...$params), ARRAY_A);
     }
 
-    public static function get_counts($liga_code) {
+    public static function get_counts($liga_code, $saison = '') {
         global $wpdb;
         $standings_table = self::standings_table();
         $schedule_table  = self::schedule_table();
@@ -372,15 +424,17 @@ class Gridirontables_AFVD_DB {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $standings_count = (int) $wpdb->get_var($wpdb->prepare(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            "SELECT COUNT(*) FROM {$standings_table} WHERE liga_code = %s",
-            $liga_code
+            "SELECT COUNT(*) FROM {$standings_table} WHERE liga_code = %s AND saison = %s",
+            $liga_code,
+            $saison
         ));
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $schedule_count = (int) $wpdb->get_var($wpdb->prepare(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            "SELECT COUNT(*) FROM {$schedule_table} WHERE liga_code = %s",
-            $liga_code
+            "SELECT COUNT(*) FROM {$schedule_table} WHERE liga_code = %s AND saison = %s",
+            $liga_code,
+            $saison
         ));
 
         return [
@@ -389,39 +443,42 @@ class Gridirontables_AFVD_DB {
         ];
     }
 
-    public static function get_standing_groups($liga_code) {
+    public static function get_standing_groups($liga_code, $saison = '') {
         global $wpdb;
         $table = self::standings_table();
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         return $wpdb->get_col($wpdb->prepare(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            "SELECT DISTINCT gruppe FROM {$table} WHERE liga_code = %s AND gruppe != '' ORDER BY gruppe ASC",
-            $liga_code
+            "SELECT DISTINCT gruppe FROM {$table} WHERE liga_code = %s AND saison = %s AND gruppe != '' ORDER BY gruppe ASC",
+            $liga_code,
+            $saison
         ));
     }
 
-    public static function get_schedule_groups($liga_code) {
+    public static function get_schedule_groups($liga_code, $saison = '') {
         global $wpdb;
         $table = self::schedule_table();
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         return $wpdb->get_col($wpdb->prepare(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            "SELECT DISTINCT gruppe FROM {$table} WHERE liga_code = %s AND gruppe != '' ORDER BY gruppe ASC",
-            $liga_code
+            "SELECT DISTINCT gruppe FROM {$table} WHERE liga_code = %s AND saison = %s AND gruppe != '' ORDER BY gruppe ASC",
+            $liga_code,
+            $saison
         ));
     }
 
-    public static function get_league_name($liga_code) {
+    public static function get_league_name($liga_code, $saison = '') {
         global $wpdb;
         $table = self::standings_table();
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $name = $wpdb->get_var($wpdb->prepare(
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            "SELECT bezeichnung FROM {$table} WHERE liga_code = %s LIMIT 1",
-            $liga_code
+            "SELECT bezeichnung FROM {$table} WHERE liga_code = %s AND saison = %s LIMIT 1",
+            $liga_code,
+            $saison
         ));
 
         if (!$name) {
@@ -429,8 +486,9 @@ class Gridirontables_AFVD_DB {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
             $name = $wpdb->get_var($wpdb->prepare(
                 // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-                "SELECT bezeichnung FROM {$table} WHERE liga_code = %s LIMIT 1",
-                $liga_code
+                "SELECT bezeichnung FROM {$table} WHERE liga_code = %s AND saison = %s LIMIT 1",
+                $liga_code,
+                $saison
             ));
         }
 

@@ -26,6 +26,7 @@ defined('ABSPATH') || exit;
             <tr>
                 <th><?php esc_html_e('League', 'gridirontables-afvd'); ?></th>
                 <th><?php esc_html_e('Liga Code', 'gridirontables-afvd'); ?></th>
+                <th><?php esc_html_e('Saison', 'gridirontables-afvd'); ?></th>
                 <th><?php esc_html_e('Active', 'gridirontables-afvd'); ?></th>
                 <th><?php esc_html_e('Standings Rows', 'gridirontables-afvd'); ?></th>
                 <th><?php esc_html_e('Schedule Rows', 'gridirontables-afvd'); ?></th>
@@ -36,35 +37,37 @@ defined('ABSPATH') || exit;
         </thead>
         <tbody>
             <?php foreach ($leagues as $league) :
-                $counts = Gridirontables_AFVD_DB::get_counts($league['liga_code']);
+                $row_saison = $league['saison'] ?? '';
+                $counts = Gridirontables_AFVD_DB::get_counts($league['liga_code'], $row_saison);
             ?>
                 <tr>
-                    <td><?php echo esc_html($league['label'] ?: $league['slug']); ?></td>
+                    <td><?php echo esc_html($league['label'] ?: $league['slug']); ?> <span style="color:#888;">(<?php echo esc_html($league['slug']); ?>)</span></td>
                     <td><code><?php echo esc_html($league['liga_code']); ?></code></td>
+                    <td><?php echo '' === $row_saison ? '<em style="color:#888;">' . esc_html__('current', 'gridirontables-afvd') . '</em>' : esc_html($row_saison); ?></td>
                     <td><?php echo !empty($league['active']) ? '&#10003;' : '&#10007;'; ?></td>
-                    <td class="gridirontables_afvd_count_standings" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
+                    <td class="gridirontables_afvd_count_standings" data-slug="<?php echo esc_attr($league['slug']); ?>">
                         <?php echo (int) $counts['standings']; ?>
                     </td>
-                    <td class="gridirontables_afvd_count_schedule" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
+                    <td class="gridirontables_afvd_count_schedule" data-slug="<?php echo esc_attr($league['slug']); ?>">
                         <?php echo (int) $counts['schedule']; ?>
                     </td>
                     <td>
                         <button type="button" class="button button-small gridirontables_afvd_view_raw"
-                                data-liga="<?php echo esc_attr($league['liga_code']); ?>" data-type="standings">
+                                data-slug="<?php echo esc_attr($league['slug']); ?>" data-type="standings">
                             <?php esc_html_e('Standings', 'gridirontables-afvd'); ?>
                         </button>
                         <button type="button" class="button button-small gridirontables_afvd_view_raw"
-                                data-liga="<?php echo esc_attr($league['liga_code']); ?>" data-type="schedule">
+                                data-slug="<?php echo esc_attr($league['slug']); ?>" data-type="schedule">
                             <?php esc_html_e('Schedule', 'gridirontables-afvd'); ?>
                         </button>
                     </td>
                     <td>
                         <button type="button" class="button gridirontables_afvd_import_league"
-                                data-liga="<?php echo esc_attr($league['liga_code']); ?>">
+                                data-slug="<?php echo esc_attr($league['slug']); ?>">
                             <?php esc_html_e('Import', 'gridirontables-afvd'); ?>
                         </button>
                     </td>
-                    <td class="gridirontables_afvd_import_status" data-liga="<?php echo esc_attr($league['liga_code']); ?>">
+                    <td class="gridirontables_afvd_import_status" data-slug="<?php echo esc_attr($league['slug']); ?>">
                         &mdash;
                     </td>
                 </tr>
@@ -83,6 +86,10 @@ defined('ABSPATH') || exit;
         <h3 id="gridirontables_afvd_raw_data_title"></h3>
         <div id="gridirontables_afvd_raw_data_content" style="overflow-x:auto;"></div>
     </div>
+
+    <p class="description" style="margin-top:15px;">
+        <?php esc_html_e('Tip: to display archive data alongside current data, create separate league entries with the same Liga Code but different Saison values (e.g. one with Saison empty for the current year and another with Saison "2025" for the archive). Each entry needs its own unique slug.', 'gridirontables-afvd'); ?>
+    </p>
 
     <h3><?php esc_html_e('Shortcode Reference', 'gridirontables-afvd'); ?></h3>
     <table class="widefat">

@@ -23,6 +23,21 @@ $last_sync  = get_option('gridirontables_afvd_last_sync', 0);
         </div>
     <?php endif; ?>
 
+    <?php
+    $save_warnings = get_transient('gridirontables_afvd_save_warnings');
+    if (!empty($save_warnings)) :
+        delete_transient('gridirontables_afvd_save_warnings');
+        ?>
+        <div class="notice notice-warning is-dismissible">
+            <p><strong><?php esc_html_e('Some league entries were skipped:', 'gridirontables-afvd'); ?></strong></p>
+            <ul style="list-style:disc;margin-left:24px;">
+                <?php foreach ($save_warnings as $warning) : ?>
+                    <li><?php echo esc_html($warning); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
     <nav class="nav-tab-wrapper">
         <a href="<?php echo esc_url(add_query_arg(['page' => 'gridirontables_afvd', 'tab' => 'settings'], admin_url('admin.php'))); ?>"
            class="nav-tab <?php echo 'settings' === $active_tab ? 'nav-tab-active' : ''; ?>">

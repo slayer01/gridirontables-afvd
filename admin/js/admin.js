@@ -24,8 +24,8 @@
 
         $(document).on('click', '.gridirontables_afvd_import_league', function () {
             var btn = $(this);
-            var liga = btn.data('liga');
-            var statusCell = $('.gridirontables_afvd_import_status[data-liga="' + liga + '"]');
+            var slug = btn.data('slug');
+            var statusCell = $('.gridirontables_afvd_import_status[data-slug="' + slug + '"]');
 
             btn.prop('disabled', true);
             statusCell.removeClass('success error').text(cfg.i18n.importing);
@@ -33,7 +33,7 @@
             $.post(cfg.ajaxUrl, {
                 action: 'gridirontables_afvd_import',
                 nonce: cfg.nonce,
-                liga_code: liga
+                slug: slug
             })
             .done(function (response) {
                 if (response.success) {
@@ -43,8 +43,8 @@
                         data.standings_count + ' standings, ' +
                         data.schedule_count + ' schedule'
                     );
-                    $('.gridirontables_afvd_count_standings[data-liga="' + liga + '"]').text(data.standings_count);
-                    $('.gridirontables_afvd_count_schedule[data-liga="' + liga + '"]').text(data.schedule_count);
+                    $('.gridirontables_afvd_count_standings[data-slug="' + slug + '"]').text(data.standings_count);
+                    $('.gridirontables_afvd_count_schedule[data-slug="' + slug + '"]').text(data.schedule_count);
                 } else {
                     statusCell.addClass('error').text(cfg.i18n.error + ': ' + response.data);
                 }
@@ -79,8 +79,8 @@
                     var ok = 0;
                     var fail = 0;
 
-                    $.each(results, function (liga, result) {
-                        var statusCell = $('.gridirontables_afvd_import_status[data-liga="' + liga + '"]');
+                    $.each(results, function (slug, result) {
+                        var statusCell = $('.gridirontables_afvd_import_status[data-slug="' + slug + '"]');
                         if (result.error) {
                             fail++;
                             statusCell.addClass('error').text(cfg.i18n.error + ': ' + result.error);
@@ -91,8 +91,8 @@
                                 result.standings_count + ' standings, ' +
                                 result.schedule_count + ' schedule'
                             );
-                            $('.gridirontables_afvd_count_standings[data-liga="' + liga + '"]').text(result.standings_count);
-                            $('.gridirontables_afvd_count_schedule[data-liga="' + liga + '"]').text(result.schedule_count);
+                            $('.gridirontables_afvd_count_standings[data-slug="' + slug + '"]').text(result.standings_count);
+                            $('.gridirontables_afvd_count_schedule[data-slug="' + slug + '"]').text(result.schedule_count);
                         }
                     });
 
@@ -112,7 +112,7 @@
 
         $(document).on('click', '.gridirontables_afvd_view_raw', function () {
             var btn = $(this);
-            var liga = btn.data('liga');
+            var slug = btn.data('slug');
             var type = btn.data('type');
             var wrap = $('#gridirontables_afvd_raw_data_wrap');
             var title = $('#gridirontables_afvd_raw_data_title');
@@ -120,13 +120,13 @@
 
             btn.prop('disabled', true);
             content.html('<em>' + cfg.i18n.importing + '</em>');
-            title.text(liga + ' — ' + type);
+            title.text(slug + ' — ' + type);
             wrap.show();
 
             $.post(cfg.ajaxUrl, {
                 action: 'gridirontables_afvd_raw_data',
                 nonce: cfg.nonce,
-                liga_code: liga,
+                slug: slug,
                 type: type
             })
             .done(function (response) {

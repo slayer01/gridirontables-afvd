@@ -4,7 +4,7 @@ Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.1.0
+Stable tag: 3.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,12 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 4. Admin: run imports, view raw data, and look up shortcodes on the Import tab
 
 == Changelog ==
+
+= 3.1.1 =
+* Two league entries can now coexist with the same Liga Code but different Saison values — useful for displaying current + archive data side by side. The `saison` column is part of the unique key on both DB tables; DB schema bumped to 1.5 (the key is migrated automatically on upgrade)
+* Validation on the Leagues form: duplicate slugs or duplicate (liga_code, saison) pairs are now skipped on save and surfaced in an admin notice — previously the second entry silently overwrote the first
+* Import buttons, count cells, and raw-data viewer in the admin Import tab key off the league slug instead of the liga_code so multi-saison setups address the right league entry
+* Import tab now shows the per-league Saison column and counts are scoped to that saison
 
 = 3.1.0 =
 * New BSO-style standings layout (default): `Rank | Team | Record (W-L (Quotient)) | TD (TD+:TD-) | Home/Away`, matching the official footballverband.de output

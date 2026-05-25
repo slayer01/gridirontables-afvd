@@ -126,6 +126,10 @@ class Gridirontables_AFVD_Admin {
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $actives    = isset($_POST['league_active']) ? wp_unslash($_POST['league_active']) : [];
 
+        $seen_slugs    = [];
+        $seen_lc_pairs = [];
+        $skipped       = [];
+
         foreach ($slugs as $i => $slug) {
             $slug = sanitize_key($slug);
             $code = sanitize_text_field($codes[$i] ?? '');
@@ -138,18 +142,44 @@ class Gridirontables_AFVD_Admin {
                 $format = 'wins';
             }
 
+            $saison = sanitize_text_field($saisons[$i] ?? '');
+
+            if (in_array($slug, $seen_slugs, true)) {
+                /* translators: %s: duplicate slug */
+                $skipped[] = sprintf(__('Slug "%s" is duplicated — only the first entry was kept.', 'gridirontables-afvd'), $slug);
+                continue;
+            }
+
+            $pair_key = $code . '|' . $saison;
+            if (in_array($pair_key, $seen_lc_pairs, true)) {
+                $skipped[] = sprintf(
+                    /* translators: 1: liga code, 2: season label or "current" */
+                    __('Liga code "%1$s" with saison "%2$s" is duplicated — only the first entry was kept (data would overwrite).', 'gridirontables-afvd'),
+                    $code,
+                    '' === $saison ? __('(current)', 'gridirontables-afvd') : $saison
+                );
+                continue;
+            }
+
+            $seen_slugs[]    = $slug;
+            $seen_lc_pairs[] = $pair_key;
+
             $leagues[] = [
                 'slug'      => $slug,
                 'label'     => sanitize_text_field($labels[$i] ?? $slug),
                 'liga_code' => $code,
                 'team_name' => sanitize_text_field($team_names[$i] ?? ''),
-                'saison'    => sanitize_text_field($saisons[$i] ?? ''),
+                'saison'    => $saison,
                 'format'    => $format,
                 'active'    => isset($actives[$i]),
             ];
         }
 
         update_option('gridirontables_afvd_leagues', $leagues);
+
+        if (!empty($skipped)) {
+            set_transient('gridirontables_afvd_save_warnings', $skipped, 60);
+        }
 
         wp_safe_redirect(add_query_arg([
             'page'    => 'gridirontables_afvd',
@@ -166,18 +196,24 @@ class Gridirontables_AFVD_Admin {
             wp_send_json_error(__('Unauthorized', 'gridirontables-afvd'));
         }
 
-        $liga_code = sanitize_text_field(wp_unslash($_POST['liga_code'] ?? ''));
-        if ('' === $liga_code) {
+        $slug = sanitize_key(wp_unslash($_POST['slug'] ?? ''));
+        if ('' === $slug) {
             wp_send_json_error(__('No league specified', 'gridirontables-afvd'));
         }
 
+        $league = self::get_league_by_slug($slug);
+        if (!$league) {
+            wp_send_json_error(__('League not found', 'gridirontables-afvd'));
+        }
+
         $importer = new Gridirontables_AFVD_Importer();
-        $result   = $importer->import_league($liga_code);
+        $result   = $importer->import_league($league['liga_code'], $league['saison'] ?? '');
 
         if (is_wp_error($result)) {
             wp_send_json_error($result->get_error_message());
         }
 
+        $result['slug'] = $slug;
         wp_send_json_success($result);
     }
 
@@ -201,17 +237,25 @@ class Gridirontables_AFVD_Admin {
             wp_send_json_error(__('Unauthorized', 'gridirontables-afvd'));
         }
 
-        $liga_code = sanitize_text_field(wp_unslash($_POST['liga_code'] ?? ''));
-        $type      = sanitize_key(wp_unslash($_POST['type'] ?? ''));
+        $slug = sanitize_key(wp_unslash($_POST['slug'] ?? ''));
+        $type = sanitize_key(wp_unslash($_POST['type'] ?? ''));
 
-        if ('' === $liga_code || !in_array($type, ['standings', 'schedule'], true)) {
+        if ('' === $slug || !in_array($type, ['standings', 'schedule'], true)) {
             wp_send_json_error(__('Invalid request', 'gridirontables-afvd'));
         }
 
+        $league = self::get_league_by_slug($slug);
+        if (!$league) {
+            wp_send_json_error(__('League not found', 'gridirontables-afvd'));
+        }
+
+        $liga_code = $league['liga_code'];
+        $saison    = $league['saison'] ?? '';
+
         if ('standings' === $type) {
-            $rows = Gridirontables_AFVD_DB::get_standings($liga_code);
+            $rows = Gridirontables_AFVD_DB::get_standings($liga_code, null, $saison);
         } else {
-            $rows = Gridirontables_AFVD_DB::get_schedule($liga_code, []);
+            $rows = Gridirontables_AFVD_DB::get_schedule($liga_code, ['saison' => $saison]);
         }
 
         wp_send_json_success([
