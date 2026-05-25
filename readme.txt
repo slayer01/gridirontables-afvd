@@ -52,6 +52,13 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 3. Go to **Gridirontables AFVD** in the admin menu to configure leagues
 4. Import data and use shortcodes on your pages
 
+== Screenshots ==
+
+1. Frontend standings table with the configured team highlighted
+2. Frontend game schedule for a configured league
+3. Admin: configure the leagues to import on the Leagues tab
+4. Admin: run imports, view raw data, and look up shortcodes on the Import tab
+
 == Changelog ==
 
 = 3.0.2 =
