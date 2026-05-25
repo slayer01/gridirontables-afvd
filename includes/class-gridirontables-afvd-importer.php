@@ -60,10 +60,11 @@ class Gridirontables_AFVD_Importer {
             );
         }
 
-        $counts = Gridirontables_AFVD_DB::get_counts($liga_code);
+        $counts = Gridirontables_AFVD_DB::get_counts($liga_code, $saison);
 
         return [
             'liga_code'       => $liga_code,
+            'saison'          => $saison,
             'standings_count' => $counts['standings'],
             'schedule_count'  => $counts['schedule'],
             'standings_error' => is_wp_error($standings_result) ? $standings_result->get_error_message() : null,

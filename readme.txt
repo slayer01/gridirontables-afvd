@@ -4,7 +4,7 @@ Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.1.2
+Stable tag: 3.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,10 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 4. Admin: run imports, view raw data, and look up shortcodes on the Import tab
 
 == Changelog ==
+
+= 3.1.3 =
+* Fix: post-import row counts in the Import tab reported the wrong saison's count. `import_league()` called `get_counts($liga_code)` without passing the saison, so importing an archive entry would store the right rows in the DB but display the count from the current saison — making two leagues with the same liga_code look identical even though the underlying data was different. Now the count is scoped to the saison that was just imported.
+* Migration robustness: replaced `SHOW INDEX … WHERE` with a fetch-all-then-filter-in-PHP approach so the saison-in-unique-key migration runs reliably on all MySQL/MariaDB versions; table and key names are now backtick-quoted.
 
 = 3.1.2 =
 * Leagues form: when duplicate slugs or duplicate (liga_code, saison) pairs are submitted, **nothing is saved** and the form re-renders with the user's unsaved input intact plus a red error notice listing the row numbers and what to fix. Previously the duplicate row was silently skipped, which lost the user's typing.

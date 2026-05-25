@@ -173,23 +173,34 @@ class Gridirontables_AFVD_DB {
         ];
 
         foreach ($targets as $table => $spec) {
+            // Fetch all index rows for the table and filter in PHP — SHOW INDEX WHERE
+            // is unreliable across MySQL/MariaDB versions.
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            $index_rows = $wpdb->get_results("SHOW INDEX FROM {$table} WHERE Key_name = '" . esc_sql($spec['key']) . "'");
-            if (empty($index_rows)) {
+            $rows = $wpdb->get_results("SHOW INDEX FROM `{$table}`");
+            if (empty($rows)) {
                 continue;
             }
 
             $cols_in_key = [];
-            foreach ($index_rows as $r) {
-                $cols_in_key[] = $r->Column_name;
+            foreach ($rows as $r) {
+                if (isset($r->Key_name) && $r->Key_name === $spec['key']) {
+                    $cols_in_key[] = $r->Column_name;
+                }
             }
 
-            if (in_array('saison', $cols_in_key, true)) {
+            if (empty($cols_in_key)) {
+                // Key doesn't exist on this table yet — fresh install via dbDelta will add it.
                 continue;
             }
 
+            if (in_array('saison', $cols_in_key, true)) {
+                continue; // Already migrated.
+            }
+
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            $wpdb->query("ALTER TABLE {$table} DROP INDEX {$spec['key']}, ADD UNIQUE KEY {$spec['key']} {$spec['cols']}");
+            $wpdb->query("ALTER TABLE `{$table}` DROP INDEX `{$spec['key']}`");
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $wpdb->query("ALTER TABLE `{$table}` ADD UNIQUE KEY `{$spec['key']}` {$spec['cols']}");
         }
     }
 
