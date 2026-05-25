@@ -4,7 +4,7 @@ Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.0.2
+Stable tag: 3.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,12 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 * `group="A"` — Show only a specific group
 * `highlight="Team Name"` — Override team name for highlighting
 * `class="my-class"` — Add custom CSS class
+* `saison="2026"` — Override the season label shown in the heading
+
+= Standings Attributes =
+
+* `format="wins"` (default) — BSO record layout: W-L (Quotient) / TD / Home-Away
+* `format="points"` — Legacy points layout: P+ / P- / TD+ / TD- (for archive data)
 
 == Installation ==
 
@@ -60,6 +66,14 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 4. Admin: run imports, view raw data, and look up shortcodes on the Import tab
 
 == Changelog ==
+
+= 3.1.0 =
+* New BSO-style standings layout (default): `Rank | Team | Record (W-L (Quotient)) | TD (TD+:TD-) | Home/Away`, matching the official footballverband.de output
+* Legacy `P+ / P- / TD+ / TD-` layout remains available via `format="points"` on the shortcode or per league config (for archive seasons that still use the old points system)
+* New per-league **Saison** field — when set, gets appended to the table heading and passed to the XML API as the `Saison` parameter so archive seasons can be imported
+* Shortcode attributes `format` and `saison` for ad-hoc overrides
+* Importer now captures `Gameswin`, `Gamesloose`, `Gamestied`, `Quotient`, Home/Away splits and overtime scores (`OTHeim` / `OTGast`) — DB schema bumped to 1.4
+* **Important after upgrade:** run a fresh import (Gridirontables AFVD → Import) to populate the new columns; until you do, standings fall back to the legacy `points` layout
 
 = 3.0.2 =
 * Corrected the `Contributors` field in `readme.txt` to the WordPress.org account that owns the plugin (`dsfooboo`)

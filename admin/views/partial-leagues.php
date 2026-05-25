@@ -7,7 +7,7 @@ defined('ABSPATH') || exit;
     <?php wp_nonce_field('gridirontables_afvd_save_leagues', 'gridirontables_afvd_nonce'); ?>
 
     <p class="description">
-        <?php esc_html_e('Configure the leagues to import. The slug is used in shortcodes, e.g. [gridirontables_afvd_standings league="mensteam"]. The Liga Code is the league identifier from the XML API (e.g., "olm", "mu19ol").', 'gridirontables-afvd'); ?>
+        <?php esc_html_e('Configure the leagues to import. The slug is used in shortcodes, e.g. [gridirontables_afvd_standings league="mensteam"]. The Liga Code is the league identifier from the XML API (e.g., "olm", "mu19ol"). Leave Saison empty for the current season; set it (e.g. "2025") to pull archive data via the &Saison API parameter.', 'gridirontables-afvd'); ?>
     </p>
 
     <table class="widefat gridirontables_afvd_leagues_table" id="gridirontables_afvd_leagues_table">
@@ -17,13 +17,17 @@ defined('ABSPATH') || exit;
                 <th><?php esc_html_e('Label', 'gridirontables-afvd'); ?></th>
                 <th><?php esc_html_e('Liga Code', 'gridirontables-afvd'); ?></th>
                 <th><?php esc_html_e('Team Name', 'gridirontables-afvd'); ?></th>
+                <th><?php esc_html_e('Saison', 'gridirontables-afvd'); ?></th>
+                <th><?php esc_html_e('Format', 'gridirontables-afvd'); ?></th>
                 <th><?php esc_html_e('Active', 'gridirontables-afvd'); ?></th>
                 <th></th>
             </tr>
         </thead>
         <tbody id="gridirontables_afvd_leagues_body">
             <?php if (!empty($leagues)) : ?>
-                <?php foreach ($leagues as $i => $league) : ?>
+                <?php foreach ($leagues as $i => $league) :
+                    $row_format = $league['format'] ?? 'wins';
+                ?>
                     <tr class="gridirontables_afvd_league_row">
                         <td>
                             <input type="text" name="league_slug[]"
@@ -46,6 +50,18 @@ defined('ABSPATH') || exit;
                                    value="<?php echo esc_attr($league['team_name'] ?? ''); ?>"
                                    class="regular-text"
                                    placeholder="<?php esc_attr_e('e.g. Wetterau Bulls', 'gridirontables-afvd'); ?>">
+                        </td>
+                        <td>
+                            <input type="text" name="league_saison[]"
+                                   value="<?php echo esc_attr($league['saison'] ?? ''); ?>"
+                                   class="small-text"
+                                   placeholder="<?php esc_attr_e('e.g. 2026', 'gridirontables-afvd'); ?>">
+                        </td>
+                        <td>
+                            <select name="league_format[]">
+                                <option value="wins" <?php selected($row_format, 'wins'); ?>><?php esc_html_e('Wins/Losses (BSO)', 'gridirontables-afvd'); ?></option>
+                                <option value="points" <?php selected($row_format, 'points'); ?>><?php esc_html_e('Points (Legacy)', 'gridirontables-afvd'); ?></option>
+                            </select>
                         </td>
                         <td>
                             <input type="checkbox" name="league_active[<?php echo (int) $i; ?>]"
@@ -77,6 +93,13 @@ defined('ABSPATH') || exit;
         <td><input type="text" name="league_label[]" class="regular-text"></td>
         <td><input type="text" name="league_code[]" class="small-text" required></td>
         <td><input type="text" name="league_team_name[]" class="regular-text" placeholder="<?php esc_attr_e('e.g. Wetterau Bulls', 'gridirontables-afvd'); ?>"></td>
+        <td><input type="text" name="league_saison[]" class="small-text" placeholder="<?php esc_attr_e('e.g. 2026', 'gridirontables-afvd'); ?>"></td>
+        <td>
+            <select name="league_format[]">
+                <option value="wins" selected><?php esc_html_e('Wins/Losses (BSO)', 'gridirontables-afvd'); ?></option>
+                <option value="points"><?php esc_html_e('Points (Legacy)', 'gridirontables-afvd'); ?></option>
+            </select>
+        </td>
         <td><input type="checkbox" name="league_active[{{INDEX}}]" checked></td>
         <td><button type="button" class="button gridirontables_afvd_remove_league"><?php esc_html_e('Remove', 'gridirontables-afvd'); ?></button></td>
     </tr>

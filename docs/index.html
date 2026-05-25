@@ -357,6 +357,8 @@
             <tr><td><code>Label</code></td><td>Herren Oberliga</td><td>Anzeigename im Admin-Bereich.</td></tr>
             <tr><td><code>Liga Code</code></td><td><code>olm</code></td><td>Das Kürzel aus der XML-API. Steht in der URL des Spielplans auf der Verbandsseite.</td></tr>
             <tr><td><code>Team Name</code></td><td>Wetterau Bulls</td><td>Dein Teamname — wird in Tabellen und Spielplänen fett markiert.</td></tr>
+            <tr><td><code>Saison</code></td><td><code>2026</code></td><td>Optional. Leer = aktuelle Saison. Gesetzt = wird an die XML-API als <code>&amp;Saison=</code> übergeben (Archivdaten) und im Heading angezeigt.</td></tr>
+            <tr><td><code>Format</code></td><td>Wins/Losses</td><td>Tabellen-Layout: <strong>Wins/Losses (BSO)</strong> = neue Verbands-Darstellung mit Record + Quotient. <strong>Points (Legacy)</strong> = alte P+/P- Spalten für Archivdaten.</td></tr>
             <tr><td><code>Active</code></td><td>✓</td><td>Nur aktive Ligen werden beim Import berücksichtigt.</td></tr>
         </table>
 
@@ -386,6 +388,8 @@
             <tr><td><code>group</code></td><td><code>"A"</code>, <code>"B"</code>, ...</td><td>Beide</td><td>Nur eine bestimmte Gruppe anzeigen.</td></tr>
             <tr><td><code>highlight</code></td><td>Teamname</td><td>Beide</td><td>Überschreibt den in der Liga konfigurierten Teamnamen.</td></tr>
             <tr><td><code>class</code></td><td>CSS-Klasse</td><td>Beide</td><td>Eigene CSS-Klasse für den Wrapper.</td></tr>
+            <tr><td><code>saison</code></td><td>Jahr, z. B. <code>"2026"</code></td><td>Beide</td><td>Saison-Label im Heading. Standard: aus Liga-Config.</td></tr>
+            <tr><td><code>format</code></td><td><code>"wins"</code>, <code>"points"</code></td><td>Standings</td><td><code>wins</code> (Default): BSO-Layout <em>Record (W-L (Quot)) / TD / Heim-Auswärts</em>. <code>points</code>: alte Punkte-Spalten für Archivdaten.</td></tr>
             <tr><td><code>home_only</code></td><td><code>"1"</code></td><td>Schedule</td><td>Nur Heimspiele des konfigurierten Teams.</td></tr>
             <tr><td><code>show</code></td><td><code>"all"</code>, <code>"upcoming"</code>, <code>"past"</code></td><td>Schedule</td><td>Zeitfilter. Standard: alle Spiele.</td></tr>
             <tr><td><code>limit</code></td><td>Zahl</td><td>Schedule</td><td>Maximale Anzahl Spiele.</td></tr>

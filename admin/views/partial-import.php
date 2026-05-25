@@ -154,6 +154,29 @@ defined('ABSPATH') || exit;
                 <td><?php esc_html_e('CSS class name', 'gridirontables-afvd'); ?></td>
                 <td><?php esc_html_e('Add a custom CSS class to the wrapper element for styling.', 'gridirontables-afvd'); ?></td>
             </tr>
+            <tr>
+                <td><code>saison</code></td>
+                <td><?php esc_html_e('Year, e.g. "2026"', 'gridirontables-afvd'); ?></td>
+                <td><?php esc_html_e('Override the season label shown in the heading. Defaults to the season configured for this league.', 'gridirontables-afvd'); ?></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4><?php esc_html_e('Standings only', 'gridirontables-afvd'); ?></h4>
+    <table class="widefat">
+        <thead>
+            <tr>
+                <th><?php esc_html_e('Attribute', 'gridirontables-afvd'); ?></th>
+                <th><?php esc_html_e('Values', 'gridirontables-afvd'); ?></th>
+                <th><?php esc_html_e('Description', 'gridirontables-afvd'); ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>format</code></td>
+                <td><code>"wins"</code>, <code>"points"</code></td>
+                <td><?php esc_html_e('"wins" (default) shows W-L (Quotient) and Home/Away records per BSO. "points" shows the legacy P+ / P- / TD+ / TD- layout for archive seasons. Overrides the league setting.', 'gridirontables-afvd'); ?></td>
+            </tr>
         </tbody>
     </table>
 

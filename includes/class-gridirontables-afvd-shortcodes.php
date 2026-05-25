@@ -39,6 +39,8 @@ class Gridirontables_AFVD_Shortcodes {
             'group'     => '',
             'highlight' => '',
             'class'     => '',
+            'format'    => '',
+            'saison'    => '',
         ], $atts, 'gridirontables_afvd_standings');
 
         $league_config = Gridirontables_AFVD_Admin::get_league_by_slug($atts['league']);
@@ -52,6 +54,11 @@ class Gridirontables_AFVD_Shortcodes {
 
         $liga_code = $league_config['liga_code'];
         $highlight = $atts['highlight'] ?: ($league_config['team_name'] ?? '');
+        $format    = $atts['format'] ?: ($league_config['format'] ?? 'wins');
+        if (!in_array($format, ['wins', 'points'], true)) {
+            $format = 'wins';
+        }
+        $saison_label = $atts['saison'] !== '' ? $atts['saison'] : ($league_config['saison'] ?? '');
 
         $this->enqueue_styles();
 
@@ -62,8 +69,7 @@ class Gridirontables_AFVD_Shortcodes {
         }
 
         $output = '';
-        $league_name = Gridirontables_AFVD_DB::get_league_name($liga_code);
-        $output .= '<h2>' . esc_html($league_name) . '</h2>';
+        $output .= '<h2>' . esc_html($this->compose_heading($liga_code, $saison_label)) . '</h2>';
 
         $wrapper_class = 'gridirontables_afvd_standings_wrap';
         if ($atts['class']) {
@@ -74,11 +80,11 @@ class Gridirontables_AFVD_Shortcodes {
         if (!empty($groups)) {
             foreach ($groups as $gruppe) {
                 $rows = Gridirontables_AFVD_DB::get_standings($liga_code, $gruppe);
-                $output .= $this->build_standings_table($rows, $highlight, $gruppe);
+                $output .= $this->build_standings_table($rows, $highlight, $gruppe, $format);
             }
         } else {
             $rows = Gridirontables_AFVD_DB::get_standings($liga_code);
-            $output .= $this->build_standings_table($rows, $highlight);
+            $output .= $this->build_standings_table($rows, $highlight, null, $format);
         }
 
         $output .= '</div>';
@@ -96,6 +102,7 @@ class Gridirontables_AFVD_Shortcodes {
             'limit'     => 0,
             'highlight' => '',
             'class'     => '',
+            'saison'    => '',
         ], $atts, 'gridirontables_afvd_schedule');
 
         $league_config = Gridirontables_AFVD_Admin::get_league_by_slug($atts['league']);
@@ -109,6 +116,7 @@ class Gridirontables_AFVD_Shortcodes {
 
         $liga_code = $league_config['liga_code'];
         $highlight = $atts['highlight'] ?: ($league_config['team_name'] ?? '');
+        $saison_label = $atts['saison'] !== '' ? $atts['saison'] : ($league_config['saison'] ?? '');
 
         $this->enqueue_styles();
 
@@ -127,8 +135,7 @@ class Gridirontables_AFVD_Shortcodes {
         ];
 
         $output = '';
-        $league_name = Gridirontables_AFVD_DB::get_league_name($liga_code);
-        $output .= '<h2>' . esc_html($league_name) . '</h2>';
+        $output .= '<h2>' . esc_html($this->compose_heading($liga_code, $saison_label)) . '</h2>';
 
         $wrapper_class = 'gridirontables_afvd_schedule_wrap';
         if ($atts['class']) {
@@ -156,11 +163,96 @@ class Gridirontables_AFVD_Shortcodes {
         return $output;
     }
 
-    private function build_standings_table($rows, $highlight, $gruppe = null) {
+    private function compose_heading($liga_code, $saison) {
+        $league_name = Gridirontables_AFVD_DB::get_league_name($liga_code);
+        $saison = trim((string) $saison);
+        if ('' !== $saison && false === strpos($league_name, $saison)) {
+            $league_name .= ' ' . $saison;
+        }
+        return $league_name;
+    }
+
+    private function build_standings_table($rows, $highlight, $gruppe = null, $format = 'wins') {
         if (empty($rows)) {
             return '<p>' . esc_html__('No standings data available.', 'gridirontables-afvd') . '</p>';
         }
 
+        if ('wins' === $format && $this->rows_have_no_wlt($rows)) {
+            $format = 'points';
+        }
+
+        return 'wins' === $format
+            ? $this->build_standings_wins($rows, $highlight, $gruppe)
+            : $this->build_standings_points($rows, $highlight, $gruppe);
+    }
+
+    private function rows_have_no_wlt($rows) {
+        foreach ($rows as $row) {
+            if ((int) $row['games_win'] > 0 || (int) $row['games_loose'] > 0 || (int) $row['games_tied'] > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function build_standings_wins($rows, $highlight, $gruppe) {
+        $output = '';
+        if ($gruppe) {
+            $output .= '<span class="gridirontables_afvd_group_header">'
+                /* translators: %s: group name/letter */
+                . sprintf(esc_html__('Group %s', 'gridirontables-afvd'), esc_html($gruppe))
+                . '</span>';
+        }
+
+        $has_ties = false;
+        foreach ($rows as $row) {
+            if ((int) $row['games_tied'] > 0 || (int) $row['home_tied'] > 0 || (int) $row['away_tied'] > 0) {
+                $has_ties = true;
+                break;
+            }
+        }
+
+        $output .= '<table class="gridirontables_afvd_league_table">';
+        $output .= '<thead><tr>';
+        $output .= '<th>' . esc_html__('Rank', 'gridirontables-afvd') . '</th>';
+        $output .= '<th>' . esc_html__('Team', 'gridirontables-afvd') . '</th>';
+        $output .= '<th>' . esc_html__('Record', 'gridirontables-afvd') . '</th>';
+        $output .= '<th>' . esc_html__('TD', 'gridirontables-afvd') . '</th>';
+        $output .= '<th class="gridirontables_afvd_nomobile">' . esc_html__('Home/Away', 'gridirontables-afvd') . '</th>';
+        $output .= '</tr></thead>';
+        $output .= '<tbody>';
+
+        foreach ($rows as $i => $row) {
+            $is_highlight = $highlight && false !== stripos($row['team'], $highlight);
+            $row_class = [];
+            if ($i % 2 === 1) {
+                $row_class[] = 'odd';
+            }
+            if ($is_highlight) {
+                $row_class[] = 'gridirontables_afvd_highlight';
+            }
+            $class_attr = !empty($row_class) ? ' class="' . esc_attr(implode(' ', $row_class)) . '"' : '';
+
+            $record  = $this->format_record($row['games_win'], $row['games_loose'], $row['games_tied'], $row['quotient'], $has_ties);
+            $td      = (int) $row['td_plus'] . ':' . (int) $row['td_minus'];
+            $home_ha = $this->format_split($row['home_win'], $row['home_loose'], $row['home_tied'], $has_ties);
+            $away_ha = $this->format_split($row['away_win'], $row['away_loose'], $row['away_tied'], $has_ties);
+
+            $output .= '<tr' . $class_attr . '>';
+            $output .= '<td>' . esc_html($row['platz']) . '</td>';
+            $output .= '<td>' . esc_html($row['team']) . '</td>';
+            $output .= '<td class="gridirontables_afvd_num">' . esc_html($record) . '</td>';
+            $output .= '<td class="gridirontables_afvd_num">' . esc_html($td) . '</td>';
+            $output .= '<td class="gridirontables_afvd_num gridirontables_afvd_nomobile">' . esc_html($home_ha . ' / ' . $away_ha) . '</td>';
+            $output .= '</tr>';
+        }
+
+        $output .= '</tbody></table>';
+
+        return $output;
+    }
+
+    private function build_standings_points($rows, $highlight, $gruppe) {
         $output = '';
         if ($gruppe) {
             $output .= '<span class="gridirontables_afvd_group_header">'
@@ -204,6 +296,22 @@ class Gridirontables_AFVD_Shortcodes {
         $output .= '</tbody></table>';
 
         return $output;
+    }
+
+    private function format_record($w, $l, $t, $quot, $has_ties) {
+        $w = (int) $w;
+        $l = (int) $l;
+        $t = (int) $t;
+        $rec = $has_ties ? "{$w}-{$l}-{$t}" : "{$w}-{$l}";
+        $q   = number_format((float) $quot, 3, ',', '');
+        return $rec . ' (' . $q . ')';
+    }
+
+    private function format_split($w, $l, $t, $has_ties) {
+        $w = (int) $w;
+        $l = (int) $l;
+        $t = (int) $t;
+        return $has_ties ? "{$w}-{$l}-{$t}" : "{$w}-{$l}";
     }
 
     private function build_schedule_table($rows, $highlight, $gruppe = null) {

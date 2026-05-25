@@ -120,6 +120,10 @@ class Gridirontables_AFVD_Admin {
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $team_names = isset($_POST['league_team_name']) ? wp_unslash($_POST['league_team_name']) : [];
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $saisons    = isset($_POST['league_saison']) ? wp_unslash($_POST['league_saison']) : [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $formats    = isset($_POST['league_format']) ? wp_unslash($_POST['league_format']) : [];
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $actives    = isset($_POST['league_active']) ? wp_unslash($_POST['league_active']) : [];
 
         foreach ($slugs as $i => $slug) {
@@ -129,11 +133,18 @@ class Gridirontables_AFVD_Admin {
                 continue;
             }
 
+            $format = sanitize_key($formats[$i] ?? 'wins');
+            if (!in_array($format, ['wins', 'points'], true)) {
+                $format = 'wins';
+            }
+
             $leagues[] = [
                 'slug'      => $slug,
                 'label'     => sanitize_text_field($labels[$i] ?? $slug),
                 'liga_code' => $code,
                 'team_name' => sanitize_text_field($team_names[$i] ?? ''),
+                'saison'    => sanitize_text_field($saisons[$i] ?? ''),
+                'format'    => $format,
                 'active'    => isset($actives[$i]),
             ];
         }

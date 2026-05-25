@@ -18,7 +18,7 @@ class Gridirontables_AFVD_Importer {
                 continue;
             }
 
-            $result = $this->import_league($league['liga_code']);
+            $result = $this->import_league($league['liga_code'], $league['saison'] ?? '');
 
             if (is_wp_error($result)) {
                 $results[$league['liga_code']] = ['error' => $result->get_error_message()];
@@ -32,12 +32,19 @@ class Gridirontables_AFVD_Importer {
         return $results;
     }
 
-    public function import_league($liga_code) {
+    public function import_league($liga_code, $saison = null) {
         $liga_code = sanitize_text_field($liga_code);
+
+        if (null === $saison) {
+            $league = Gridirontables_AFVD_Admin::get_league_by_slug($liga_code);
+            $saison = $league['saison'] ?? '';
+        }
+        $saison = sanitize_text_field((string) $saison);
+
         $now = current_time('mysql');
 
-        $standings_result = $this->import_standings($liga_code, $now);
-        $schedule_result  = $this->import_schedule($liga_code, $now);
+        $standings_result = $this->import_standings($liga_code, $now, $saison);
+        $schedule_result  = $this->import_schedule($liga_code, $now, $saison);
 
         if (is_wp_error($standings_result) && is_wp_error($schedule_result)) {
             return new WP_Error(
@@ -62,8 +69,11 @@ class Gridirontables_AFVD_Importer {
         ];
     }
 
-    private function import_standings($liga_code, $import_time) {
+    private function import_standings($liga_code, $import_time, $saison = '') {
         $url = $this->base_url . '/xmltabelle.php5?Liga=' . urlencode($liga_code);
+        if ('' !== $saison) {
+            $url .= '&Saison=' . urlencode($saison);
+        }
         $xml = $this->fetch_xml($url);
 
         if (is_wp_error($xml)) {
@@ -73,18 +83,28 @@ class Gridirontables_AFVD_Importer {
         $count = 0;
         foreach ($xml->children() as $row) {
             Gridirontables_AFVD_DB::upsert_standing([
-                'liga_code'   => sanitize_text_field((string) $row->Liga),
-                'bezeichnung' => sanitize_text_field((string) $row->Bezeichnung),
-                'gruppe'      => sanitize_text_field((string) $row->Gruppe),
-                'platz'       => (int) $row->Platz,
-                'team'        => sanitize_text_field((string) $row->Team),
-                'teamname'    => sanitize_text_field((string) $row->Teamname),
-                'kuerzel'     => sanitize_text_field((string) $row->Kuerzel),
-                'p_plus'      => (int) $row->PPlus,
-                'p_minus'     => (int) $row->PMinus,
-                'td_plus'     => (int) $row->TDPlus,
-                'td_minus'    => (int) $row->TDMinus,
-                'imported_at' => $import_time,
+                'liga_code'    => sanitize_text_field((string) $row->Liga),
+                'bezeichnung'  => sanitize_text_field((string) $row->Bezeichnung),
+                'gruppe'       => sanitize_text_field((string) $row->Gruppe),
+                'platz'        => (int) $row->Platz,
+                'team'         => sanitize_text_field((string) $row->Team),
+                'teamname'     => sanitize_text_field((string) $row->Teamname),
+                'kuerzel'      => sanitize_text_field((string) $row->Kuerzel),
+                'p_plus'       => (int) $row->PPlus,
+                'p_minus'      => (int) $row->PMinus,
+                'td_plus'      => (int) $row->TDPlus,
+                'td_minus'     => (int) $row->TDMinus,
+                'games_win'    => (int) $row->Gameswin,
+                'games_loose'  => (int) $row->Gamesloose,
+                'games_tied'   => (int) $row->Gamestied,
+                'home_win'     => (int) $row->Homewin,
+                'home_loose'   => (int) $row->Homeloose,
+                'home_tied'    => (int) $row->Hometied,
+                'away_win'     => (int) $row->Awaywin,
+                'away_loose'   => (int) $row->Awayloose,
+                'away_tied'    => (int) $row->Awaytied,
+                'quotient'     => $this->parse_decimal((string) $row->Quotient),
+                'imported_at'  => $import_time,
             ]);
             $count++;
         }
@@ -96,8 +116,11 @@ class Gridirontables_AFVD_Importer {
         return $count;
     }
 
-    private function import_schedule($liga_code, $import_time) {
+    private function import_schedule($liga_code, $import_time, $saison = '') {
         $url = $this->base_url . '/xmlspielplan.php5?Liga=' . urlencode($liga_code);
+        if ('' !== $saison) {
+            $url .= '&Saison=' . urlencode($saison);
+        }
         $xml = $this->fetch_xml($url);
 
         if (is_wp_error($xml)) {
@@ -133,6 +156,8 @@ class Gridirontables_AFVD_Importer {
                 'q3_gast'      => (int) $row->Q3Gast,
                 'q4_heim'      => (int) $row->Q4Heim,
                 'q4_gast'      => (int) $row->Q4Gast,
+                'ot_heim'      => (int) $row->OTHeim,
+                'ot_gast'      => (int) $row->OTGast,
                 'stadion'      => sanitize_text_field((string) $row->Stadion),
                 'kommentar'    => sanitize_text_field((string) $row->Kommentar),
                 'imported_at'  => $import_time,
@@ -145,6 +170,14 @@ class Gridirontables_AFVD_Importer {
         }
 
         return $count;
+    }
+
+    private function parse_decimal($value) {
+        $value = trim($value);
+        if ('' === $value) {
+            return 0.0;
+        }
+        return (float) str_replace(',', '.', $value);
     }
 
     private function fetch_xml($url) {

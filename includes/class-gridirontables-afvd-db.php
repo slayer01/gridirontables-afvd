@@ -89,6 +89,16 @@ class Gridirontables_AFVD_DB {
             p_minus int NOT NULL DEFAULT 0,
             td_plus int NOT NULL DEFAULT 0,
             td_minus int NOT NULL DEFAULT 0,
+            games_win int NOT NULL DEFAULT 0,
+            games_loose int NOT NULL DEFAULT 0,
+            games_tied int NOT NULL DEFAULT 0,
+            home_win int NOT NULL DEFAULT 0,
+            home_loose int NOT NULL DEFAULT 0,
+            home_tied int NOT NULL DEFAULT 0,
+            away_win int NOT NULL DEFAULT 0,
+            away_loose int NOT NULL DEFAULT 0,
+            away_tied int NOT NULL DEFAULT 0,
+            quotient decimal(6,4) NOT NULL DEFAULT 0.0000,
             imported_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
             UNIQUE KEY standing_unique (liga_code, gruppe, kuerzel),
@@ -120,6 +130,8 @@ class Gridirontables_AFVD_DB {
             q3_gast int NOT NULL DEFAULT 0,
             q4_heim int NOT NULL DEFAULT 0,
             q4_gast int NOT NULL DEFAULT 0,
+            ot_heim int NOT NULL DEFAULT 0,
+            ot_gast int NOT NULL DEFAULT 0,
             stadion varchar(255) NOT NULL DEFAULT '',
             kommentar text,
             imported_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -144,8 +156,13 @@ class Gridirontables_AFVD_DB {
             // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             "INSERT INTO {$table}
                 (liga_code, bezeichnung, gruppe, platz, team, teamname, kuerzel,
-                 p_plus, p_minus, td_plus, td_minus, imported_at)
-            VALUES (%s, %s, %s, %d, %s, %s, %s, %d, %d, %d, %d, %s)
+                 p_plus, p_minus, td_plus, td_minus,
+                 games_win, games_loose, games_tied,
+                 home_win, home_loose, home_tied,
+                 away_win, away_loose, away_tied,
+                 quotient, imported_at)
+            VALUES (%s, %s, %s, %d, %s, %s, %s, %d, %d, %d, %d,
+                    %d, %d, %d, %d, %d, %d, %d, %d, %d, %f, %s)
             ON DUPLICATE KEY UPDATE
                 bezeichnung = VALUES(bezeichnung),
                 platz = VALUES(platz),
@@ -155,6 +172,16 @@ class Gridirontables_AFVD_DB {
                 p_minus = VALUES(p_minus),
                 td_plus = VALUES(td_plus),
                 td_minus = VALUES(td_minus),
+                games_win = VALUES(games_win),
+                games_loose = VALUES(games_loose),
+                games_tied = VALUES(games_tied),
+                home_win = VALUES(home_win),
+                home_loose = VALUES(home_loose),
+                home_tied = VALUES(home_tied),
+                away_win = VALUES(away_win),
+                away_loose = VALUES(away_loose),
+                away_tied = VALUES(away_tied),
+                quotient = VALUES(quotient),
                 imported_at = VALUES(imported_at)",
             $data['liga_code'],
             $data['bezeichnung'],
@@ -167,6 +194,16 @@ class Gridirontables_AFVD_DB {
             $data['p_minus'],
             $data['td_plus'],
             $data['td_minus'],
+            $data['games_win'],
+            $data['games_loose'],
+            $data['games_tied'],
+            $data['home_win'],
+            $data['home_loose'],
+            $data['home_tied'],
+            $data['away_win'],
+            $data['away_loose'],
+            $data['away_tied'],
+            $data['quotient'],
             $data['imported_at']
         ));
     }
@@ -182,9 +219,10 @@ class Gridirontables_AFVD_DB {
                 (game_id, liga_code, bezeichnung, gruppe, datum1, datum2, kickoff,
                  heim, heimname, heimkuerzel, gast, gastname, gastkuerzel,
                  td_heim, td_gast, q1_heim, q1_gast, q2_heim, q2_gast,
-                 q3_heim, q3_gast, q4_heim, q4_gast, stadion, kommentar, imported_at)
+                 q3_heim, q3_gast, q4_heim, q4_gast, ot_heim, ot_gast,
+                 stadion, kommentar, imported_at)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                    %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %s)
+                    %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 bezeichnung = VALUES(bezeichnung),
                 gruppe = VALUES(gruppe),
@@ -207,6 +245,8 @@ class Gridirontables_AFVD_DB {
                 q3_gast = VALUES(q3_gast),
                 q4_heim = VALUES(q4_heim),
                 q4_gast = VALUES(q4_gast),
+                ot_heim = VALUES(ot_heim),
+                ot_gast = VALUES(ot_gast),
                 stadion = VALUES(stadion),
                 kommentar = VALUES(kommentar),
                 imported_at = VALUES(imported_at)",
@@ -233,6 +273,8 @@ class Gridirontables_AFVD_DB {
             $data['q3_gast'],
             $data['q4_heim'],
             $data['q4_gast'],
+            $data['ot_heim'],
+            $data['ot_gast'],
             $data['stadion'],
             $data['kommentar'],
             $data['imported_at']
