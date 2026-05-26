@@ -5,7 +5,7 @@ Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 3.1.3
+Stable tag: 3.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -71,6 +71,9 @@ If this plugin saves you time, consider buying me a coffee: https://buymeacoffee
 4. Admin: run imports, view raw data, and look up shortcodes on the Import tab
 
 == Changelog ==
+
+= 3.1.4 =
+* Added a Buy Me a Coffee link to the plugin's Info tab, the WordPress.org Donate field, the GitHub README, and the GitHub Pages landing page. No functional changes.
 
 = 3.1.3 =
 * Fix: post-import row counts in the Import tab reported the wrong saison's count. `import_league()` called `get_counts($liga_code)` without passing the saison, so importing an archive entry would store the right rows in the DB but display the count from the current saison — making two leagues with the same liga_code look identical even though the underlying data was different. Now the count is scoped to the saison that was just imported.
