@@ -83,6 +83,12 @@ table.gridirontables_afvd_league_table th {
 }
 ```
 
+## Support
+
+Wenn dir das Plugin hilft, kannst du die Entwicklung mit einem Kaffee unterstützen:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-dscr-FFDD00?logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/dscr)
+
 ## Lizenz
 
 GPL v2 or later

@@ -1,5 +1,6 @@
 === Gridirontables AFVD – League tables & schedules - data provided by AFVD ===
 Contributors: dsfooboo
+Donate link: https://buymeacoffee.com/dscr
 Tags: american football, standings, schedule, sports, germany
 Requires at least: 5.9
 Tested up to: 6.9
@@ -50,6 +51,10 @@ This plugin is an independent project and is not affiliated with, endorsed by, o
 
 * `format="wins"` (default) — BSO record layout: W-L (Quotient) / TD / Home-Away
 * `format="points"` — Legacy points layout: P+ / P- / TD+ / TD- (for archive data)
+
+== Support development ==
+
+If this plugin saves you time, consider buying me a coffee: https://buymeacoffee.com/dscr
 
 == Installation ==
 

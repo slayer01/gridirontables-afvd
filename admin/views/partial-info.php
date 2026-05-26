@@ -46,6 +46,15 @@ defined('ABSPATH') || exit;
             <th scope="row"><?php esc_html_e('License', 'gridirontables-afvd'); ?></th>
             <td>GPL v2 or later</td>
         </tr>
+        <tr>
+            <th scope="row"><?php esc_html_e('Support development', 'gridirontables-afvd'); ?></th>
+            <td>
+                <a href="https://buymeacoffee.com/dscr" target="_blank" rel="noopener">
+                    <?php esc_html_e('☕ Buy me a coffee', 'gridirontables-afvd'); ?>
+                </a>
+                <p class="description"><?php esc_html_e('If this plugin saves you time, a small tip keeps it maintained.', 'gridirontables-afvd'); ?></p>
+            </td>
+        </tr>
     </table>
 
 </div>
